@@ -1,0 +1,43 @@
+name: Test webapplication and scan with SonarQube
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - "front-end/**"
+      - "github/workflows/front-end-sonarQube-scan.yml"
+
+defaults:
+  run:
+    working-directory: "./front-end"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.X]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js v${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests and collect coverage
+        run: |
+          npm run test:unit
+          npm run test:e2e
+
+      - name: Run SonarQube scanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner -D"sonar.projectKey=module-3-front-end" -D"sonar.sources=." -D"sonar.host.url=https://sonar.cloud-native-minor.it" -D"sonar.login=${SONAR_TOKEN}" -D"sonar.javascript.lcov.reportPaths=coverage/lcov.info"

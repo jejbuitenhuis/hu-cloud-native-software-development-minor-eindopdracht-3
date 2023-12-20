@@ -1,0 +1,49 @@
+name: Test user bounded context and scan with sonarQube
+
+on:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "user/**"
+      - ".github/workflows/user-sonarQube-scan.yml"
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: "./user"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set Locale
+        run: echo "export LC_ALL=C.UTF-8" >> $GITHUB_ENV
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: "pip"
+
+      - name: Set up SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Build the serverless application
+        run: sam build
+
+      - name: Test the serverless application
+        run: |
+          pip3 install -r tests/test-requirements.txt
+          coverage run --source=. -m pytest tests -rap --junitxml target/testreport-coverage.xml
+          coverage xml -o target/<coverave-report-xml>
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+          projectBaseDir: "./card"
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

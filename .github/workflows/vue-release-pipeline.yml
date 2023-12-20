@@ -1,0 +1,45 @@
+name: Upload webapplication
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+defaults:
+  run:
+    working-directory: "./front-end"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.X]
+    steps:
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Install packages
+        run: |
+          npm install
+
+      - name: Production build
+        run: |
+          unset CI
+          npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Upload to S3
+        run: aws s3 sync build <<bucket-to-be-made>>
