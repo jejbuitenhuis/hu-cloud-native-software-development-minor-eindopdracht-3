@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: common-service
+
+Parameters:
+  Stage:
+    Type: String
+    Default: staging
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Handler: app.lambda_handler
+    Runtime: python3.9
+    Architectures:
+      - x86_64
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+
+Resources:
+  MTGApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: MTGApiGateway
+      StageName: !Ref Stage
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO
+          MetricsEnabled: true
+      AccessLogSetting:
+        DestinationArn: !GetAtt MTGApiGatewayAccessLogGroup.Arn
+        Format: '{"requestTime":"$context.requestTime","requestId":"$context.requestId","httpMethod":"$context.httpMethod","path":"$context.path","routeKey":"$context.routeKey","status":$context.status,"responseLatency":$context.responseLatency}'
+
+  MTGApiGatewayAccessLogGroup:
+    Type: AWS::Logs::LogGroup
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref MTGApiGateway
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/hello_world/
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+            RestApiId: !Ref MTGApiGateway
+
+Outputs:
+  MTGApiGateway:
+    Description: "MTG API Gateway"
+    Value: !Ref MTGApiGateway
+    Export:
+      Name: !Sub "${AWS::StackName}-MTGApiGateway"
+  MTGApiGatewayDomainName:
+    Description: "MTG API Gateway Domain Name"
+    Value: !Join [ '', [ !Ref MTGApiGateway, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com' ] ]
+    Export:
+      Name: !Sub "${AWS::StackName}-MTGApiGatewayDomainName"
