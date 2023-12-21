@@ -3,7 +3,27 @@
 </template>
 
 <script setup lang="ts">
+import { onBeforeMount, onBeforeUnmount } from "vue";
 import { RouterView } from "vue-router";
+
+const HTML_ELEMENT_CLASS_LIST = document.documentElement.classList;
+
+function toggleDarkMode(enabled: boolean): void {
+	if (enabled) {
+		HTML_ELEMENT_CLASS_LIST.add("sl-theme-dark")
+		HTML_ELEMENT_CLASS_LIST.remove("sl-theme-light")
+	} else {
+		HTML_ELEMENT_CLASS_LIST.add("sl-theme-light")
+		HTML_ELEMENT_CLASS_LIST.remove("sl-theme-dark")
+	}
+}
+
+onBeforeMount(() => {
+	const preferDarkMode = window.matchMedia("(prefers-color-scheme: dark)")
+		.matches;
+
+	toggleDarkMode(preferDarkMode);
+});
 </script>
 
 <style lang="scss">
