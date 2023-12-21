@@ -21,38 +21,95 @@ Globals:
 
 Resources:
   MTGApiGateway:
-    Type: AWS::Serverless::Api
+    Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: MTGApiGateway
-      StageName: !Ref Stage
-      MethodSettings:
-        - ResourcePath: '/*'
-          HttpMethod: '*'
-          LoggingLevel: INFO
-          MetricsEnabled: true
-      AccessLogSetting:
-        DestinationArn: !GetAtt MTGApiGatewayAccessLogGroup.Arn
-        Format: '{"requestTime":"$context.requestTime","requestId":"$context.requestId","httpMethod":"$context.httpMethod","path":"$context.path","routeKey":"$context.routeKey","status":$context.status,"responseLatency":$context.responseLatency}'
+      Description: An API Gateway for MTG
+      ProtocolType: HTTP
 
-  MTGApiGatewayAccessLogGroup:
-    Type: AWS::Logs::LogGroup
-
-  ApiDeployment:
-    Type: AWS::ApiGateway::Deployment
+  ApiGatewayDeployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn: HelloWorldIntegration
     Properties:
-      RestApiId: !Ref MTGApiGateway
+      Description: Lambda API Deployment
+      ApiId: !Ref MTGApiGateway
+
+  ApiGatewayStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      DeploymentId: !Ref ApiGatewayDeployment
+      Description: Lambda API Stage
+      ApiId: !Ref MTGApiGateway
+      StageName: !Ref Stage
+
+  ApiGatewayIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ""
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "apigateway.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: LambdaAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "lambda:*"
+                Resource: !GetAtt HelloWorldFunction.Arn
+
+  HelloWorldIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MTGApiGateway
+      Description: Test Integration
+      ConnectionType: INTERNET
+      CredentialsArn: !GetAtt ApiGatewayIamRole.Arn
+      PassthroughBehavior: WHEN_NO_MATCH
+      TimeoutInMillis: 29000
+      IntegrationMethod: POST
+      IntegrationType: AWS_PROXY
+      PayloadFormatVersion: "2.0"
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HelloWorldFunction.Arn}/invocations"
+
+  HelloWorldRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - HelloWorldFunction
+    Properties:
+      ApiId: !Ref MTGApiGateway
+      RouteKey: GET /hello
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref HelloWorldIntegration
 
   HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/hello_world/
-      Events:
-        HelloWorld:
-          Type: Api
-          Properties:
-            Path: /hello
-            Method: get
-            RestApiId: !Ref MTGApiGateway
+      Role: !GetAtt HelloWorldFunctionIamRole.Arn
+
+  HelloWorldFunctionIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
 
 Outputs:
   MTGApiGateway:
