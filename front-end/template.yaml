@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  cnsdm-eindopdracht-3
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+Parameters:
+  Stage:
+    Type: String
+
+Resources:
+  FrontEndS3Bucket: # {{{
+    Type: AWS::S3::Bucket
+  # }}}
+
+  FrontEndS3BucketParameter: # {{{
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/frontEnd/bucketName
+      Type: String
+      Value: !Ref FrontEndS3Bucket
+    # }}}
+
+Outputs:
+  FrontEndS3BucketDomainName:
+    Description: Front-end S3 bucket domain name
+    Value: !GetAtt FrontEndS3Bucket.DomainName
+    Export:
+      Name: !Sub ${AWS::StackName}-FrontEndS3BucketDomainName
