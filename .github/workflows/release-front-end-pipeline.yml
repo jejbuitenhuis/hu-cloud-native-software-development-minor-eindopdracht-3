@@ -1,13 +1,21 @@
-name: Upload webapplication
+name: Deploy webapplication to ${environment}
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      s3-bucket-name:
+        required: true
+        type: string
+
 defaults:
   run:
-    working-directory: "./front-end"
+    working-directory: ${{ github.event.inputs.path }}
 
 jobs:
   build:
@@ -41,4 +49,4 @@ jobs:
           aws-region: us-east-1
 
       - name: Upload to S3
-        run: aws s3 sync dist/ <<bucket-to-be-made>>
+        run: aws s3 sync dist/ ${{ github.event.inputs.s3-bucket-name }}

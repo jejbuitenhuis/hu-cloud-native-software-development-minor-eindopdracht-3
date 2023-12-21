@@ -18,8 +18,19 @@ jobs:
       sonarQube-token: ${{ secrets.SONAR_TOKEN_CARD_SERVICE }}
       coverage-file: 'coverage-card.xml'
 
-  deploy-card-service-to-staging:
-    uses: .github/workflows/release-pipeline.yml
+  deploy-card-service-staging:
+    if: success() && github.ref == 'refs/heads/staging'
+    needs: run-sonarQube-scan-on-card-service
+    uses: .github/workflows/release-back-end-pipeline.yml
     with:
       path: '/card/**'
-      environment: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
+      service-name: 'card-service'
+      environment: 'staging'
+
+  deploy-card-service-master:
+    if: github.ref == 'refs/heads/master'
+    uses: .github/workflows/release-back-end-pipeline.yml
+    with:
+      path: '/card/**'
+      service-name: 'card-service'
+      environment: 'production'

@@ -1,17 +1,18 @@
 name: Test webapplication and scan with SonarQube
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - "front-end/**"
-      - "github/workflows/front-end-sonarQube-scan.yml"
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+      sonarQube-token:
+        required: true
+        type: string
 
 defaults:
   run:
-    working-directory: "./front-end"
+    working-directory: ${{ github.event.inputs.path }}
 
 jobs:
   build:
@@ -36,8 +37,10 @@ jobs:
           npm run test:unit
           npm run test:e2e
 
-      - name: Run SonarQube scanner
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+          projectBaseDir: ${{ github.event.inputs.path }}
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          sonar-scanner -D"sonar.projectKey=module-3-front-end" -D"sonar.sources=." -D"sonar.host.url=https://sonar.cloud-native-minor.it" -D"sonar.login=${SONAR_TOKEN}" -D"sonar.javascript.lcov.reportPaths=coverage/lcov.info"
+          SONAR_TOKEN: ${{ github.event.inputs.sonarQube-token }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
