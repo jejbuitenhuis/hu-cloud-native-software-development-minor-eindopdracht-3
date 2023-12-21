@@ -1,30 +1,20 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+	<RouterView />
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script setup lang="ts">
+import { RouterView } from "vue-router";
+</script>
 
-nav {
-  padding: 30px;
+<style scoped lang="scss">
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+html,
+body {
+	margin: 0;
+	padding: 0;
+	font-size: 16px;
+	line-height: 1.6;
+	font-family: "Inter", sans-serif;
 }
 </style>
