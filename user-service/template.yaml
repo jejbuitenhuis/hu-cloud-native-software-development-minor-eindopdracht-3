@@ -40,7 +40,93 @@ Resources:
             Statement:
               - Effect: "Allow"
                 Action: "lambda:*"
-                Resource: !GetAtt HelloWorld2Function.Arn
+                Resource: 
+                  - !GetAtt HelloWorld2Function.Arn
+                  - !GetAtt RegisterUserFunction.Arn
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MTGUserPool
+      EmailVerificationSubject: Please verify your email address
+      EmailVerificationMessage: "Hello {username},\n\nPlease click the following link to verify your email: {link}"
+      Policies:
+        - PasswordPolicy:
+            MinimumLength: 8
+            RequireUppercase: true
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: true
+        - PolicyName: RegisterFunctionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:AdminCreateUser
+                Resource: "*"
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: MTGUserPoolClient
+
+  RegisterUserIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref MTGApiGatewayId
+      Description: Register User Integration
+      ConnectionType: INTERNET
+      CredentialsArn: !GetAtt ApiGatewayIamRole.Arn
+      PassthroughBehavior: WHEN_NO_MATCH
+      TimeoutInMillis: 29000
+      IntegrationMethod: POST
+      IntegrationType: AWS_PROXY
+      PayloadFormatVersion: "2.0"
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RegisterUserFunction.Arn}/invocations"
+
+  RegisterUserRoute:
+    Type: AWS::ApiGatewayV2::Route
+    DependsOn:
+      - RegisterUserFunction
+    Properties:
+      ApiId: !Ref MTGApiGatewayId
+      RouteKey: POST /users/new
+      Target: !Join
+        - /
+        - - integrations
+          - !Ref RegisterUserIntegration
+
+  RegisterUserFunctionIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+
+  RegisterUserFunction:
+    Type: AWS::Serverless::Function
+    DependsOn:
+        - UserPoolClient
+    Properties:
+      FunctionName: RegisterUserFunction
+      CodeUri: functions/register_user/
+      Role: !GetAtt RegisterUserFunctionIamRole.Arn
+      Environment:
+        Variables:
+          USER_POOL_CLIENT_ID: !Ref UserPoolClient
 
   HelloWorld2Integration:
     Type: AWS::ApiGatewayV2::Integration
@@ -89,6 +175,9 @@ Resources:
       Role: !GetAtt HelloWorld2FunctionIamRole.Arn
 
 Outputs:
+  UserPoolClientId:
+    Description: UserPool Client Id
+    Value: !Ref UserPoolClient
   HelloWorld2Function:
     Description: Hello World Lambda Function ARN
     Value: !GetAtt HelloWorld2Function.Arn
