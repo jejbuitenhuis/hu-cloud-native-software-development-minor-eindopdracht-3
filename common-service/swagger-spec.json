@@ -1,0 +1,33 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "MTGAPI",
+    "version": "1.0"
+  },
+  "paths": {
+    "/mock": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Mock response",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "mock",
+          "response": {
+            "statusCode": 200,
+            "responseParameters": {
+              "method.response.header.Content-Type": "'text/plain'"
+            },
+            "responseTemplates": {
+              "application/json": "{\"message\": \"This is a mock response\"}"
+            }
+          }
+        }
+      }
+    }
+  }
+}
