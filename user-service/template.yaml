@@ -50,7 +50,7 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
-  # Template code for tables
+  # Template code for db tables
 
   # MTGUserDynamoDBTable:
   #   Type: AWS::DynamoDB::Table
@@ -85,6 +85,8 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: MTGUserPool
+      UsernameAttributes:
+        - email
       AutoVerifiedAttributes:
         - email
       VerificationMessageTemplate:
@@ -98,8 +100,9 @@ Resources:
             RequireSymbols: true
       Schema:
         - Name: email
-          Required: true
-          Mutable: true
+          AttributeDataType: String
+        - Name: username
+          AttributeDataType: String
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
@@ -113,36 +116,35 @@ Resources:
       UserPoolId: !Ref UserPool
   #     ClientName: MTGUserPoolClient
 
-  # RegisterUserFunctionIamRole:
-  #   Type: AWS::IAM::Role
-  #   Properties:
-  #     AssumeRolePolicyDocument:
-  #       Version: "2012-10-17"
-  #       Statement:
-  #         - Effect: "Allow"
-  #           Principal:
-  #             Service:
-  #               - "lambda.amazonaws.com"
-  #           Action:
-  #             - "sts:AssumeRole"
-  #     Path: "/"
-  #     Policies:
-  #       - PolicyName: RegisterUserFunctionPolicy
-  #         PolicyDocument:
-  #           Version: "2012-10-17"
-  #           Statement:
-  #             - Effect: "Allow"
-  #               Action:
-  #                 - "cognito-idp:AdminCreateUser"
-  #               Resource: "*"
-  #             - Effect: "Allow"
-  #               Action:
-  #                 - "cognito-idp:AdminInitiateAuth"
-  #               Resource: "*"
+  RegisterUserFunctionIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: RegisterUserFunctionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "cognito-idp:AdminCreateUser"
+                  - "cognito-idp:AdminInitiateAuth"
+                  - "cognito-idp:AdminGetUser"
+                Resource: "*"
 
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Role: !GetAtt RegisterUserFunctionIamRole.Arn
       CodeUri: functions/register_user/
       Events:
         RegisterUser:
@@ -154,11 +156,15 @@ Resources:
       Environment:
         Variables:
           USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          USER_POOL_ID: !Ref UserPool
 
 Outputs:
   UserPoolClientId:
     Description: UserPool Client Id
     Value: !Ref UserPoolClient
+  UserPoolId:
+    Description: UserPool Id
+    Value: !Ref UserPool
   RegisterUserFunction:
     Description: Function
     Value: !GetAtt RegisterUserFunction.Arn
