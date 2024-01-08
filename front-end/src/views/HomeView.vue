@@ -1,11 +1,13 @@
 <template>
 	<Title />
 
-	<sl-input maxlength="255" label="Test value" v-model="test" />
+	<sl-input maxlength="255" label="Test value" v-model="test" data-test-id="input" />
 
 	<sl-button @click="click()">Mooie knop</sl-button>
 
-	<p><strong>Output:</strong> {{ test }}</p>
+	<p data-test-id="something"><strong>Output:</strong> {{ test }}</p>
+
+	<p>Hi!</p>
 </template>
 
 <script setup lang="ts">
