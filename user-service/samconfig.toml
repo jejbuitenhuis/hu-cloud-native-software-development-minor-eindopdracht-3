@@ -21,14 +21,6 @@ resolve_s3 = true
 s3_prefix = "sam-user-development"
 region = "us-east-1"
 
-[staging.deploy.parameters]
-capabilities = "CAPABILITY_IAM"
-confirm_changeset = false
-disable_rollback = false
-resolve_s3 = true
-s3_prefix = "sam-user-staging"
-region = "us-east-1"
-
 [default.package.parameters]
 resolve_s3 = true
 
@@ -40,3 +32,21 @@ warm_containers = "EAGER"
 
 [default.local_start_lambda.parameters]
 warm_containers = "EAGER"
+
+[staging.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+disable_rollback = false
+resolve_s3 = true
+s3_prefix = "sam-user-staging"
+region = "us-east-1"
+parameter_overrides = "Stage=\"staging\""
+
+[production.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+disable_rollback = false
+resolve_s3 = true
+s3_prefix = "sam-user-staging"
+region = "us-east-1"
+parameter_overrides = "Stage=\"production\""
