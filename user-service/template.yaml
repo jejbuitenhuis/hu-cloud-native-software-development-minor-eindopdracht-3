@@ -31,7 +31,8 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: !Sub "${Stage}-mtg-user-api"
-      StageName: Prod
+      StageName: !Ref Stage
+      OpenApiVersion: '2.0'
       DefinitionBody:
         Fn::Transform:
           Name: AWS::Include
