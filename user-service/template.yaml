@@ -12,86 +12,73 @@ Globals:
     Architectures:
       - x86_64
     Tracing: Active
+    Environment:
+      Variables:
+        EVENT_BUS_ARN:
+          Fn::ImportValue:
+            !Sub "${CommonStack}-MTGEventBus"
 
 Parameters:
-  MTGApiGatewayId:
+  Stage:
     Type: String
-    Default: '7sscdg19c6'
+    Default: staging
+  CommonStack:
+    Type: String
+    Default: common-service
 
 Resources:
-  ApiGatewayIamRole:
-    Type: AWS::IAM::Role
+  MTGUserApi:
+    Type: AWS::Serverless::Api
     Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Sid: ""
-            Effect: "Allow"
-            Principal:
-              Service:
-                - "apigateway.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        - PolicyName: LambdaAccess
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action: "lambda:*"
-                Resource: !GetAtt HelloWorld2Function.Arn
+      Name: !Sub "${Stage}-mtg-user-api"
+      StageName: Prod
+#      DefinitionBody:
+#        Fn::Transform:
+#          Name: AWS::Include
+#          Parameters:
+#            Location: ./swagger-spec.json
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO
+          MetricsEnabled: true
+      AccessLogSetting:
+        DestinationArn: !GetAtt AccessLogGroup.Arn
+        Format: '{"requestTime":"$context.requestTime","requestId":"$context.requestId","httpMethod":"$context.httpMethod","path":"$context.path","routeKey":"$context.routeKey","status":$context.status,"responseLatency":$context.responseLatency}'
 
-  HelloWorld2Integration:
-    Type: AWS::ApiGatewayV2::Integration
-    Properties:
-      ApiId: !Ref MTGApiGatewayId
-      Description: Test Integration
-      ConnectionType: INTERNET
-      CredentialsArn: !GetAtt ApiGatewayIamRole.Arn
-      PassthroughBehavior: WHEN_NO_MATCH
-      TimeoutInMillis: 29000
-      IntegrationMethod: POST
-      IntegrationType: AWS_PROXY
-      PayloadFormatVersion: "2.0"
-      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HelloWorld2Function.Arn}/invocations"
+  AccessLogGroup:
+    Type: AWS::Logs::LogGroup
 
-  HelloWorld2Route:
-    Type: AWS::ApiGatewayV2::Route
-    DependsOn:
-      - HelloWorld2Function
+  MTGUserDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
     Properties:
-      ApiId: !Ref MTGApiGatewayId
-      RouteKey: GET /hello2
-      Target: !Join
-        - /
-        - - integrations
-          - !Ref HelloWorld2Integration
+      TableName: !Sub "${Stage}-mtg-user-db"
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
 
-  HelloWorld2FunctionIamRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - "lambda.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
-  
-  HelloWorld2Function:
+  HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/hello_world/
-      Role: !GetAtt HelloWorld2FunctionIamRole.Arn
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGUserApi"
+            Path: /hello-world
+            Method: get
 
 Outputs:
-  HelloWorld2Function:
-    Description: Hello World Lambda Function ARN
-    Value: !GetAtt HelloWorld2Function.Arn
-  HelloWorld2FunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt HelloWorld2FunctionIamRole.Arn
+  MTGUserApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"

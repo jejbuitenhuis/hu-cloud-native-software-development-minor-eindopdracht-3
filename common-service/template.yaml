@@ -2,11 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: common-service
 
-Parameters:
-  Stage:
-    Type: String
-    Default: staging
-
 Globals:
   Function:
     Timeout: 3
@@ -19,106 +14,33 @@ Globals:
   Api:
     TracingEnabled: true
 
+Parameters:
+  Stage:
+    Type: String
+    Default: staging
+
 Resources:
-  MTGApiGateway:
-    Type: AWS::ApiGatewayV2::Api
+  MTGEventBus:
+    Type: AWS::Events::EventBus
     Properties:
-      Name: MTGApiGateway
-      Description: An API Gateway for MTG
-      ProtocolType: HTTP
+      Name: !Sub "${Stage}-mtg-event-bus"
 
-  ApiGatewayDeployment:
-    Type: AWS::ApiGatewayV2::Deployment
-    DependsOn: HelloWorldIntegration
+  EventBusPolicy:
+    Type: AWS::Events::EventBusPolicy
     Properties:
-      Description: Lambda API Deployment
-      ApiId: !Ref MTGApiGateway
-
-  ApiGatewayStage:
-    Type: AWS::ApiGatewayV2::Stage
-    Properties:
-      DeploymentId: !Ref ApiGatewayDeployment
-      Description: Lambda API Stage
-      ApiId: !Ref MTGApiGateway
-      StageName: !Ref Stage
-
-  ApiGatewayIamRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Sid: ""
-            Effect: "Allow"
-            Principal:
-              Service:
-                - "apigateway.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        - PolicyName: LambdaAccess
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action: "lambda:*"
-                Resource: !GetAtt HelloWorldFunction.Arn
-
-  HelloWorldIntegration:
-    Type: AWS::ApiGatewayV2::Integration
-    Properties:
-      ApiId: !Ref MTGApiGateway
-      Description: Test Integration
-      ConnectionType: INTERNET
-      CredentialsArn: !GetAtt ApiGatewayIamRole.Arn
-      PassthroughBehavior: WHEN_NO_MATCH
-      TimeoutInMillis: 29000
-      IntegrationMethod: POST
-      IntegrationType: AWS_PROXY
-      PayloadFormatVersion: "2.0"
-      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${HelloWorldFunction.Arn}/invocations"
-
-  HelloWorldRoute:
-    Type: AWS::ApiGatewayV2::Route
-    DependsOn:
-      - HelloWorldFunction
-    Properties:
-      ApiId: !Ref MTGApiGateway
-      RouteKey: GET /hello
-      Target: !Join
-        - /
-        - - integrations
-          - !Ref HelloWorldIntegration
-
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: functions/hello_world/
-      Role: !GetAtt HelloWorldFunctionIamRole.Arn
-
-  HelloWorldFunctionIamRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - "lambda.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
+      EventBusName:
+        Ref: "MTGEventBus"
+      StatementId: "AllowToPutEvents"
+      Statement:
+        Effect: "Allow"
+        Principal: "*"
+        Action: "events:PutEvents"
+        Resource: !GetAtt "MTGEventBus.Arn"
 
 Outputs:
-  MTGApiGateway:
-    Description: "MTG API Gateway"
-    Value: !Ref MTGApiGateway
+  MTGEventBus:
+    Description: "Event bus"
+    Value: !Ref MTGEventBus
     Export:
-      Name: !Sub "${AWS::StackName}-MTGApiGateway"
-  MTGApiGatewayDomainName:
-    Description: "MTG API Gateway Domain Name"
-    Value: !Join [ '', [ !Ref MTGApiGateway, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com' ] ]
-    Export:
-      Name: !Sub "${AWS::StackName}-MTGApiGatewayDomainName"
+      Name:
+        'Fn::Sub': '${AWS::StackName}-MTGEventBus'
