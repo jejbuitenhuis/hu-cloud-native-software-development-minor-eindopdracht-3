@@ -2,10 +2,6 @@
 # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-config.html
 version = 0.1
 
-[default]
-[default.global.parameters]
-stack_name = "user-service"
-
 [default.build.parameters]
 cached = true
 parallel = true
@@ -18,8 +14,13 @@ capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 disable_rollback = false
 resolve_s3 = true
-s3_prefix = "sam-user-development"
+stack_name = "user-service-development"
+s3_prefix = "user-service-development"
 region = "us-east-1"
+parameter_overrides = [
+    "Stage=development",
+    "CommonStack=common-service-development",
+]
 
 [default.package.parameters]
 resolve_s3 = true
@@ -38,15 +39,23 @@ capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 disable_rollback = false
 resolve_s3 = true
-s3_prefix = "sam-user-staging"
+stack_name = "user-service-staging"
+s3_prefix = "user-service-staging"
 region = "us-east-1"
-parameter_overrides = "Stage=\"staging\""
+parameter_overrides = [
+    "Stage=staging",
+    "CommonStack=common-service-staging",
+]
 
 [production.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 disable_rollback = false
 resolve_s3 = true
-s3_prefix = "sam-user-staging"
+stack_name = "user-service-production"
+s3_prefix = "user-service-production"
 region = "us-east-1"
-parameter_overrides = "Stage=\"production\""
+parameter_overrides = [
+    "Stage=production",
+    "CommonStack=common-service-production",
+]
