@@ -1,5 +1,5 @@
 <template>
-	<h1>Hello, World!</h1>
+	<Title />
 
 	<sl-input maxlength="255" label="Test value" v-model="test" />
 
@@ -12,6 +12,8 @@
 import { ref } from "vue";
 import "@shoelace-style/shoelace/dist/components/input/input";
 import "@shoelace-style/shoelace/dist/components/button/button";
+
+import Title from "@/components/Title.vue";
 
 const test = ref("");
 
