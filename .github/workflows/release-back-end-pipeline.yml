@@ -43,7 +43,7 @@ jobs:
         run: sam build
 
       - name: Deploy the serverless application
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --parameters "Stage=${{ github.event.inputs.environment }}"
+        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --config-env ${{ github.event.inputs.environment }}
 
       - name: Tag the build version
         run: |

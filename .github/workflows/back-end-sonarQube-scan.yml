@@ -9,10 +9,11 @@ on:
       service-name:
         required: true
         type: string
-      sonarQube-token:
+      coverage-file:
         required: true
         type: string
-      coverage-file:
+    secrets:
+      SONAR_QUBE_TOKEN:
         required: true
         type: string
 
@@ -52,5 +53,5 @@ jobs:
         with:
           projectBaseDir: ${{ github.event.inputs.path }}
         env:
-          SONAR_TOKEN: ${{ github.event.inputs.sonarQube-token }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_QUBE_TOKEN }}
+          SONAR_HOST_URL: https://sonar.cloud-native-minor.it
