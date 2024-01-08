@@ -8,9 +8,9 @@ event_bus = boto3.client('events')
 def lambda_handler(event, context):
     event = {
         'Source': 'user-context',
-        'DetailType': 'HelloWorldEvent',
+        'DetailType': 'PingEvent',
         'Detail': json.dumps({
-            "message": "Hello World!"
+            "message": "Ping!"
         }),
         'EventBusName': environ['EVENT_BUS_ARN']
     }
@@ -19,6 +19,6 @@ def lambda_handler(event, context):
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "message": "hello world",
+            "message": "Pong",
         }),
     }

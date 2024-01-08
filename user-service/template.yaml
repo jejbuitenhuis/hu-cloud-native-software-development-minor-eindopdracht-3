@@ -32,11 +32,11 @@ Resources:
     Properties:
       Name: !Sub "${Stage}-mtg-user-api"
       StageName: Prod
-#      DefinitionBody:
-#        Fn::Transform:
-#          Name: AWS::Include
-#          Parameters:
-#            Location: ./swagger-spec.json
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: ./swagger-spec.json
       MethodSettings:
         - ResourcePath: '/*'
           HttpMethod: '*'
@@ -66,16 +66,16 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 
-  HelloWorldFunction:
+  PingFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/hello_world/
+      CodeUri: functions/Ping/
       Events:
         HelloWorld:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGUserApi"
-            Path: /hello-world
+            Path: /ping
             Method: get
 
 Outputs:
