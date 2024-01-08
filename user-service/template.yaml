@@ -51,20 +51,12 @@ Resources:
       EmailVerificationSubject: Please verify your email address
       EmailVerificationMessage: "Hello {username},\n\nPlease click the following link to verify your email: {link}"
       Policies:
-        - PasswordPolicy:
+        PasswordPolicy:
             MinimumLength: 8
             RequireUppercase: true
             RequireLowercase: true
             RequireNumbers: true
             RequireSymbols: true
-        - PolicyName: RegisterFunctionPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - cognito-idp:AdminCreateUser
-                Resource: "*"
       Schema:
         - Name: email
           Required: true
@@ -115,15 +107,26 @@ Resources:
             Action:
               - "sts:AssumeRole"
       Path: "/"
+      Policies:
+        - PolicyName: RegisterUserFunctionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "cognito-idp:AdminCreateUser"
+                Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "cognito-idp:AdminInitiateAuth"
+                Resource: "*"
 
   RegisterUserFunction:
     Type: AWS::Serverless::Function
-    DependsOn:
-        - UserPoolClient
     Properties:
       FunctionName: RegisterUserFunction
       CodeUri: functions/register_user/
-      Role: !GetAtt RegisterUserFunctionIamRole.Arn
+      Role: !Ref RegisterUserFunctionIamRole
       Environment:
         Variables:
           USER_POOL_CLIENT_ID: !Ref UserPoolClient
