@@ -4,10 +4,10 @@ on:
       - staging
       - master
     paths:
-      - '/user/**'
-      - '/collection/**'
-      - '/deck/**'
-      - '/card/**'
+      - '/user-service/**'
+      - '/collection-service/**'
+      - '/deck-service/**'
+      - '/card-service/**'
   workflow_dispatch:
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
             sonarQubeSecret: SONAR_TOKEN_COLLECTION_SERVICE
     uses: .github/workflows/back-end-sonarQube-scan.yml
     with:
-      path: ./${{ matrix.service }}
+      path: ./${{ matrix.service }}-service
       service-name: ${{ matrix.service }}-service
       coverage-file: coverage-${{ matrix.service }}.xml
     secrets:
@@ -39,6 +39,24 @@ jobs:
         service: [ 'user', 'collection', 'deck', 'card' ]
     uses: .github/workflows/release-back-end-pipeline.yml
     with:
-      path: ./${{ matrix.service }}
+      path: ./${{ matrix.service }}-service
       service-name: ${{ matrix.service }}-service
       environment: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
+
+  tag-and-release:
+    needs: back-end-deployment-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tag the build version
+        run: |
+          git tag "back-end-v${GITHUB_RUN_NUMBER}"
+          git push origin "back-end-v${GITHUB_RUN_NUMBER}"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: back-end-v${{ github.run_number }}
+          release_name: back-end-v${{ github.run_number }}
+          draft: false
+          prerelease: false
