@@ -1,6 +1,6 @@
 <template>
 <h1>Register</h1>
-<form id="login-form" @submit.prevent="register">
+<form id="login-form" @submit.prevent.submit="register">
     <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="username" ref="usernameInput"></sl-input>
     <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
     <sl-input label="Re-enter password" id="confirm" password-toggle placeholder="Confirm password" type="password" required v-model="confirmPassword" @sl-input="handleInput" ref="passwordConfirmInput"></sl-input>
@@ -25,8 +25,10 @@ const passwordConfirmInput : Ref<null> | Ref<HTMLObjectElement> = ref(null);
 
 const errorMessage = ref('');
 
-
 function register(){
+    if (!isFormValid()) {
+        return
+    }
     console.log("submitted");
 }
 
@@ -47,6 +49,19 @@ function handleInput(){
     }
 }
 
+function isFormValid() : boolean{
+    if (usernameInput.value.getAttribute('data-invalid') === ''){
+        return false;
+    }
+    if (passwordInput.value.getAttribute('data-invalid') === ''){
+        return false;
+    }
+    if (passwordConfirmInput.value.getAttribute('data-invalid') === ''){
+        return false;
+    }
+
+    return true;
+}
 
 </script>
 
