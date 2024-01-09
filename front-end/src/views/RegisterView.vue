@@ -52,12 +52,15 @@ function handleInput(){
 }
 
 function isFormValid() : boolean{
+    // @ts-ignore typescript detecteerd het bestaan van getAttribute() niet
     if (usernameInput.value.getAttribute('data-invalid') === ''){
         return false;
     }
+    // @ts-ignore typescript detecteerd het bestaan van getAttribute() niet
     if (passwordInput.value.getAttribute('data-invalid') === ''){
         return false;
     }
+    // @ts-ignore typescript detecteerd het bestaan van getAttribute() niet
     if (passwordConfirmInput.value.getAttribute('data-invalid') === ''){
         return false;
     }
