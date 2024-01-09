@@ -8,12 +8,14 @@ on:
       - '/collection-service/**'
       - '/deck-service/**'
       - '/card-service/**'
+      - '/common-service/**'
   workflow_dispatch:
 
 jobs:
   back-end-sonarQube-matrix:
     if: github.ref == 'refs/heads/staging'
     strategy:
+      max-parallel: 1
       matrix:
         include:
           - service: card
@@ -36,7 +38,7 @@ jobs:
     if: (github.ref == 'refs/heads/staging' && success()) || github.ref == 'refs/heads/master'
     strategy:
       matrix:
-        service: [ 'user', 'collection', 'deck', 'card' ]
+        service: [ 'common', 'user', 'collection', 'deck', 'card' ]
     uses: .github/workflows/release-back-end-pipeline.yml
     with:
       path: ./${{ matrix.service }}-service
