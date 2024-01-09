@@ -5,7 +5,6 @@ on:
     branches:
      - staging
      - master
-     - pipeline-dev
     paths:
       - '/user-service/**'
       - '/collection-service/**'
