@@ -26,7 +26,7 @@ jobs:
 #            sonarQubeSecret: SONAR_TOKEN_DECK_SERVICE
 #          - service: collection
 #            sonarQubeSecret: SONAR_TOKEN_COLLECTION_SERVICE
-    uses: .github/workflows/back-end-sonarQube-scan.yml@pipeline-dev
+    uses: ./.github/workflows/back-end-sonarQube-scan.yml@pipeline-dev
     with:
       path: ./${{ matrix.service }}-service
       service-name: ${{ matrix.service }}-service
@@ -40,7 +40,7 @@ jobs:
       max-parallel: 1
       matrix:
         service: [ 'common', 'user' ]
-    uses: .github/workflows/release-back-end-pipeline.yml@pipeline-dev
+    uses: ./.github/workflows/release-back-end-pipeline.yml@pipeline-dev
     with:
       path: ./${{ matrix.service }}-service
       service-name: ${{ matrix.service }}-service
