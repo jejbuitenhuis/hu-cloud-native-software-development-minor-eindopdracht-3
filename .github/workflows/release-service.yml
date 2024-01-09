@@ -3,9 +3,8 @@ name: Deploy back-end services
 on:
   push:
     branches:
-#      - staging
-#      - master
-        - pipeline-dev
+     - staging
+     - master
     paths:
       - '/user-service/**'
       - '/collection-service/**'
@@ -16,7 +15,7 @@ on:
 
 jobs:
   back-end-sonarQube-matrix:
-    if: github.ref == 'refs/heads/pipeline-dev'
+    if: github.ref == 'refs/heads/staging'
     strategy:
       matrix:
         include:
@@ -37,7 +36,7 @@ jobs:
       SONAR_QUBE_TOKEN: ${{ secrets[matrix.sonarQubeSecret] }}
 
   back-end-deployment-matrix:
-    if: (github.ref == 'refs/heads/pipeline-dev' && success()) || github.ref == 'refs/heads/master'
+    if: (github.ref == 'refs/heads/staging' && success()) || github.ref == 'refs/heads/master'
     strategy:
       max-parallel: 1
       matrix:
