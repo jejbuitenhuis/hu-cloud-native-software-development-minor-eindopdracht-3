@@ -27,7 +27,7 @@ jobs:
 #            sonarQubeSecret: SONAR_TOKEN_DECK_SERVICE
 #          - service: collection
 #            sonarQubeSecret: SONAR_TOKEN_COLLECTION_SERVICE
-    uses: ./.github/workflows/back-end-sonarQube-scan.yml
+    uses: .github/workflows/back-end-sonarQube-scan.yml
     with:
       path: ./${{ matrix.service }}-service
       service-name: ${{ matrix.service }}-service
