@@ -6,8 +6,8 @@
     <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
     <sl-input label="Re-enter password" id="confirm" password-toggle placeholder="Confirm password" type="password" required v-model="confirmPassword" @sl-input="handleInput" ref="passwordConfirmInput"></sl-input>
     <p id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
-    <sl-button class="confirm" variant="primary" type="submit">Confirm</sl-button>
-    <sl-button class="gologin" variant="neutral" @click="router.push('/login')">To login</sl-button>
+    <sl-button id="submit" class="confirm" variant="primary" type="submit">Confirm</sl-button>
+    <sl-button id="login" class="gologin" variant="neutral" @click="router.push('/login')">To login</sl-button>
 </form>
 </sl-card>
 </template>
