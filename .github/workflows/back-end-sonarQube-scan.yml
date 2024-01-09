@@ -18,7 +18,7 @@ on:
 
 defaults:
   run:
-    working-directory: ${{ inputs.path }}
+    working-directory: ${{ github.event.inputs.path }}
 
 jobs:
   build:
@@ -50,7 +50,7 @@ jobs:
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         with:
-          projectBaseDir: ${{ inputs.path }}
+          projectBaseDir: ${{ github.event.inputs.path }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_QUBE_TOKEN }}
           SONAR_HOST_URL: https://sonar.cloud-native-minor.it
