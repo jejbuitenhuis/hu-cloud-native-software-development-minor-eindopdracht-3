@@ -1,8 +1,9 @@
 on:
   push:
     branches:
-      - staging
-      - master
+#      - staging
+#      - master
+        - pipeline-dev
     paths:
       - '/user-service/**'
       - '/collection-service/**'
@@ -13,19 +14,18 @@ on:
 
 jobs:
   back-end-sonarQube-matrix:
-    if: github.ref == 'refs/heads/staging'
+    if: github.ref == 'refs/heads/pipeline-dev'
     strategy:
-      max-parallel: 1
       matrix:
         include:
-          - service: card
-            sonarQubeSecret: SONAR_TOKEN_CARD_SERVICE
+#          - service: card
+#            sonarQubeSecret: SONAR_TOKEN_CARD_SERVICE
           - service: user
             sonarQubeSecret: SONAR_TOKEN_USER_SERVICE
-          - service: deck
-            sonarQubeSecret: SONAR_TOKEN_DECK_SERVICE
-          - service: collection
-            sonarQubeSecret: SONAR_TOKEN_COLLECTION_SERVICE
+#          - service: deck
+#            sonarQubeSecret: SONAR_TOKEN_DECK_SERVICE
+#          - service: collection
+#            sonarQubeSecret: SONAR_TOKEN_COLLECTION_SERVICE
     uses: .github/workflows/back-end-sonarQube-scan.yml
     with:
       path: ./${{ matrix.service }}-service
@@ -35,10 +35,11 @@ jobs:
       SONAR_QUBE_TOKEN: ${{ secrets[matrix.sonarQubeSecret] }}
 
   back-end-deployment-matrix:
-    if: (github.ref == 'refs/heads/staging' && success()) || github.ref == 'refs/heads/master'
+    if: (github.ref == 'refs/heads/pipeline-dev' && success()) || github.ref == 'refs/heads/master'
     strategy:
+      max-parallel: 1
       matrix:
-        service: [ 'common', 'user', 'collection', 'deck', 'card' ]
+        service: [ 'common', 'user' ]
     uses: .github/workflows/release-back-end-pipeline.yml
     with:
       path: ./${{ matrix.service }}-service
