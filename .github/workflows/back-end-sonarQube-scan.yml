@@ -16,13 +16,13 @@ on:
       SONAR_QUBE_TOKEN:
         required: true
 
-defaults:
-  run:
-    working-directory: ${{ workflow_call.inputs.path }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.path }}
 
     steps:
       - uses: actions/checkout@v4
