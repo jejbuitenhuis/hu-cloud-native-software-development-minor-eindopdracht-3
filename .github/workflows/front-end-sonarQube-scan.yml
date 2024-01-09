@@ -1,0 +1,61 @@
+name: Test webapplication and scan with SonarQube
+
+on:
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+      sonarQube-token:
+        required: true
+        type: string
+
+defaults:
+  run:
+    working-directory: ${{ github.event.inputs.path }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.X]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js v${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Typescript typings
+        run: npm run type-check
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: "pip"
+
+      - name: Set up SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Build the serverless application
+        run: sam build
+
+      - name: Run tests and collect coverage
+        run: |
+          npm run test:unit
+          npm run test:e2e
+
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+          projectBaseDir: ${{ github.event.inputs.path }}
+        env:
+          SONAR_TOKEN: ${{ github.event.inputs.sonarQube-token }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
