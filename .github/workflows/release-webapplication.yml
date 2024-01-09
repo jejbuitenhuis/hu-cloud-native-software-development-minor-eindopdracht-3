@@ -10,7 +10,7 @@ on:
 jobs:
   run-sonarQube-scan-on-front-end:
     if: github.ref == 'refs/heads/staging'
-    uses: .github/workflows/front-end-sonarQube-scan.yml
+    uses: ./.github/workflows/front-end-sonarQube-scan.yml@pipeline-dev
     with:
       path: './front-end'
       sonarQube-token: ${{ secrets.SONAR_TOKEN_FRONT_END }}
@@ -18,7 +18,7 @@ jobs:
   deploy-front-end-staging:
     if: success() && github.ref == 'refs/heads/staging'
     needs: run-sonarQube-scan-on-front-end
-    uses: .github/workflows/release-front-end-pipeline.yml
+    uses: ./.github/workflows/release-front-end-pipeline.yml@pipeline-dev
     with:
       path: '/front-end/**'
       environment: 'staging'
@@ -26,7 +26,7 @@ jobs:
 
   deploy-front-end-master:
     if: github.ref == 'refs/heads/master'
-    uses: .github/workflows/release-front-end-pipeline.yml
+    uses: ./.github/workflows/release-front-end-pipeline.yml@pipeline-dev
     with:
       path: '/front-end/**'
       environment: 'production'
