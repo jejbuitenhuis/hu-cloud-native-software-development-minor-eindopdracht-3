@@ -35,8 +35,9 @@ jobs:
     secrets:
       SONAR_QUBE_TOKEN: ${{ secrets[matrix.sonarQubeSecret] }}
 
-  back-end-deployment-matrix:
-    if: (github.ref == 'refs/heads/staging' && success()) || github.ref == 'refs/heads/master'
+  back-end-deployment-matrix-staging:
+    needs: back-end-sonarQube-matrix
+    if: github.ref == 'refs/heads/staging' && success()
     strategy:
       max-parallel: 1
       matrix:
@@ -45,12 +46,30 @@ jobs:
     with:
       path: ./${{ matrix.service }}
       service-name: ${{ matrix.service }}
-      environment: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
+      environment: staging
+
+  back-end-deployment-matrix-production:
+    if: github.ref == 'refs/heads/master'
+    strategy:
+      max-parallel: 1
+      matrix:
+        service: [ 'common-service', 'user-service' ]
+    uses: ./.github/workflows/release-back-end-pipeline.yml
+    with:
+      path: ./${{ matrix.service }}
+      service-name: ${{ matrix.service }}
+      environment: production
 
   tag-and-release:
-    needs: back-end-deployment-matrix
+    needs: [back-end-deployment-matrix-staging, back-end-deployment-matrix-production]
+    if: always() && !cancelled()
+    timeout-minutes: 2
     runs-on: ubuntu-latest
     steps:
+      - name: fail if conditional job failed
+        if: ${{ needs.back-end-deployment-matrix-staging.result == 'failure' || needs.back-end-deployment-matrix-production.result == 'failure' }}
+        run: exit 1
+      
       - name: Tag the build version
         run: |
           git tag "back-end-v${GITHUB_RUN_NUMBER}"
