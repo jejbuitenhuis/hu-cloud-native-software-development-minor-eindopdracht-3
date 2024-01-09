@@ -1,4 +1,4 @@
-name: Deploy webapplication to ${environment}
+name: Deploy webapplication to proper environment
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: Test webapplication and scan with SonarQube
+name: SonarQUbe scan of the front-end service
 
 on:
   workflow_call:

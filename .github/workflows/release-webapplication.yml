@@ -1,3 +1,5 @@
+name: Deploy front-end
+
 on:
   push:
     branches:
