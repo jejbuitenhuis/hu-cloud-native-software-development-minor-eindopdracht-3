@@ -29,7 +29,7 @@ jobs:
 #            sonarQubeSecret: SONAR_TOKEN_COLLECTION_SERVICE
     uses: ./.github/workflows/back-end-sonarQube-scan.yml
     with:
-      path: ${{ matrix.service }}
+      path: ./${{ matrix.service }}
       service-name: ${{ matrix.service }}
       coverage-file: coverage-${{ matrix.service }}.xml
     secrets:
@@ -43,7 +43,7 @@ jobs:
         service: [ 'common-service', 'user-service' ]
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
-      path: ${{ matrix.service }}
+      path: ./${{ matrix.service }}
       service-name: ${{ matrix.service }}
       environment: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
 
