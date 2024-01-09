@@ -21,16 +21,16 @@ jobs:
         include:
 #          - service: card
 #            sonarQubeSecret: SONAR_TOKEN_CARD_SERVICE
-          - service: user
+          - service: user-service
             sonarQubeSecret: SONAR_TOKEN_USER_SERVICE
 #          - service: deck
 #            sonarQubeSecret: SONAR_TOKEN_DECK_SERVICE
 #          - service: collection
 #            sonarQubeSecret: SONAR_TOKEN_COLLECTION_SERVICE
-    uses: .github/workflows/back-end-sonarQube-scan.yml
+    uses: ./.github/workflows/back-end-sonarQube-scan.yml
     with:
-      path: ./${{ matrix.service }}-service
-      service-name: ${{ matrix.service }}-service
+      path: ${{ matrix.service }}
+      service-name: ${{ matrix.service }}
       coverage-file: coverage-${{ matrix.service }}.xml
     secrets:
       SONAR_QUBE_TOKEN: ${{ secrets[matrix.sonarQubeSecret] }}
@@ -40,11 +40,11 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        service: [ 'common', 'user' ]
+        service: [ 'common-service', 'user-service' ]
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
-      path: ./${{ matrix.service }}-service
-      service-name: ${{ matrix.service }}-service
+      path: ${{ matrix.service }}
+      service-name: ${{ matrix.service }}
       environment: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
 
   tag-and-release:
