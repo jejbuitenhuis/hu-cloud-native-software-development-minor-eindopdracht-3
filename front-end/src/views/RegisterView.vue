@@ -1,4 +1,5 @@
 <template>
+<sl-card class="card-header">
 <h1>Register</h1>
 <form id="login-form" @submit.prevent.submit="register">
     <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="username" ref="usernameInput"></sl-input>
@@ -7,11 +8,12 @@
     <br><p id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
     <sl-button class="confirm" type="submit">Confirm</sl-button>
 </form>
-
+</sl-card>
 </template>
 
 <script setup lang="ts">
 import "@shoelace-style/shoelace/dist/components/input/input";
+import '@shoelace-style/shoelace/dist/components/card/card';
 import type SlInput from "@shoelace-style/shoelace/dist/components/input/input";
 import { onMounted, ref, type Ref } from "vue";
 
