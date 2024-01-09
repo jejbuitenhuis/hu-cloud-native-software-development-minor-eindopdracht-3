@@ -63,6 +63,7 @@ jobs:
   tag-and-release:
     needs: [back-end-deployment-matrix-staging, back-end-deployment-matrix-production]
     if: always() && !cancelled()
+    timeout-minutes: 2
     runs-on: ubuntu-latest
     steps:
       - name: fail if conditional job failed
