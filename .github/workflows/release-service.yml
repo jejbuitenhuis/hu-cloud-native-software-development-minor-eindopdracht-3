@@ -1,3 +1,5 @@
+name: Deploy back-end services
+
 on:
   push:
     branches:
