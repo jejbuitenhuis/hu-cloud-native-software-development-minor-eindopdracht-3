@@ -12,19 +12,19 @@ Globals:
     Architectures:
       - x86_64
     Tracing: Active
-    # Environment:
-    #   Variables:
-    #     EVENT_BUS_ARN:
-    #       Fn::ImportValue:
-    #         !Sub "${CommonStack}-MTGEventBus"
+    Environment:
+      Variables:
+        EVENT_BUS_ARN:
+          Fn::ImportValue:
+            !Sub "${CommonStack}-MTGEventBus"
 
 Parameters:
   Stage:
     Type: String
     Default: staging
-  # CommonStack:
-  #   Type: String
-  #   Default: common-service
+  CommonStack:
+    Type: String
+    Default: common-service-development
 
 Resources:
   MTGUserApi:
@@ -109,54 +109,36 @@ Resources:
     Properties:
       Domain: mtguserpooldomain
       UserPoolId: !Ref UserPool
+      
 
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId: !Ref UserPool
-  #     ClientName: MTGUserPoolClient
-
-  RegisterUserFunctionIamRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - "lambda.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        - PolicyName: RegisterUserFunctionPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action:
-                  - "cognito-idp:AdminCreateUser"
-                  - "cognito-idp:AdminInitiateAuth"
-                  - "cognito-idp:AdminGetUser"
-                Resource: "*"
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_CUSTOM_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
 
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Role: !GetAtt RegisterUserFunctionIamRole.Arn
       CodeUri: functions/register_user/
       Events:
         RegisterUser:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGUserApi"
-            Path: /users/new
+            Path: /auth/register
             Method: post
       Environment:
         Variables:
           USER_POOL_CLIENT_ID: !Ref UserPoolClient
           USER_POOL_ID: !Ref UserPool
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonCognitoPowerUser
 
 Outputs:
   UserPoolClientId:

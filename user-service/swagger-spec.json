@@ -21,12 +21,15 @@
         }
       }
     },
-    "/users/new": {
+    "/auth/register": {
       "post": {
         "parameters" : [],
         "responses" : {
           "201": {
-            "description": "OK"
+            "description": "User registered successfully"
+          },
+          "409": {
+            "description": "This email address is already in use"
           }
         },
         "x-amazon-apigateway-integration" : {
