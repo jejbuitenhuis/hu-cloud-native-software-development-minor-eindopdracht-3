@@ -1,4 +1,4 @@
-name: Deploy ${service-name} to ${environment}
+name: Deploy back-end service
 
 on:
   workflow_call:

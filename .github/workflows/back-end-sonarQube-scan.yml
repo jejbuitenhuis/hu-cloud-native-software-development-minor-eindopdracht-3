@@ -1,4 +1,4 @@
-name: SonarQube scan of ${service-name}
+name: SonarQube scan of a back-end service
 
 on:
   workflow_call:
