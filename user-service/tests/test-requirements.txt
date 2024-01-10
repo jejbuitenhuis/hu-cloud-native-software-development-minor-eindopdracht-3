@@ -1,3 +1,8 @@
+# Test requirements
 pytest
 coverage
 moto
+
+# Function requirements
+boto3
+aws_xray_sdk
