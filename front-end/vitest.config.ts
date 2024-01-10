@@ -6,6 +6,9 @@ export default mergeConfig(
 	viteConfig,
 	defineConfig({
 		test: {
+			coverage: {
+				reportsDirectory: "coverage",
+			},
 			globals: true,
 			environment: "jsdom",
 			include: [ "**/__tests__/**.ts" ],
