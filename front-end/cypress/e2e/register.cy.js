@@ -26,4 +26,5 @@ describe("Register page Test", () => {
 
         cy.contains("This email adress has already been registered!")
     })
+
 });

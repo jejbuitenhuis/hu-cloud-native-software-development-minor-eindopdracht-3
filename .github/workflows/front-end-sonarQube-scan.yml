@@ -6,28 +6,24 @@ on:
       path:
         required: true
         type: string
+    secrets:
       sonarQube-token:
         required: true
-        type: string
-
-defaults:
-  run:
-    working-directory: ${{ inputs.path }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.X]
+    defaults:
+      run:
+        working-directory: ${{ inputs.path }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js v${{ matrix.node-version }}
+      - name: Set up Node.js v18.X
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18.X
 
       - name: Install dependencies
         run: npm ci
@@ -57,5 +53,5 @@ jobs:
         with:
           projectBaseDir: ${{ inputs.path }}
         env:
-          SONAR_TOKEN: ${{ inputs.sonarQube-token }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.sonarQube-token }}
+          SONAR_HOST_URL: https://sonar.cloud-native-minor.it
