@@ -4,6 +4,7 @@ import boto3
 from botocore.exceptions import ClientError
 from aws_xray_sdk.core import patch_all
 import logging
+import datetime
 
 patch_all()
 
@@ -11,12 +12,9 @@ logger = logging.getLogger()
 logger.setLevel("INFO")
 
 client = boto3.client('cognito-idp', region_name='us-east-1')
-client_id = os.environ['USER_POOL_CLIENT_ID']
-user_pool_id = os.environ['USER_POOL_ID']
 
 
-def is_email_already_registered(email):
-    logger.info(user_pool_id)
+def is_email_already_registered(email, user_pool_id):
     try:
         response = client.admin_get_user(
             UserPoolId=user_pool_id,
@@ -27,29 +25,32 @@ def is_email_already_registered(email):
         if e.response["Error"]["Code"] == "UserNotFoundException":
             return False
         else:
-            logger.error(str(e))
-            return {
-                "status_code": 500,
-                "message": str(e)
-            }
+            logger.error(e.response)
+            return e.response
+
 
 
 def lambda_handler(event, context):
     """
         RegisterUserFunction: Lambda function to validate and register a new user in the Cognito User Pool
     """
+    client_id = os.environ['USER_POOL_CLIENT_ID']
+    user_pool_id = os.environ['USER_POOL_ID']
 
     logger.info(f'EventType: {type(event)}')
     logger.info(f'Event: {event}')
-    logger.info(user_pool_id)
+    
+    logger.info(f'Client: {client}')
+    logger.info(f'ClientID: {client_id}')
+    logger.info(f'UserPoolID: {user_pool_id}')
 
     body = json.loads(event['body'])
 
-    username = body['username']
+    # username = body['username']
     password = body['password']
     email = body['email']
 
-    email_exists = is_email_already_registered(email)
+    email_exists = is_email_already_registered(email, user_pool_id)
     email_used_str = 'Email address is already in use.'
 
     if email_exists is True:
@@ -62,14 +63,28 @@ def lambda_handler(event, context):
         }
     elif email_exists is False:
         logger.info("Email address is not registered. Proceeding with user registration.")
-        response = client.sign_up(
-            ClientId=client_id,
-            Username=email,
-            Password=password,
-            UserAttributes=[
-                {'Name': 'preferred_username', 'Value': username}
-            ]
-        )
+
+        try:
+            response = client.sign_up(
+                ClientId=client_id,
+                Username=email,
+                Password=password,
+                # UserAttributes=[
+                #     {'Name': 'preferred_username', 'Value': username}
+                # ]
+            )
+        except ClientError as e:
+            logger.error(e.response)
+            
+            if e.response["Error"]["Code"] == "InvalidPasswordException":
+                logger.error(e.response)
+                return {
+                    "statusCode": 400,
+                    "body": json.dumps({
+                        "error": "Password must be at least 8 characters long."
+                    })
+        }
+            
 
         logger.info(f'User Registered: {response}')
 
@@ -78,12 +93,7 @@ def lambda_handler(event, context):
             "body": json.dumps(response)
         }
     else:
-        return {
-            "statusCode": email_exists["status_code"],
-            "body": json.dumps({
-                "error": email_exists["message"]
-            })
-        }
+        return email_exists
 
 
     # try:

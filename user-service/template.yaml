@@ -94,15 +94,11 @@ Resources:
       Policies:
         PasswordPolicy:
             MinimumLength: 8
-            RequireUppercase: true
-            RequireLowercase: true
-            RequireNumbers: true
-            RequireSymbols: true
       Schema:
         - Name: email
           AttributeDataType: String
-        - Name: username
-          AttributeDataType: String
+        # - Name: username
+        #   AttributeDataType: String
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain

@@ -65,7 +65,6 @@ function register(){
     if (!isFormValid()) {
         return
     }
-    console.log("submitted");
     sendData(email.value, password.value)
         .then((response) => {
             if (response.status === 409){
@@ -74,6 +73,9 @@ function register(){
             if (response.ok) {
                 alert("We have send you an email to verify your email adress.");
                 router.push("/login");
+            }
+            if (response.status === 400) {
+                alert(response.json().then((response) => showErrorMessage(response.error)))
             } else {
                 showErrorMessage(`Something went wrong: \n${response.statusText}`);
             }
@@ -96,7 +98,7 @@ function handleInput(){
     password.value = passwordInput.value.value;
 
     if (password.value.length >= 8) {
-        passwordInput.value.setCustomValidity('');
+        passwordInput.value.setCustomValidity(''); //Empty validity means it's valid
     } else {
         passwordInput.value.setCustomValidity('Password must be at least 8 characters long!')
         return //return so it can't be overwritten by other checks
