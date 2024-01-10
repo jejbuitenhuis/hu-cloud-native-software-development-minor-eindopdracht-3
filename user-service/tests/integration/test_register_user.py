@@ -92,7 +92,7 @@ def test_lambda_handler_email_exists():
         
 
 @mock_cognitoidp
-def test_lambda_handler_PasswordTooShort():
+def test_lambda_handler_password_too_short():
 
     # Arrange
     client, user_pool_id, client_id, event = setup_mocks()
