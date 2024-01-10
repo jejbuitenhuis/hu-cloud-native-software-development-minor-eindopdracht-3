@@ -18,21 +18,19 @@ on:
       AWS_SECRET_ACCESS_KEY:
         required: true
 
-defaults:
-  run:
-    working-directory: ${{ inputs.path }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.X]
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.path }}
+
     steps:
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 18.X
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18.X
 
       - name: Git checkout
         uses: actions/checkout@v4
