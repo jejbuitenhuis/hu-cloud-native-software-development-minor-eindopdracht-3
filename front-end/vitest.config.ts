@@ -12,7 +12,7 @@ export default mergeConfig(
 			globals: true,
 			environment: "jsdom",
 			include: [ "**/__tests__/**.ts" ],
-			exclude: [ ...configDefaults.exclude, "e2e/*" ],
+			exclude: [ ...configDefaults.exclude, "e2e/*", "src/main.ts", "src/assets"],
 			root: fileURLToPath(
 				new URL("./", import.meta.url),
 			),
