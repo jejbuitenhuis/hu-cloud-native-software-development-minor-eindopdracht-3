@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  cnsdm-eindopdracht-3
+Description: frontend stack
 
 Globals:
   Function:
@@ -16,7 +15,7 @@ Parameters:
     Default: front-end
 
 Resources:
-  FrontEndS3Bucket: # {{{
+  FrontEndS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       PublicAccessBlockConfiguration:
@@ -24,18 +23,15 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
-  # }}}
 
-  FrontEndS3BucketParameter: # {{{
+  FrontEndS3BucketParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub /${Stage}/frontEnd/bucketName
       Type: String
       Value: !Ref FrontEndS3Bucket
-    # }}}
 
-  # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
-  FrontEndS3Policy: # {{{
+  FrontEndS3Policy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref FrontEndS3Bucket
@@ -52,52 +48,49 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFront}
-  # }}}
 
-  WebAppOriginAccessControl: # {{{
-    Type: AWS::CloudFront::OriginAccessControl
-    Properties:
-      OriginAccessControlConfig:
-        Name: !Sub "${Stage}-front-end-origin-access-control"
-        OriginAccessControlOriginType: s3
-        SigningBehavior: always
-        SigningProtocol: sigv4
-  # }}}
+#  WebAppOriginAccessControl:
+#    Type: AWS::CloudFront::OriginAccessControl
+#    Properties:
+#      OriginAccessControlConfig:
+#        Name: !Sub "${Stage}-front-end-origin-access-control"
+#        OriginAccessControlOriginType: s3
+#        SigningBehavior: always
+#        SigningProtocol: sigv4
 
-  CloudFront: # {{{
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Enabled: true
-        DefaultRootObject: "index.html"
-        Origins:
-          - Id: !Sub ${Stage}-front-end
-            DomainName: !GetAtt FrontEndS3Bucket.DomainName
-            OriginAccessControlId: !GetAtt WebAppOriginAccessControl.Id
-            CustomOriginConfig:
-              OriginProtocolPolicy: https-only
-        DefaultCacheBehavior:
-          TargetOriginId: !Sub ${Stage}-front-end
-          AllowedMethods:
-            - GET
-            - HEAD
-            - OPTIONS
-            - PUT
-            - PATCH
-            - POST
-            - DELETE
-          CachedMethods:
-            - GET
-            - HEAD
-          ViewerProtocolPolicy: redirect-to-https
-          ForwardedValues:
-            QueryString: true
-        CustomErrorResponses:
-          - ErrorCode: 404
-            ResponsePagePath: /index.html
-            ErrorCachingMinTTL: 30
-            ResponseCode: 200
-  # }}}
+#  CloudFront:
+#    Type: AWS::CloudFront::Distribution
+#    Properties:
+#      DistributionConfig:
+#        Enabled: true
+#        DefaultRootObject: "index.html"
+#        Origins:
+#          - Id: !Sub ${Stage}-front-end
+#            DomainName: !GetAtt FrontEndS3Bucket.DomainName
+#            OriginAccessControlId: !GetAtt WebAppOriginAccessControl.Id
+#            CustomOriginConfig:
+#              OriginProtocolPolicy: https-only
+#        DefaultCacheBehavior:
+#          TargetOriginId: !Sub ${Stage}-front-end
+#          AllowedMethods:
+#            - GET
+#            - HEAD
+#            - OPTIONS
+#            - PUT
+#            - PATCH
+#            - POST
+#            - DELETE
+#          CachedMethods:
+#            - GET
+#            - HEAD
+#          ViewerProtocolPolicy: redirect-to-https
+#          ForwardedValues:
+#            QueryString: true
+#        CustomErrorResponses:
+#          - ErrorCode: 404
+#            ResponsePagePath: /index.html
+#            ErrorCachingMinTTL: 30
+#            ResponseCode: 200
 
 Outputs:
   FrontEndS3BucketDomainName:
