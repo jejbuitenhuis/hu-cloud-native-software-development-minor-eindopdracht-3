@@ -17,6 +17,8 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+      GITHUB_TOKEN:
+        required: true
 
 defaults:
   run:
@@ -73,6 +75,8 @@ jobs:
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: front-end-v${{ github.run_number }}
           release_name: front-end-v${{ github.run_number }}
