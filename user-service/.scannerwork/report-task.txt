@@ -1,0 +1,6 @@
+projectKey=module-3-back-end-user
+serverUrl=https://sonar.cloud-native-minor.it
+serverVersion=8.9.9.56886
+dashboardUrl=https://sonar.cloud-native-minor.it/dashboard?id=module-3-back-end-user
+ceTaskId=AYzy_TvCCBEYaknGZqR0
+ceTaskUrl=https://sonar.cloud-native-minor.it/api/ce/task?id=AYzy_TvCCBEYaknGZqR0
