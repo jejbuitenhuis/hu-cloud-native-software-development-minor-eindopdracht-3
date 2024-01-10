@@ -8,7 +8,7 @@ describe("Register page Test", () => {
         cy.get('#email').find("input").type('test@example.com')
         cy.get('#password').find("input").type('testtest')
         cy.get('#confirm').find("input").type('testtest')
-        cy.get('#submit').find('button').click({ position: 'top' })
+        cy.get('#submit').find('button').clickAtTop()
         cy.contains("We have send you an email to verify your email adress.")
     })
 
@@ -16,13 +16,13 @@ describe("Register page Test", () => {
         cy.get('#email').find("input").type('test@example.com')
         cy.get('#password').find("input").type('testtest')
         cy.get('#confirm').find("input").type('testtest')
-        cy.get('#submit').find('button').click({ position: 'top' })
+        cy.get('#submit').find('button').clickAtTop()
         
         
         cy.get('#email').type('test@example.com')
         cy.get('#password').type('testtest')
         cy.get('#confirm').find('input').type('testtest')
-        cy.get('#submit').find('button').click({ position: 'top' })
+        cy.get('#submit').find('button').clickAtTop()
 
         cy.contains("This email adress has already been registered!")
     })
