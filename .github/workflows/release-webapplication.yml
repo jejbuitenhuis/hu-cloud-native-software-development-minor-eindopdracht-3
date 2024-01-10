@@ -23,7 +23,7 @@ jobs:
     needs: run-sonarQube-scan-on-front-end
     uses: ./.github/workflows/release-front-end-pipeline.yml
     with:
-      path: '/front-end/**'
+      path: './front-end/**'
       environment: 'staging'
       s3-bucket-name: 'module-3-front-end'
     secrets:
@@ -34,7 +34,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     uses: ./.github/workflows/release-front-end-pipeline.yml
     with:
-      path: '/front-end/**'
+      path: './front-end/**'
       environment: 'production'
       s3-bucket-name: 'module-3-front-end'
     secrets:
