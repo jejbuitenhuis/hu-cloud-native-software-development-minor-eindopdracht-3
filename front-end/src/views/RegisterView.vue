@@ -1,7 +1,8 @@
 <template>
-<sl-card class="login-card">
-<h1>Register</h1>
-<form id="login-form" @submit.prevent.submit="register">
+<div class="container">
+    <sl-card class="login-card">
+    <h1>Register</h1>
+    <form id="login-form" @submit.prevent.submit="register">
     <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="email" ref="emailInput"></sl-input>
     <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
     <sl-input label="Re-enter password" id="confirm" password-toggle placeholder="Confirm password" type="password" required v-model="confirmPassword" @sl-input="handleInput" ref="passwordConfirmInput"></sl-input>
@@ -10,6 +11,8 @@
     <sl-button id="login" class="button" variant="neutral" @click="router.push('/login')">To login</sl-button>
 </form>
 </sl-card>
+</div>
+
 </template>
 
 
@@ -114,13 +117,16 @@ async function sendData(email : string, password : string){
 
 
 <style scoped lang="scss">
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5rem;
+}
+
 .button {
     width: 100%;
-    margin-top: 5px;
-}
-.login-card {
-    align-items: center;
-    justify-content: center;
-    display: flex;
+    margin-top: 1rem;
 }
 </style>
