@@ -30,7 +30,7 @@ coverage
 .scannerwork/**
 coverage/**
 *.tsbuildinfo
-*/tests/testreports/*
+*/tests/testreports/
 
 .aws-sam
 
