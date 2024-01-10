@@ -21,15 +21,15 @@ jobs:
       matrix:
         include:
           - service: card
-            sonarQubeSecret: SONAR_TOKEN_CARD_SERVICE
+            sonarQubeSecret: SONAR_TOKEN_CARD
           - service: user-service
-            sonarQubeSecret: SONAR_TOKEN_USER_SERVICE
+            sonarQubeSecret: SONAR_TOKEN_USER
           - service: deck
-            sonarQubeSecret: SONAR_TOKEN_DECK_SERVICE
+            sonarQubeSecret: SONAR_TOKEN_DECK
           - service: wishlist
-            sonarQubeSecret: SONAR_TOKEN_WISHLIST_SERVICE
+            sonarQubeSecret: SONAR_TOKEN_WISHLIST
           - service: collection
-            sonarQubeSecret: SONAR_TOKEN_COLLECTION_SERVICE
+            sonarQubeSecret: SONAR_TOKEN_COLLECTION
     uses: ./.github/workflows/back-end-sonarQube-scan.yml
     with:
       path: ./${{ matrix.service }}
@@ -50,6 +50,9 @@ jobs:
       path: ./${{ matrix.service }}
       service-name: ${{ matrix.service }}
       environment: staging
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   back-end-deployment-matrix-production:
     if: github.ref == 'refs/heads/master'
@@ -62,6 +65,9 @@ jobs:
       path: ./${{ matrix.service }}
       service-name: ${{ matrix.service }}
       environment: production
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   tag-and-release:
     needs: [back-end-deployment-matrix-staging, back-end-deployment-matrix-production]
@@ -84,6 +90,8 @@ jobs:
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: back-end-v${{ github.run_number }}
           release_name: back-end-v${{ github.run_number }}

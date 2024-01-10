@@ -25,6 +25,9 @@ jobs:
       path: '/front-end/**'
       environment: 'staging'
       s3-bucket-name: 'module-3-front-end'
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   deploy-front-end-master:
     if: github.ref == 'refs/heads/master'
@@ -33,3 +36,6 @@ jobs:
       path: '/front-end/**'
       environment: 'production'
       s3-bucket-name: 'module-3-front-end'
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

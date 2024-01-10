@@ -30,7 +30,7 @@ Resources:
     Properties:
       EventBusName:
         Ref: "MTGEventBus"
-      StatementId: "AllowToPutEvents"
+      StatementId: !Sub "${Stage}AllowToPutEvents"
       Statement:
         Effect: "Allow"
         Principal: "*"
