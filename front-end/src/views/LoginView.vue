@@ -64,6 +64,10 @@
         sendData(email.value, password.value)
             .then((response) => {
                 if (response.ok) {
+                    response.json()
+                        .then((body) => {
+                            storeSessionToken(body.jwtToken);
+                        })
                     router.push("/home");
                 } if (response.status === 400) {
                     showErrorMessage('Invalid credentials!')
@@ -71,6 +75,10 @@
                     showErrorMessage('Something went wrong!');
                 }
             });
+    }
+
+    function storeSessionToken(token : string){
+        localStorage.setItem("jwtToken", token);
     }
     
     function showErrorMessage(error : string){
@@ -94,7 +102,7 @@
     async function sendData(email : string, password : string){
         return await fetch("/api/auth/login", {
             "method" : "post",
-            "mode" : "cors",
+            "mode" : "no-cors", //Kan potentieel een pijnpunt zijn. Als er cors problemen zijn kijk hier.
             "headers" : {
                 "Content-Type" : "application/json"
             },
