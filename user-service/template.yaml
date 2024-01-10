@@ -24,7 +24,7 @@ Parameters:
     Default: staging
   CommonStack:
     Type: String
-    Default: common-service
+    Default: common-service-development
 
 Resources:
   MTGUserApi:
@@ -50,22 +50,24 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
-  MTGUserDynamoDBTable:
-    Type: AWS::DynamoDB::Table
-    DeletionPolicy: Retain
-    Properties:
-      TableName: !Sub "${Stage}-mtg-user-db"
-      AttributeDefinitions:
-        - AttributeName: PK
-          AttributeType: S
-        - AttributeName: SK
-          AttributeType: S
-      KeySchema:
-        - AttributeName: PK
-          KeyType: HASH
-        - AttributeName: SK
-          KeyType: RANGE
-      BillingMode: PAY_PER_REQUEST
+  # Template code for db tables
+
+  # MTGUserDynamoDBTable:
+  #   Type: AWS::DynamoDB::Table
+  #   DeletionPolicy: Retain
+  #   Properties:
+  #     TableName: !Sub "${Stage}-mtg-user-db"
+  #     AttributeDefinitions:
+  #       - AttributeName: PK
+  #         AttributeType: S
+  #       - AttributeName: SK
+  #         AttributeType: S
+  #     KeySchema:
+  #       - AttributeName: PK
+  #         KeyType: HASH
+  #       - AttributeName: SK
+  #         KeyType: RANGE
+  #     BillingMode: PAY_PER_REQUEST
 
   PingFunction:
     Type: AWS::Serverless::Function
@@ -79,7 +81,75 @@ Resources:
             Path: /ping
             Method: get
 
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MTGUserPool
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      VerificationMessageTemplate:
+        DefaultEmailOption: CONFIRM_WITH_LINK
+      Policies:
+        PasswordPolicy:
+            MinimumLength: 8
+            RequireUppercase: true
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: true
+      Schema:
+        - Name: email
+          AttributeDataType: String
+        - Name: username
+          AttributeDataType: String
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: mtguserpooldomain
+      UserPoolId: !Ref UserPool
+      
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_CUSTOM_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+  RegisterUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/register_user/
+      Events:
+        RegisterUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGUserApi"
+            Path: /auth/register
+            Method: post
+      Environment:
+        Variables:
+          USER_POOL_CLIENT_ID: !Ref UserPoolClient
+          USER_POOL_ID: !Ref UserPool
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonCognitoPowerUser
+
 Outputs:
+  UserPoolClientId:
+    Description: UserPool Client Id
+    Value: !Ref UserPoolClient
+  UserPoolId:
+    Description: UserPool Id
+    Value: !Ref UserPool
+  RegisterUserFunction:
+    Description: Function
+    Value: !GetAtt RegisterUserFunction.Arn
   MTGUserApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"

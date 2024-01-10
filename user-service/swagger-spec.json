@@ -20,6 +20,25 @@
           "type" : "aws_proxy"
         }
       }
+    },
+    "/auth/register": {
+      "post": {
+        "parameters" : [],
+        "responses" : {
+          "201": {
+            "description": "User registered successfully"
+          },
+          "409": {
+            "description": "This email address is already in use"
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RegisterUserFunction.Arn}/invocations"},
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
+      }
     }
   }
 }

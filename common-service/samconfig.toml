@@ -17,7 +17,9 @@ resolve_s3 = true
 stack_name = "common-service-development"
 s3_prefix = "common-service-development"
 region = "us-east-1"
-parameter_overrides = "Stage=\"development\""
+parameter_overrides = [
+	"Stage=development"
+ ]
 
 [default.package.parameters]
 resolve_s3 = true
@@ -39,7 +41,9 @@ resolve_s3 = true
 stack_name = "common-service-staging"
 s3_prefix = "common-service-staging"
 region = "us-east-1"
-parameter_overrides = "Stage=\"staging\""
+parameter_overrides = [
+	"Stage=staging"
+]
 
 [production.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
@@ -49,4 +53,6 @@ resolve_s3 = true
 stack_name = "common-service-production"
 s3_prefix = "common-service-production"
 region = "us-east-1"
-parameter_overrides = "Stage=\"production\""
+parameter_overrides = [
+	"Stage=production"
+]
