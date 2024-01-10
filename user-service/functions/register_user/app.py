@@ -16,7 +16,7 @@ client = boto3.client('cognito-idp', region_name='us-east-1')
 
 def is_email_already_registered(email, user_pool_id):
     try:
-        response = client.admin_get_user(
+        client.admin_get_user(
             UserPoolId=user_pool_id,
             Username=email
         )
@@ -46,7 +46,6 @@ def lambda_handler(event, context):
 
     body = json.loads(event['body'])
 
-    # username = body['username']
     password = body['password']
     email = body['email']
 
@@ -68,10 +67,7 @@ def lambda_handler(event, context):
             response = client.sign_up(
                 ClientId=client_id,
                 Username=email,
-                Password=password,
-                # UserAttributes=[
-                #     {'Name': 'preferred_username', 'Value': username}
-                # ]
+                Password=password
             )
         except ClientError as e:
             logger.error(e.response)
@@ -84,7 +80,6 @@ def lambda_handler(event, context):
                         "error": "Password must be at least 8 characters long."
                     })
         }
-            
 
         logger.info(f'User Registered: {response}')
 
@@ -94,12 +89,3 @@ def lambda_handler(event, context):
         }
     else:
         return email_exists
-
-
-    # try:
-    #     ip = requests.get("http://checkip.amazonaws.com/")
-    # except requests.RequestException as e:
-    #     # Send some context about this error to Lambda Logs
-    #     print(e)
-
-    #     raise e

@@ -14,7 +14,6 @@ def setup_mocks():
         AutoVerifiedAttributes=['email']
     )
     user_pool_id = pool_res['UserPool']['Id']
-    print("user_pool_id:", user_pool_id)
 
     client_res = client.create_user_pool_client(
         UserPoolId=user_pool_id,
@@ -22,7 +21,6 @@ def setup_mocks():
         GenerateSecret=False
     )
     client_id = client_res['UserPoolClient']['ClientId']
-    print("client_id:", client_id)
 
     event = {
         'body': json.dumps({
@@ -111,8 +109,6 @@ def test_lambda_handler_password_too_short():
 
         # Act
         result = lambda_handler(event, {})
-        print("result:", result)
-
 
         # Assert
         assert result['statusCode'] == 400
