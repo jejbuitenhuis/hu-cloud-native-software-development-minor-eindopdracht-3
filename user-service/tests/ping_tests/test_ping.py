@@ -3,15 +3,21 @@ from unittest.mock import patch
 import os
 
 
-@patch.dict(os.environ, {"DISABLE_XRAY": "True"})
+@patch.dict(os.environ, {"DISABLE_XRAY": "True", "EVENT_BUS_ARN": ""})
 def test_ping_pong():
-    # Arrange
-    from functions.Ping.app import lambda_handler
+    # Mock EventBridge client
+    with patch('boto3.client') as mock_client:
+        mock_event_bridge = MagicMock()
+        mock_client.return_value = mock_event_bridge
 
-    # Act
-    response = lambda_handler({}, {})
+        # Invoke the lambda handler
+        from functions.Ping.app import lambda_handler
+        response = lambda_handler({}, {})
 
-    # Assert the response
-    assert response['statusCode'] == 200
-    body = json.loads(response['body'])
-    assert body["message"] == "Pong"
+        # Verify put_events was called
+        assert mock_event_bridge.put_events.call_count == 1
+
+        # Assert the response
+        assert response['statusCode'] == 200
+        body = json.loads(response['body'])
+        assert body["message"] == "Pong"
