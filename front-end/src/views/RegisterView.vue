@@ -6,7 +6,7 @@
     <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="email" ref="emailInput"></sl-input>
     <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
     <sl-input label="Re-enter password" id="confirm" password-toggle placeholder="Confirm password" type="password" required v-model="confirmPassword" @sl-input="handleInput" ref="passwordConfirmInput"></sl-input>
-    <p id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
+    <p class="error" id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
     <sl-button id="submit" class="button" variant="primary" type="submit">Confirm</sl-button>
     <sl-button id="login" class="button" variant="neutral" @click="router.push('/login')">To login</sl-button>
 </form>
@@ -14,6 +14,28 @@
 </div>
 
 </template>
+
+<!-- STYLE -->
+
+<style scoped lang="scss">
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5rem;
+}
+
+.button {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.error {
+    color: var(--sl-color-red-200)
+}
+
+</style>
 
 
 <!-- SCRIPT -->
@@ -23,6 +45,7 @@
 import "@shoelace-style/shoelace/dist/components/input/input";
 import '@shoelace-style/shoelace/dist/components/card/card';
 import type SlInput from "@shoelace-style/shoelace/dist/components/input/input";
+
 import { ref, type Ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -111,22 +134,3 @@ async function sendData(email : string, password : string){
     )
 }
 </script>
-
-
-<!-- STYLE -->
-
-
-<style scoped lang="scss">
-
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 5rem;
-}
-
-.button {
-    width: 100%;
-    margin-top: 1rem;
-}
-</style>
