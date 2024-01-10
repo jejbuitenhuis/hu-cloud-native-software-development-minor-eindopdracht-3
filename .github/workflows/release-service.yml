@@ -6,11 +6,11 @@ on:
      - staging
      - master
     paths:
-      - '/user-service/**'
-      - '/collection-service/**'
-      - '/deck-service/**'
-      - '/card-service/**'
-      - '/common-service/**'
+      - 'user-service/**'
+      - 'collection-service/**'
+      - 'deck-service/**'
+      - 'card-service/**'
+      - 'common-service/**'
   workflow_dispatch:
 
 jobs:
