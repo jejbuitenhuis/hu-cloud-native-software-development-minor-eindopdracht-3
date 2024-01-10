@@ -20,20 +20,19 @@ jobs:
     strategy:
       matrix:
         include:
-          - service: card
+          - path: ./card-service
             sonarQubeSecret: SONAR_TOKEN_CARD
-          - service: user-service
+          - path: ./user-service
             sonarQubeSecret: SONAR_TOKEN_USER
-          - service: deck
+          - path: ./deck-service
             sonarQubeSecret: SONAR_TOKEN_DECK
-          - service: wishlist
+          - path: ./wishlist-service
             sonarQubeSecret: SONAR_TOKEN_WISHLIST
-          - service: collection
+          - path: ./collection-service
             sonarQubeSecret: SONAR_TOKEN_COLLECTION
     uses: ./.github/workflows/back-end-sonarQube-scan.yml
     with:
-      path: ${{ matrix.service }}
-      service-name: ${{ matrix.service }}
+      path: ${{ matrix.path }}
       coverage-file: coverage-${{ matrix.service }}.xml
     secrets:
       SONAR_QUBE_TOKEN: ${{ secrets[matrix.sonarQubeSecret] }}

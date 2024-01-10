@@ -6,9 +6,6 @@ on:
       path:
         required: true
         type: string
-      service-name:
-        required: true
-        type: string
       coverage-file:
         required: true
         type: string
