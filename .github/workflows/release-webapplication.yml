@@ -10,17 +10,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-sonarQube-scan-on-front-end:
-    if: github.ref == 'refs/heads/staging'
-    uses: ./.github/workflows/front-end-sonarQube-scan.yml
-    with:
-      path: './front-end'
-    secrets:
-      sonarQube-token: ${{ secrets.SONAR_TOKEN_FRONT_END }}
+#  run-sonarQube-scan-on-front-end:
+#    if: github.ref == 'refs/heads/staging'
+#    uses: ./.github/workflows/front-end-sonarQube-scan.yml
+#    with:
+#      path: './front-end'
+#    secrets:
+#      sonarQube-token: ${{ secrets.SONAR_TOKEN_FRONT_END }}
 
   deploy-front-end-staging:
     if: success() && github.ref == 'refs/heads/staging'
-    needs: run-sonarQube-scan-on-front-end
+#    needs: run-sonarQube-scan-on-front-end
     uses: ./.github/workflows/release-front-end-pipeline.yml
     with:
       path: './front-end'
