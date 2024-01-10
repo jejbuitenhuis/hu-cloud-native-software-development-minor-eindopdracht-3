@@ -2,10 +2,6 @@
 # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-config.html
 version = 0.1
 
-[default]
-[default.global.parameters]
-stack_name = "user-service2"
-
 [default.build.parameters]
 cached = true
 parallel = true
@@ -18,7 +14,8 @@ capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 disable_rollback = false
 resolve_s3 = true
-s3_prefix = "user-service2"
+stack_name = "user-service-development"
+s3_prefix = "user-service-development"
 region = "us-east-1"
 parameter_overrides = [
     "Stage=development",
