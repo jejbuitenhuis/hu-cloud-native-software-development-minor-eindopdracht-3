@@ -34,3 +34,4 @@ coverage/**
 .aws-sam
 
 .idea/
+.vscode/

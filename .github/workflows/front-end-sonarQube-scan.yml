@@ -1,43 +1,57 @@
-name: Test webapplication and scan with SonarQube
+name: SonarQUbe scan of the front-end service
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - "front-end/**"
-      - "github/workflows/front-end-sonarQube-scan.yml"
-
-defaults:
-  run:
-    working-directory: "./front-end"
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+    secrets:
+      sonarQube-token:
+        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.X]
+    defaults:
+      run:
+        working-directory: ${{ inputs.path }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js v${{ matrix.node-version }}
+      - name: Set up Node.js v18.X
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18.X
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Validate Typescript typings
+        run: npm run type-check
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: "pip"
+
+      - name: Set up SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Build the serverless application
+        run: sam build
 
       - name: Run tests and collect coverage
         run: |
           npm run test:unit
           npm run test:e2e
 
-      - name: Run SonarQube scanner
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+          projectBaseDir: ${{ inputs.path }}
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          sonar-scanner -D"sonar.projectKey=module-3-front-end" -D"sonar.sources=." -D"sonar.host.url=https://sonar.cloud-native-minor.it" -D"sonar.login=${SONAR_TOKEN}" -D"sonar.javascript.lcov.reportPaths=coverage/lcov.info"
+          SONAR_TOKEN: ${{ secrets.sonarQube-token }}
+          SONAR_HOST_URL: https://sonar.cloud-native-minor.it

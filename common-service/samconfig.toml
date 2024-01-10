@@ -18,9 +18,8 @@ stack_name = "common-service-development"
 s3_prefix = "common-service-development"
 region = "us-east-1"
 parameter_overrides = [
-	"Stage=development",
-	"FrontEndStack=front-end-development"
-]
+	"Stage=development"
+ ]
 
 [default.package.parameters]
 resolve_s3 = true
@@ -43,8 +42,7 @@ stack_name = "common-service-staging"
 s3_prefix = "common-service-staging"
 region = "us-east-1"
 parameter_overrides = [
-	"Stage=staging",
-	"FrontEndStack=front-end-staging"
+	"Stage=staging"
 ]
 
 [production.deploy.parameters]
@@ -56,6 +54,5 @@ stack_name = "common-service-production"
 s3_prefix = "common-service-production"
 region = "us-east-1"
 parameter_overrides = [
-	"Stage=production",
-	"FrontEndStack=front-end-production"
+	"Stage=production"
 ]

@@ -1,24 +1,28 @@
-name: Test card bounded context and scan with sonarQube
+name: SonarQube scan of a back-end service
 
 on:
-  push:
-    branches:
-      - "master"
-    paths:
-      - "card/**"
-      - ".github/workflows/card-sonarQube-scan.yml"
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+      coverage-file:
+        required: true
+        type: string
+    secrets:
+      SONAR_QUBE_TOKEN:
+        required: true
 
-defaults:
-  run:
-    working-directory: "./card"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.path }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set Locale
         run: echo "export LC_ALL=C.UTF-8" >> $GITHUB_ENV
 
@@ -38,12 +42,12 @@ jobs:
         run: |
           pip3 install -r tests/test-requirements.txt
           coverage run --source=. -m pytest tests -rap --junitxml target/testreport-coverage.xml
-          coverage xml -o target/<coverave-report-xml>
+          coverage xml -o target/${{ inputs.coverage-file }}
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
         with:
-          projectBaseDir: "./card"
+          projectBaseDir: ${{ inputs.path }}
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_QUBE_TOKEN }}
+          SONAR_HOST_URL: https://sonar.cloud-native-minor.it

@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  cnsdm-eindopdracht-3
+Description: frontend stack
 
 Globals:
   Function:
@@ -16,7 +15,7 @@ Parameters:
     Default: front-end
 
 Resources:
-  FrontEndS3Bucket: # {{{
+  FrontEndS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       PublicAccessBlockConfiguration:
@@ -24,45 +23,40 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
-  # }}}
 
-  FrontEndS3BucketParameter: # {{{
+  FrontEndS3BucketParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub /${Stage}/frontEnd/bucketName
       Type: String
       Value: !Ref FrontEndS3Bucket
-    # }}}
 
-  # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html
-  FrontEndS3Policy: # {{{
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref FrontEndS3Bucket
-      PolicyDocument:
-        Id: PolicyForCloudFrontPrivateContent
-        Version: "2012-10-17"
-        Statement:
-          - Sid: AllowCloudFrontServicePrincipal
-            Effect: Allow
-            Principal:
-              Service: cloudfront.amazonaws.com
-            Action: s3:GetObject
-            Resource: !Sub "arn:aws:s3:::${FrontEndS3Bucket}/*"
-            Condition:
-              StringEquals:
-                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFront}
-  # }}}
+#  FrontEndS3Policy:
+#    Type: AWS::S3::BucketPolicy
+#    Properties:
+#      Bucket: !Ref FrontEndS3Bucket
+#      PolicyDocument:
+#        Id: PolicyForCloudFrontPrivateContent
+#        Version: "2012-10-17"
+#        Statement:
+#          - Sid: AllowCloudFrontServicePrincipal
+#            Effect: Allow
+#            Principal:
+#              Service: cloudfront.amazonaws.com
+#            Action: s3:GetObject
+#            Resource: !Sub "arn:aws:s3:::${FrontEndS3Bucket}/*"
+#            Condition:
+#              StringEquals:
+#                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFront}
 
-  WebAppOriginAccessControl: # {{{
-    Type: AWS::CloudFront::OriginAccessControl
-    Properties:
-      OriginAccessControlConfig:
-        Name: !Sub "${Stage}-front-end-origin-access-control"
-        OriginAccessControlOriginType: s3
-        SigningBehavior: always
-        SigningProtocol: sigv4
-  # }}}
+#  WebAppOriginAccessControl:
+#    Type: AWS::CloudFront::OriginAccessControl
+#    Properties:
+#      OriginAccessControlConfig:
+#        Name: !Sub "${Stage}-front-end-origin-access-control"
+#        OriginAccessControlOriginType: s3
+#        SigningBehavior: always
+#        SigningProtocol: sigv4
 
   CloudFront: # {{{
     Type: AWS::CloudFront::Distribution

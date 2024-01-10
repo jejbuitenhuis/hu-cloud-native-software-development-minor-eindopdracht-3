@@ -1,0 +1,103 @@
+name: Test and release back-end services
+
+on:
+  push:
+    branches:
+     - staging
+     - master
+    paths:
+      - 'user-service/**'
+      - 'wishlist-service/**'
+      - 'deck-service/**'
+      - 'card-service/**'
+      - 'common-service/**'
+      - 'collection-service/**'
+  workflow_dispatch:
+
+jobs:
+  back-end-sonarQube-matrix:
+    if: github.ref == 'refs/heads/staging'
+    strategy:
+      matrix:
+        include:
+          - service: card
+            path: ./card-service
+            sonarQubeSecret: SONAR_TOKEN_CARD
+          - service: user
+            path: ./user-service
+            sonarQubeSecret: SONAR_TOKEN_USER
+          - service: deck
+            path: ./deck-service
+            sonarQubeSecret: SONAR_TOKEN_DECK
+          - service: wishlist
+            path: ./wishlist-service
+            sonarQubeSecret: SONAR_TOKEN_WISHLIST
+          - service: collection
+            path: ./collection-service
+            sonarQubeSecret: SONAR_TOKEN_COLLECTION
+    uses: ./.github/workflows/back-end-sonarQube-scan.yml
+    with:
+      path: ${{ matrix.path }}
+      coverage-file: coverage-${{ matrix.service }}.xml
+    secrets:
+      SONAR_QUBE_TOKEN: ${{ secrets[matrix.sonarQubeSecret] }}
+
+  back-end-deployment-matrix-staging:
+    needs: back-end-sonarQube-matrix
+    if: github.ref == 'refs/heads/staging' && success()
+    strategy:
+      max-parallel: 1
+      matrix:
+        service: [ 'common-service', 'user-service', 'card-service', 'deck-service', 'wishlist-service', 'collection-service' ]
+    uses: ./.github/workflows/release-back-end-pipeline.yml
+    with:
+      path: ./${{ matrix.service }}
+      service-name: ${{ matrix.service }}
+      environment: staging
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  back-end-deployment-matrix-production:
+    if: github.ref == 'refs/heads/master'
+    strategy:
+      max-parallel: 1
+      matrix:
+        service: [ 'common-service', 'user-service', 'card-service', 'deck-service', 'wishlist-service', 'collection-service' ]
+    uses: ./.github/workflows/release-back-end-pipeline.yml
+    with:
+      path: ./${{ matrix.service }}
+      service-name: ${{ matrix.service }}
+      environment: production
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  tag-and-release:
+    needs: [back-end-deployment-matrix-staging, back-end-deployment-matrix-production]
+    if: always() && !cancelled()
+    timeout-minutes: 2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: fail if conditional job failed
+        if: ${{ needs.back-end-deployment-matrix-staging.result == 'failure' || needs.back-end-deployment-matrix-production.result == 'failure' }}
+        run: exit 1
+      
+      - name: Tag the build version
+        run: |
+          git tag "back-end-v${GITHUB_RUN_NUMBER}"
+          git push origin "back-end-v${GITHUB_RUN_NUMBER}"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: back-end-v${{ github.run_number }}
+          release_name: back-end-v${{ github.run_number }}
+          draft: false
+          prerelease: false

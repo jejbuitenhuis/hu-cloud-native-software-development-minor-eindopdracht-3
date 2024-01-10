@@ -1,0 +1,89 @@
+name: Deploy webapplication to proper environment
+
+on:
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      s3-bucket-name:
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.path }}
+
+    steps:
+      - name: Use Node.js 18.X
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18.X
+
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          npm ci
+
+      - name: Production build
+        run: |
+          unset CI
+          npm run build --omit dev
+
+      - name: Set up SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Build the webapplication
+        run: sam build
+
+      - name: Deploy the webapplication
+        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --config-env ${{ inputs.environment }}
+
+      - name: Retrieve SSM parameter
+        id: parameters
+        run: |
+          echo "bucket_name=$(aws ssm get-parameter --name="/${{ inputs.environment }}/frontEnd/bucketName" --output json | jq '.Parameter.Value' -r)" >> $GITHUB_OUTPUT
+#          echo "cloudfront_id=$(aws ssm get-parameter --name="/staging/frontEnd/cloudFrontId" --output json | jq '.Parameter.Value' -r)" >> $GITHUB_OUTPUT
+
+      - name: Upload to S3
+        run: aws s3 sync dist s3://${{ steps.parameters.outputs.bucket_name }}/
+
+#      - name: Invalidate CloudFront caches
+#        run: aws cloudfront create-invalidation --distribution-id ${{ steps.parameters.outputs.cloudfront_id }}  --paths "/*" 1> /dev/null
+
+      - name: Tag the build version
+        run: |
+          git tag "front-end-v${GITHUB_RUN_NUMBER}"
+          git push origin "front-end-v${GITHUB_RUN_NUMBER}"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: front-end-v${{ github.run_number }}
+          release_name: front-end-v${{ github.run_number }}
+          draft: false
+          prerelease: false
