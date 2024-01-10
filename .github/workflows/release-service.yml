@@ -62,6 +62,9 @@ jobs:
       path: ./${{ matrix.service }}
       service-name: ${{ matrix.service }}
       environment: production
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   tag-and-release:
     needs: [back-end-deployment-matrix-staging, back-end-deployment-matrix-production]
