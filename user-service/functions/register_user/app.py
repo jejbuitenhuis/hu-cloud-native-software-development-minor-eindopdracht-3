@@ -24,14 +24,9 @@ def is_email_already_registered(email, user_pool_id):
     except ClientError as e:
         if e.response["Error"]["Code"] == "UserNotFoundException":
             return False
-        if e.response["Error"]["Code"] == "InvalidPasswordException":
+        else:
             logger.error(e.response)
-            return {
-                "statusCode": 400,
-                "body": json.dumps({
-                    "error": "Password must be at least 8 characters long."
-                })
-        }
+            return e.response
 
 
 
@@ -67,7 +62,7 @@ def lambda_handler(event, context):
             })
         }
     elif email_exists is False:
-        logger.info('Email address is not registered. Proceeding with user registration.')
+        logger.info("Email address is not registered. Proceeding with user registration.")
 
         try:
             response = client.sign_up(
@@ -80,7 +75,15 @@ def lambda_handler(event, context):
             )
         except ClientError as e:
             logger.error(e.response)
-            return e.response
+            
+            if e.response["Error"]["Code"] == "InvalidPasswordException":
+                logger.error(e.response)
+                return {
+                    "statusCode": 400,
+                    "body": json.dumps({
+                        "error": "Password must be at least 8 characters long."
+                    })
+        }
             
 
         logger.info(f'User Registered: {response}')
