@@ -115,5 +115,6 @@ def test_lambda_handler_PasswordTooShort():
 
 
         # Assert
-        assert result['ResponseMetadata']['HTTPStatusCode'] == 400
-        assert result['Error']['Code'] == 'InvalidPasswordException'
+        assert result['statusCode'] == 400
+        response_body = json.loads(result['body'])
+        assert response_body['error'] == 'Password must be at least 8 characters long.'

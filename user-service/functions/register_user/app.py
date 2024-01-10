@@ -75,7 +75,15 @@ def lambda_handler(event, context):
             )
         except ClientError as e:
             logger.error(e.response)
-            return e.response
+            
+            if e.response["Error"]["Code"] == "InvalidPasswordException":
+                logger.error(e.response)
+                return {
+                    "statusCode": 400,
+                    "body": json.dumps({
+                        "error": "Password must be at least 8 characters long."
+                    })
+        }
             
 
         logger.info(f'User Registered: {response}')
