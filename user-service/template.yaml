@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: user-service
+Description: user-service2
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -94,15 +94,11 @@ Resources:
       Policies:
         PasswordPolicy:
             MinimumLength: 8
-            RequireUppercase: true
-            RequireLowercase: true
-            RequireNumbers: true
-            RequireSymbols: true
       Schema:
         - Name: email
           AttributeDataType: String
-        - Name: username
-          AttributeDataType: String
+        # - Name: username
+        #   AttributeDataType: String
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
