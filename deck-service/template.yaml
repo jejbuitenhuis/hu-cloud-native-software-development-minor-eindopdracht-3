@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: user-service
+Description: Deck-service
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -27,10 +27,10 @@ Parameters:
     Default: common-service
 
 Resources:
-  MTGUserApi:
+  MTGDeckApi:
     Type: AWS::Serverless::Api
     Properties:
-      Name: !Sub "${Stage}-mtg-user-api"
+      Name: !Sub "${Stage}-mtg-deck-api"
       StageName: !Ref Stage
       OpenApiVersion: '2.0'
       DefinitionBody:
@@ -50,11 +50,11 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
-  MTGUserDynamoDBTable:
+  MTGDeckDynamoDBTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: !Sub "${Stage}-mtg-user-db"
+      TableName: !Sub "${Stage}-mtg-deck-db"
       AttributeDefinitions:
         - AttributeName: PK
           AttributeType: S
@@ -75,11 +75,11 @@ Resources:
         HelloWorld:
           Type: Api
           Properties:
-            RestApiId: !Ref "MTGUserApi"
+            RestApiId: !Ref "MTGDeckApi"
             Path: /ping
             Method: get
 
 Outputs:
-  MTGUserApiUrl:
+  MTGDeckApiUrl:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+    Value: !Sub "https://${MTGDeckApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
