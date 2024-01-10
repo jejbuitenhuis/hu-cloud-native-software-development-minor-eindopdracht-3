@@ -7,10 +7,11 @@ on:
      - master
     paths:
       - 'user-service/**'
-      - 'collection-service/**'
+      - 'wishlist-service/**'
       - 'deck-service/**'
       - 'card-service/**'
       - 'common-service/**'
+      - 'collection-service/**'
   workflow_dispatch:
 
 jobs:
@@ -19,14 +20,16 @@ jobs:
     strategy:
       matrix:
         include:
-#          - service: card
-#            sonarQubeSecret: SONAR_TOKEN_CARD_SERVICE
+          # - service: card
+            # sonarQubeSecret: SONAR_TOKEN_CARD
           - service: user-service
             sonarQubeSecret: SONAR_TOKEN_USER
-#          - service: deck
-#            sonarQubeSecret: SONAR_TOKEN_DECK_SERVICE
-#          - service: collection
-#            sonarQubeSecret: SONAR_TOKEN_COLLECTION_SERVICE
+          # - service: deck
+            # sonarQubeSecret: SONAR_TOKEN_DECK
+          # - service: wishlist
+            # sonarQubeSecret: SONAR_TOKEN_WISHLIST
+          # - service: collection
+            # sonarQubeSecret: SONAR_TOKEN_COLLECTION
     uses: ./.github/workflows/back-end-sonarQube-scan.yml
     with:
       path: ./${{ matrix.service }}
@@ -41,7 +44,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        service: [ 'common-service', 'user-service' ]
+        service: [ 'common-service', 'user-service', 'card-service', 'deck-service', 'wishlist-service', 'collection-service' ]
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
       path: ./${{ matrix.service }}
@@ -56,7 +59,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        service: [ 'common-service', 'user-service' ]
+        service: [ 'common-service', 'user-service', 'card-service', 'deck-service', 'wishlist-service', 'collection-service' ]
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
       path: ./${{ matrix.service }}
