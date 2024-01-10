@@ -1,0 +1,41 @@
+name: Test and release webapplication
+
+on:
+  push:
+    branches:
+      - staging
+      - master
+    paths:
+      - '/front-end/**'
+  workflow_dispatch:
+
+jobs:
+  run-sonarQube-scan-on-front-end:
+    if: github.ref == 'refs/heads/staging'
+    uses: ./.github/workflows/front-end-sonarQube-scan.yml
+    with:
+      path: './front-end'
+      sonarQube-token: ${{ secrets.SONAR_TOKEN_FRONT_END }}
+
+  deploy-front-end-staging:
+    if: success() && github.ref == 'refs/heads/staging'
+    needs: run-sonarQube-scan-on-front-end
+    uses: ./.github/workflows/release-front-end-pipeline.yml
+    with:
+      path: '/front-end/**'
+      environment: 'staging'
+      s3-bucket-name: 'module-3-front-end'
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy-front-end-master:
+    if: github.ref == 'refs/heads/master'
+    uses: ./.github/workflows/release-front-end-pipeline.yml
+    with:
+      path: '/front-end/**'
+      environment: 'production'
+      s3-bucket-name: 'module-3-front-end'
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
