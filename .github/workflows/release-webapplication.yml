@@ -6,7 +6,7 @@ on:
       - staging
       - master
     paths:
-      - '/front-end/**'
+      - 'front-end/**'
   workflow_dispatch:
 
 jobs:
