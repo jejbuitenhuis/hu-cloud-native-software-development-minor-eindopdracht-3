@@ -86,19 +86,28 @@ function showErrorMessage(error : string){
 }
 
 function handleInput(){
-    if (passwordConfirmInput.value === null) {
-        throw "Where did the password confirm field go?"
+    if (passwordConfirmInput.value === null || passwordInput.value === null) {
+        throw "Where did my fields go?"
     }
-
+    
     // @ts-ignore typescript zeikt over dat hij niet weet dat het html element een value heeft
     confirmPassword.value = passwordConfirmInput.value.value;
     // @ts-ignore typescript zeikt over dat hij niet weet dat het html element een value heeft
     password.value = passwordInput.value.value;
 
+    if (password.value.length >= 8) {
+        passwordInput.value.setCustomValidity('');
+    } else {
+        passwordInput.value.setCustomValidity('Password must be at least 8 characters long!')
+        return //return so it can't be overwritten by other checks
+    }
+
+    //Checks if the passwords match
     if (password.value === confirmPassword.value) {
         passwordConfirmInput.value.setCustomValidity('');
     } else {
         passwordConfirmInput.value.setCustomValidity('Passwords must match!');
+        return;
     }
 }
 
