@@ -9,13 +9,10 @@ on:
     secrets:
       sonarQube-token:
         required: true
-      sonarQube-host-url:
-        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: ${{ inputs.path }}
@@ -57,4 +54,4 @@ jobs:
           projectBaseDir: ${{ inputs.path }}
         env:
           SONAR_TOKEN: ${{ secrets.sonarQube-token }}
-          SONAR_HOST_URL: ${{ secrets.sonarQube-host-url }}
+          SONAR_HOST_URL: https://sonar.cloud-native-minor.it

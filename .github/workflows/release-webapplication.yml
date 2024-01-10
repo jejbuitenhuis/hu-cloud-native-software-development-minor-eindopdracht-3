@@ -17,7 +17,6 @@ jobs:
       path: './front-end'
     secrets:
       sonarQube-token: ${{ secrets.SONAR_TOKEN_FRONT_END }}
-      sonarQube-host-url: ${{ secrets.SONAR_HOST_URL }}
 
   deploy-front-end-staging:
     if: success() && github.ref == 'refs/heads/staging'
