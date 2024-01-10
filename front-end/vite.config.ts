@@ -10,7 +10,7 @@ export default defineConfig({
 		port: 8080,
 		proxy: {
 			'/api': {
-				target : "http://example.org", // TODO: stel deze url in op de daadwerkelijke cloudfront url
+				target : "https://d24n8wcogmyxee.cloudfront.net/",
 				changeOrigin: true
 			}
 		}
