@@ -32,7 +32,7 @@ jobs:
             sonarQubeSecret: SONAR_TOKEN_COLLECTION
     uses: ./.github/workflows/back-end-sonarQube-scan.yml
     with:
-      path: ./${{ matrix.service }}
+      path: ${{ matrix.service }}
       service-name: ${{ matrix.service }}
       coverage-file: coverage-${{ matrix.service }}.xml
     secrets:
