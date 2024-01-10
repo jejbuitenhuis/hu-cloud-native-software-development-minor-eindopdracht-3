@@ -22,7 +22,7 @@ jobs:
 #          - service: card
 #            sonarQubeSecret: SONAR_TOKEN_CARD_SERVICE
           - service: user-service
-            sonarQubeSecret: SONAR_TOKEN_USER_SERVICE
+            sonarQubeSecret: SONAR_TOKEN_USER
 #          - service: deck
 #            sonarQubeSecret: SONAR_TOKEN_DECK_SERVICE
 #          - service: collection
