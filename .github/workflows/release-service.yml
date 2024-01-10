@@ -66,6 +66,9 @@ jobs:
     timeout-minutes: 2
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
       - name: fail if conditional job failed
         if: ${{ needs.back-end-deployment-matrix-staging.result == 'failure' || needs.back-end-deployment-matrix-production.result == 'failure' }}
         run: exit 1
