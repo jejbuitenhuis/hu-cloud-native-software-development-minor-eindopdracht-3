@@ -1,13 +1,13 @@
 <template>
-<sl-card class="card-header">
+<sl-card class="login-card">
 <h1>Register</h1>
 <form id="login-form" @submit.prevent.submit="register">
     <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="email" ref="emailInput"></sl-input>
     <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
     <sl-input label="Re-enter password" id="confirm" password-toggle placeholder="Confirm password" type="password" required v-model="confirmPassword" @sl-input="handleInput" ref="passwordConfirmInput"></sl-input>
     <p id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
-    <sl-button id="submit" class="confirm" variant="primary" type="submit">Confirm</sl-button>
-    <sl-button id="login" class="gologin" variant="neutral" @click="router.push('/login')">To login</sl-button>
+    <sl-button id="submit" class="button" variant="primary" type="submit">Confirm</sl-button>
+    <sl-button id="login" class="button" variant="neutral" @click="router.push('/login')">To login</sl-button>
 </form>
 </sl-card>
 </template>
@@ -114,11 +114,13 @@ async function sendData(email : string, password : string){
 
 
 <style scoped lang="scss">
-.confirm {
-    width: 100%;
-}
-.gologin {
+.button {
     width: 100%;
     margin-top: 5px;
+}
+.login-card {
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }
 </style>
