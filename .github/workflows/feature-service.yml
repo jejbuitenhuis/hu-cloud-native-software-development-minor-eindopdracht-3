@@ -2,8 +2,6 @@ name: Feature pipeline test back-end services
 
 on:
   pull_request:
-    branches:
-     - feature/**
     paths:
       - 'user-service/**'
       - 'wishlist-service/**'
