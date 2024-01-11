@@ -30,6 +30,7 @@
     
     const cardObject = ref();
     const cardName = ref("");
+    const cardOracle = ref("");
     const cardImageLink = ref("https://cards.scryfall.io/normal/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.jpg?1632831210");
 
     const props = defineProps({
@@ -39,12 +40,14 @@
     onMounted(() => {
         cardObject.value = props.cardObject;
         cardName.value = cardObject.value.name
-        
+        cardOracle.value = cardObject.value.oracle_id;
         const imageUrls = cardObject.value.image_uris
         
         if(imageUrls){
             cardImageLink.value = imageUrls.normal;
         }
+        
+
     });
 
 </script>
