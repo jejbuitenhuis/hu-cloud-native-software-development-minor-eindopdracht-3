@@ -44,10 +44,9 @@ jobs:
         run: sam build
 
       - name: Run tests and collect coverage
-        run: |
-          npm run test:unit
-          npm run test:e2e
+        run: |        
           npm run test:coverage
+          npm run test:e2e
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
