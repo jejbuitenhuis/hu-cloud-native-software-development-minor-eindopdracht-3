@@ -92,12 +92,10 @@ jobs:
           git push origin "back-end-v${GITHUB_RUN_NUMBER}"
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: back-end-v${{ github.run_number }}
           tag_name: back-end-v${{ github.run_number }}
-          release_name: back-end-v${{ github.run_number }}
           draft: false
           prerelease: false
