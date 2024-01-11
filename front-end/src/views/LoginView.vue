@@ -66,11 +66,13 @@
                 if (response.ok) {
                     response.json()
                         .then((body) => {
-                            storeSessionToken(body.jwtToken);
+                            storeSessionToken(body.token);
                         })
                     router.push("/home");
-                } if (response.status === 400) {
+                } if (response.status === 403) {
                     showErrorMessage('Invalid credentials!')
+                } if (response.status === 400) {
+                    showErrorMessage('Please verify your account with the confirmation email!')
                 } else {
                     showErrorMessage('Something went wrong!');
                 }
