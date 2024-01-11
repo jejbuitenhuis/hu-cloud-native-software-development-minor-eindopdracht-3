@@ -15,7 +15,7 @@ Parameters:
     Default: front-end
 
 Resources:
-  FrontEndS3Bucket:
+  FrontEndS3Bucket: # {{{
     Type: AWS::S3::Bucket
     Properties:
       PublicAccessBlockConfiguration:
@@ -23,8 +23,9 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+  # }}}
 
-  FrontEndS3BucketParameter:
+  FrontEndS3BucketParameter: # {{{
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub /${Stage}/frontEnd/bucketName
