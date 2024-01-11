@@ -1,11 +1,11 @@
 <template>
     <article class="cardItem">
-        <a>
+        <RouterLink :to="{ path: '/cards/', query: { cardName: cardName } }">
             <span>{{ cardName }}</span>
             <div>
-                <img class="image" src="../assets/testcard.jpg" :alt="cardName">
+                <img class="image" :src="cardImageLink" :alt="cardName">
             </div>
-        </a>
+        </RouterLink>
     </article>
 </template>
 
@@ -26,14 +26,11 @@
 
 
 <script setup lang="ts">
-    import "@shoelace-style/shoelace/dist/components/input/input";
-    import '@shoelace-style/shoelace/dist/components/card/card';
-    import '@shoelace-style/shoelace/dist/components/button/button';
     import { ref, onMounted } from 'vue';
     
     const cardObject = ref();
     const cardName = ref("");
-    const cardImageLink = ref("");
+    const cardImageLink = ref("https://cards.scryfall.io/normal/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.jpg?1632831210");
 
     const props = defineProps({
         cardObject : Object
@@ -41,7 +38,13 @@
 
     onMounted(() => {
         cardObject.value = props.cardObject;
-        console.log(cardObject.value)
+        cardName.value = cardObject.value.name
+        
+        const imageUrls = cardObject.value.image_uris
+        
+        if(imageUrls){
+            cardImageLink.value = imageUrls.normal;
+        }
     });
 
 </script>
