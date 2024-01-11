@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: user-service2
+Description: user-service
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -50,25 +50,6 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
-  # Template code for db tables
-
-  # MTGUserDynamoDBTable:
-  #   Type: AWS::DynamoDB::Table
-  #   DeletionPolicy: Retain
-  #   Properties:
-  #     TableName: !Sub "${Stage}-mtg-user-db"
-  #     AttributeDefinitions:
-  #       - AttributeName: PK
-  #         AttributeType: S
-  #       - AttributeName: SK
-  #         AttributeType: S
-  #     KeySchema:
-  #       - AttributeName: PK
-  #         KeyType: HASH
-  #       - AttributeName: SK
-  #         KeyType: RANGE
-  #     BillingMode: PAY_PER_REQUEST
-
   PingFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -84,7 +65,7 @@ Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: MTGUserPool
+      UserPoolName: !Sub "${Stage}-MTGUserPool"
       UsernameAttributes:
         - email
       AutoVerifiedAttributes:
@@ -101,9 +82,8 @@ Resources:
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      Domain: mtguserpooldomain
+      Domain: !Sub "${Stage}-mtg-user-pool-domain"
       UserPoolId: !Ref UserPool
-      
 
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient

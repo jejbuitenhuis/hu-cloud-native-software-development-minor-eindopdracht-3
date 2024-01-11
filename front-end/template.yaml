@@ -31,67 +31,72 @@ Resources:
       Name: !Sub /${Stage}/frontEnd/bucketName
       Type: String
       Value: !Ref FrontEndS3Bucket
+  # }}}
 
-#  FrontEndS3Policy:
-#    Type: AWS::S3::BucketPolicy
-#    Properties:
-#      Bucket: !Ref FrontEndS3Bucket
-#      PolicyDocument:
-#        Id: PolicyForCloudFrontPrivateContent
-#        Version: "2012-10-17"
-#        Statement:
-#          - Sid: AllowCloudFrontServicePrincipal
-#            Effect: Allow
-#            Principal:
-#              Service: cloudfront.amazonaws.com
-#            Action: s3:GetObject
-#            Resource: !Sub "arn:aws:s3:::${FrontEndS3Bucket}/*"
-#            Condition:
-#              StringEquals:
-#                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFront}
+  FrontEndS3Policy: # {{{
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontEndS3Bucket
+      PolicyDocument:
+        Id: PolicyForCloudFrontPrivateContent
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudFrontServicePrincipal
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "arn:aws:s3:::${FrontEndS3Bucket}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFront}
+  # }}}
 
-#  WebAppOriginAccessControl:
-#    Type: AWS::CloudFront::OriginAccessControl
-#    Properties:
-#      OriginAccessControlConfig:
-#        Name: !Sub "${Stage}-front-end-origin-access-control"
-#        OriginAccessControlOriginType: s3
-#        SigningBehavior: always
-#        SigningProtocol: sigv4
+  WebAppOriginAccessControl: # {{{
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${Stage}-front-end-origin-access-control"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+  # }}}
 
-#  CloudFront:
-#    Type: AWS::CloudFront::Distribution
-#    Properties:
-#      DistributionConfig:
-#        Enabled: true
-#        DefaultRootObject: "index.html"
-#        Origins:
-#          - Id: !Sub ${Stage}-front-end
-#            DomainName: !GetAtt FrontEndS3Bucket.DomainName
-#            OriginAccessControlId: !GetAtt WebAppOriginAccessControl.Id
-#            CustomOriginConfig:
-#              OriginProtocolPolicy: https-only
-#        DefaultCacheBehavior:
-#          TargetOriginId: !Sub ${Stage}-front-end
-#          AllowedMethods:
-#            - GET
-#            - HEAD
-#            - OPTIONS
-#            - PUT
-#            - PATCH
-#            - POST
-#            - DELETE
-#          CachedMethods:
-#            - GET
-#            - HEAD
-#          ViewerProtocolPolicy: redirect-to-https
-#          ForwardedValues:
-#            QueryString: true
-#        CustomErrorResponses:
-#          - ErrorCode: 404
-#            ResponsePagePath: /index.html
-#            ErrorCachingMinTTL: 30
-#            ResponseCode: 200
+  CloudFront: # {{{
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: "index.html"
+        Origins:
+          - Id: !Sub ${Stage}-front-end
+            DomainName: !GetAtt FrontEndS3Bucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt WebAppOriginAccessControl.Id
+            S3OriginConfig: {}
+        DefaultCacheBehavior:
+          TargetOriginId: !Sub ${Stage}-front-end
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - PATCH
+            - POST
+            - DELETE
+          CachedMethods:
+            - GET
+            - HEAD
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+          OriginRequestPolicyId: 88a5eaf4-2fd4-4709-b370-b4c650ea3fcf # CORS-S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: true
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 30
+            ResponseCode: 200
+  # }}}
 
 Outputs:
   FrontEndS3BucketDomainName:

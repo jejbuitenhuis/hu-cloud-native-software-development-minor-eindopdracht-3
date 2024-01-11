@@ -1,4 +1,4 @@
-name: Test and release webapplication
+name: Test and release web-application
 
 on:
   push:
