@@ -1,7 +1,7 @@
 name: Feature pipeline test back-end services
 
 on:
-  push:
+  pull_request:
     branches:
      - feature/**
     paths:
