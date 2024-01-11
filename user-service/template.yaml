@@ -129,3 +129,9 @@ Outputs:
   MTGUserApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+  MTGUserApi:
+    Description: "Api gateway"
+    Value: !Ref MTGUserApi
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-api'
