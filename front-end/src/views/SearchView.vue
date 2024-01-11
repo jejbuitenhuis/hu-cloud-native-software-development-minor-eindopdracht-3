@@ -6,7 +6,7 @@
         </form>
 
         <section class="cards" >
-            <Card class="card" v-for="card in cards"></Card>
+            <Card :cardObject="card" class="card" v-for="card in cards"></Card>
         </section>
 
     </div>
@@ -42,12 +42,45 @@ const scryfallAPI = inject<Ref<string>>('ScryfallAPI');
 const searchQuery = ref('');
 const cards = ref([]);
 
+const canSubmitForm = ref(true);
+const formSubmitCount = ref(0);
+const MAX_CLICK_PER_SECOND = 3;
+
+
+function canSubmit(){
+    if(canSubmitForm.value){
+        
+        formSubmitCount.value++;
+
+        if(formSubmitCount.value >= MAX_CLICK_PER_SECOND){
+            setTimeout(() => {
+                formSubmitCount.value = 0;
+                canSubmitForm.value = true;
+            }, 1000);
+
+            return false;
+        }
+        return true;
+    } else {
+        return false
+    }
+}
+
+
 async function findCards() {
+    
+    if(!canSubmit()){
+        return;
+    }
+
     let apiUrl : string = scryfallAPI!.value + "/cards/search?";
     const query = "q=" + searchQuery.value;
     apiUrl = apiUrl + query;
     
     const response = await requestCards(apiUrl);
+    cards.value = response.data;
+    
+    console.info(response);
 }
 
 async function requestCards(scryfallAPI: string) : Promise<any>{

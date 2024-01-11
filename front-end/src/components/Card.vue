@@ -22,10 +22,25 @@
     import "@shoelace-style/shoelace/dist/components/input/input";
     import '@shoelace-style/shoelace/dist/components/card/card';
     import '@shoelace-style/shoelace/dist/components/button/button';
+    import { ref, onMounted } from 'vue';
     
-    import { ref } from 'vue';
-
+    const cardObject = ref();
     const cardName = ref("");
     const cardImageLink = ref("");
+
+    const props = defineProps({
+        cardObject : Object
+    })
+
+    onMounted(() => {
+        cardObject.value = props.cardObject;
+        console.log(cardObject.value)
+    });
+
+  
+
+
+
+    
 
 </script>
