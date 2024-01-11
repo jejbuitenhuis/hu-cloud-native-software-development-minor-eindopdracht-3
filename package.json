@@ -1,5 +1,0 @@
-{
-  "devDependencies": {
-    "@vitejs/plugin-basic-ssl": "^1.0.2"
-  }
-}
