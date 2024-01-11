@@ -65,7 +65,7 @@ Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: MTGUserPool
+      UserPoolName: !Sub "${Stage}-MTGUserPool"
       UsernameAttributes:
         - email
       AutoVerifiedAttributes:
@@ -75,10 +75,6 @@ Resources:
       Policies:
         PasswordPolicy:
             MinimumLength: 8
-            RequireUppercase: true
-            RequireLowercase: true
-            RequireNumbers: true
-            RequireSymbols: true
       Schema:
         - Name: email
           AttributeDataType: String
