@@ -66,7 +66,7 @@
                 if (response.ok) {
                     response.json()
                         .then((body) => {
-                            storeSessionToken(body.jwtToken);
+                            storeSessionToken(body.token);
                         })
                     router.push("/home");
                 } if (response.status === 400) {
