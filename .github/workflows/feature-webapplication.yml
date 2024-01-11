@@ -2,8 +2,6 @@ name: Feature test web-application
 
 on:
   pull_request:
-    branches:
-      - feature/**
     paths:
       - 'front-end/**'
   workflow_dispatch:
