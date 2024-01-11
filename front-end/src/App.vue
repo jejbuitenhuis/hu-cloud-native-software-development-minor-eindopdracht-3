@@ -1,7 +1,3 @@
-<template>
-	<RouterView />
-</template>
-
 <script setup lang="ts">
 import { onBeforeMount, onBeforeUnmount } from "vue";
 import { RouterView } from "vue-router";
@@ -25,6 +21,11 @@ onBeforeMount(() => {
 	toggleDarkMode(preferDarkMode);
 });
 </script>
+
+<template>
+	<RouterView />
+</template>
+
 
 <style lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
