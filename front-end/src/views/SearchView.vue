@@ -1,11 +1,11 @@
 <template>
     <div class="container">
         <h1>Search a card:</h1>
-        <form @submit.prevent.submit="findCards">
+        <form @submit.prevent.submit="findCards" :class="{ 'disabled': formDisabled }">
             <sl-input v-model="searchQuery"></sl-input>
         </form>
 
-        <section class="cards" >
+        <section class="cardsContainer" >
             <Card :cardObject="card" class="card" v-for="card in cards"></Card>
         </section>
 
@@ -21,9 +21,8 @@
     flex-direction: column;
 }
 
-.cards {
+.cardsContainer {
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap;
     padding-top: 1rem;
     width: 80%;
@@ -42,27 +41,29 @@ const scryfallAPI = inject<Ref<string>>('ScryfallAPI');
 const searchQuery = ref('');
 const cards = ref([]);
 
-const canSubmitForm = ref(true);
+const formDisabled = ref(false);
 const formSubmitCount = ref(0);
-const MAX_CLICK_PER_SECOND = 3;
-
+const MAX_SUBMITS_PER_SECOND = 2;
 
 function canSubmit(){
-    if(canSubmitForm.value){
+    if(formDisabled.value){
+        return false;
+    }
+
+    formSubmitCount.value++;
+
+    if(formSubmitCount.value >= MAX_SUBMITS_PER_SECOND){
         
-        formSubmitCount.value++;
+        formDisabled.value = true;
 
-        if(formSubmitCount.value >= MAX_CLICK_PER_SECOND){
-            setTimeout(() => {
-                formSubmitCount.value = 0;
-                canSubmitForm.value = true;
-            }, 1000);
+        setTimeout(() => {
+            formSubmitCount.value = 0;
+            formDisabled.value = false;
+        }, 3000);
 
-            return false;
-        }
+        return false;
+    } else{
         return true;
-    } else {
-        return false
     }
 }
 
@@ -79,8 +80,6 @@ async function findCards() {
     
     const response = await requestCards(apiUrl);
     cards.value = response.data;
-    
-    console.info(response);
 }
 
 async function requestCards(scryfallAPI: string) : Promise<any>{

@@ -1,19 +1,26 @@
 <template>
-    <sl-card class="cardItem">
+    <article class="cardItem">
         <a>
             <span>{{ cardName }}</span>
             <div>
-                <img :src="cardImageLink" :alt="cardName">
+                <img class="image" src="../assets/testcard.jpg" :alt="cardName">
             </div>
         </a>
-    </sl-card>
+    </article>
 </template>
 
 
 <style scoped>
   .cardItem{
-    height: fit-content;
-    width: fit-content;
+    max-width: 25%;
+    padding: 0.4rem;
+  }
+
+  .image {
+    height: auto;
+    width: 100%;
+    display: block;
+    border-radius: 1rem;
   }
 </style>
 
@@ -36,11 +43,5 @@
         cardObject.value = props.cardObject;
         console.log(cardObject.value)
     });
-
-  
-
-
-
-    
 
 </script>
