@@ -24,7 +24,6 @@ def setup_mocks():
 
     event = {
         'body': json.dumps({
-            # 'username': 'testnewuser',
             'password': 'NewPassword456!',
             'email': 'maikel.reijneke@gmail.com'
         })
@@ -97,7 +96,6 @@ def test_lambda_handler_password_too_short():
 
     event = {
         'body': json.dumps({
-            # 'username': 'testnewuser',
             'password': 'Pass',
             'email': 'maikel.reijneke@gmail.com'
         })

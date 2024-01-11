@@ -39,6 +39,25 @@
           "type" : "aws_proxy"
         }
       }
+    },
+    "/auth/login": {
+      "post": {
+        "parameters" : [],
+        "responses" : {
+          "200": {
+            "description": "User logged in successfully"
+          },
+          "500": {
+            "description": "Wrong login credentials"
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LoginUserFunction.Arn}/invocations"},
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
+      }
     }
   }
 }

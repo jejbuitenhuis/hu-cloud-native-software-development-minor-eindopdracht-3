@@ -1,10 +1,10 @@
 import json
 import os
+
 import boto3
 from botocore.exceptions import ClientError
 from aws_xray_sdk.core import patch_all
 import logging
-import datetime
 
 patch_all()
 
@@ -45,15 +45,15 @@ def lambda_handler(event, context):
     logger.info(f'UserPoolID: {user_pool_id}')
 
     body = json.loads(event['body'])
-
     password = body['password']
     email = body['email']
 
     email_exists = is_email_already_registered(email, user_pool_id)
-    email_used_str = 'Email address is already in use.'
-
+    
     if email_exists is True:
+        email_used_str = 'Email address is already in use.'
         logger.info(email_used_str)
+
         return {
             "statusCode": 409,
             "body": json.dumps({
