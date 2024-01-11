@@ -1,6 +1,3 @@
-./coverage
-.scannerwork/
-
 .DS_Store
 node_modules/
 /dist/
@@ -22,3 +19,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+
+.scannerwork/**
+coverage/**
+

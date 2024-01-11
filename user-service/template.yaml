@@ -86,7 +86,6 @@ Resources:
     Properties:
       Domain: !Sub "${Stage}-mtg-user-pool-domain"
       UserPoolId: !Ref UserPool
-      
 
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
