@@ -39,7 +39,7 @@ Resources:
           Parameters:
             Location: ./swagger-spec.json
       MethodSettings:
-        - ResourcePath: '/*'
+        - ResourcePath: '/api/*'
           HttpMethod: '*'
           LoggingLevel: INFO
           MetricsEnabled: true

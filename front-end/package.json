@@ -12,6 +12,8 @@
     "test:coverage": "vitest run --coverage",
     "test:coverage:ui": "vitest --ui",
     "test:e2e": "NODE_ENV='e2e' start-server-and-test preview http://localhost:4173 'cypress run --e2e --browser chromium --headless'",
+    "test:start-server": " start-server-and-test preview http://localhost:4173",
+    "test:e2e-windows": "set NODE_ENV=e2e && start-server-and-test preview http://localhost:4173 'cypress run --e2e --browser chrome --headless'",
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e --browser chromium'",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force"

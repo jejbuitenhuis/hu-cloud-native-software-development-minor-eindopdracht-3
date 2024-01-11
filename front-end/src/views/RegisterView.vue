@@ -108,11 +108,11 @@ async function sendData(email : string, password : string){
     <sl-card class="login-card">
     <h1>Register</h1>
     <form id="login-form" @submit.prevent.submit="register">
-    <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="email" ref="emailInput"></sl-input>
-    <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
-    <sl-input label="Re-enter password" id="confirm" password-toggle placeholder="Confirm password" type="password" required v-model="confirmPassword" @sl-input="handleInput" ref="passwordConfirmInput"></sl-input>
+    <sl-input label="Email" data-test-id="email" id="email" type="email" placeholder="Email" required v-model="email" ref="emailInput"></sl-input>
+    <sl-input label="Password" data-test-id="password" id="password" password-toggle placeholder="Password" type="password" required v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
+    <sl-input label="Re-enter password" data-test-id="confirm" id="confirm" password-toggle placeholder="Confirm password" type="password" required v-model="confirmPassword" @sl-input="handleInput" ref="passwordConfirmInput"></sl-input>
     <p class="error" id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
-    <sl-button id="submit" class="button" variant="primary" type="submit">Confirm</sl-button>
+    <sl-button data-test-id="submit" id="submit" class="button" variant="primary" type="submit">Confirm</sl-button>
     <sl-button id="login" class="button" variant="neutral" @click="router.push('/login')">To login</sl-button>
 </form>
 </sl-card>
