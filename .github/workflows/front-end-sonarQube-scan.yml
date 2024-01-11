@@ -45,9 +45,8 @@ jobs:
 
       - name: Run tests and collect coverage
         run: |
-          npm run test:unit
-          npm run test:e2e
           npm run test:coverage
+          npm run test:e2e
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
