@@ -30,7 +30,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ${ matrix.path }
+        working-directory: ${{ matrix.path }}
 
     steps:
       - uses: actions/checkout@v4
