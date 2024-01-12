@@ -1,4 +1,9 @@
+import { v4 as uuidv4} from 'uuid';
+
 describe("Register page Test", () => {
+	const firstEmail = `test-${uuidv4()}@example.com`;
+	const secondEmail = `test-${uuidv4()}@example.com`;
+
 	beforeEach(()=>{
 		cy.visit("/register");
 	});
@@ -7,7 +12,7 @@ describe("Register page Test", () => {
 		cy.getByTestId('email')
 			.shadow()
 			.find("input")
-			.type('test@example.com');
+			.type(firstEmail);
 		cy.getByTestId('password')
 			.shadow()
 			.find("input")
@@ -20,27 +25,49 @@ describe("Register page Test", () => {
 			.shadow()
 			.find('button')
 			.clickAtTop();
-		cy.contains("We have send you an email to verify your email adress.");
+		cy.on('window:alert', (str) => {
+			expect(str).to.equal(`We have send you an email to verify your email adress.`)
+		  })
 	});
 
 	it("Registers when user already exists", () => {
 		cy.getByTestId('email')
-			.typeInWebComponent('test@example.com');
+		.shadow()
+		.find("input")
+		.type(secondEmail)
+			// .typeInWebComponent(secondEmail);
 		cy.getByTestId('password')
-			.typeInWebComponent('testtest');
+		.shadow()
+		.find("input")
+		.type('testtest')
+			// .typeInWebComponent('testtest');
 		cy.getByTestId('confirm')
-			.typeInWebComponent('testtest');
+		.shadow()
+		.find("input")
+		.type('testtest')
+			// .typeInWebComponent('testtest');
 		cy.getByTestId('submit')
 			.shadow()
 			.find('button')
 			.clickAtTop();
 
+		cy.visit("/register");
+
 		cy.getByTestId('email')
-			.typeInWebComponent('test@example.com');
+		.shadow()
+		.find("input")
+		.type(secondEmail)
+			// .typeInWebComponent(secondEmail);
 		cy.getByTestId('password')
-			.typeInWebComponent('testtest');
+		.shadow()
+		.find("input")
+		.type('testtest')
+			// .typeInWebComponent('testtest');
 		cy.getByTestId('confirm')
-			.typeInWebComponent('testtest');
+		.shadow()
+		.find("input")
+		.type('testtest')
+			// .typeInWebComponent('testtest');
 		cy.getByTestId('submit')
 			.shadow()
 			.find('button')
