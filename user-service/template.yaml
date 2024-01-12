@@ -39,7 +39,7 @@ Resources:
           Parameters:
             Location: ./swagger-spec.json
       MethodSettings:
-        - ResourcePath: '/api/*'
+        - ResourcePath: '/*'
           HttpMethod: '*'
           LoggingLevel: INFO
           MetricsEnabled: true
@@ -104,7 +104,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGUserApi"
-            Path: /auth/register
+            Path: /api/user/register
             Method: post
       Environment:
         Variables:
@@ -123,7 +123,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGUserApi"
-            Path: /auth/login
+            Path: /api/user/login
             Method: post
       Environment:
         Variables:
