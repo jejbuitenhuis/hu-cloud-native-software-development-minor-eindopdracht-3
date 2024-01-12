@@ -50,25 +50,6 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
-  # Template code for db tables
-
-  # MTGUserDynamoDBTable:
-  #   Type: AWS::DynamoDB::Table
-  #   DeletionPolicy: Retain
-  #   Properties:
-  #     TableName: !Sub "${Stage}-mtg-user-db"
-  #     AttributeDefinitions:
-  #       - AttributeName: PK
-  #         AttributeType: S
-  #       - AttributeName: SK
-  #         AttributeType: S
-  #     KeySchema:
-  #       - AttributeName: PK
-  #         KeyType: HASH
-  #       - AttributeName: SK
-  #         KeyType: RANGE
-  #     BillingMode: PAY_PER_REQUEST
-
   PingFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -84,7 +65,7 @@ Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: MTGUserPool
+      UserPoolName: !Sub "${Stage}-MTGUserPool"
       UsernameAttributes:
         - email
       AutoVerifiedAttributes:
@@ -94,22 +75,15 @@ Resources:
       Policies:
         PasswordPolicy:
             MinimumLength: 8
-            RequireUppercase: true
-            RequireLowercase: true
-            RequireNumbers: true
-            RequireSymbols: true
       Schema:
         - Name: email
-          AttributeDataType: String
-        - Name: username
           AttributeDataType: String
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
-      Domain: mtguserpooldomain
+      Domain: !Sub "${Stage}-mtg-user-pool-domain"
       UserPoolId: !Ref UserPool
-      
 
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -140,6 +114,24 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AmazonCognitoPowerUser
 
+  LoginUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/login_user/
+      Events:
+        LoginUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGUserApi"
+            Path: /api/user/login
+            Method: post
+      Environment:
+        Variables:
+          USER_POOL_CLIENT_ID: !Ref UserPoolClient
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonCognitoPowerUser
+
 Outputs:
   UserPoolClientId:
     Description: UserPool Client Id
@@ -150,6 +142,15 @@ Outputs:
   RegisterUserFunction:
     Description: Function
     Value: !GetAtt RegisterUserFunction.Arn
+  LoginUserFunction:
+    Description: Function
+    Value: !GetAtt LoginUserFunction.Arn
   MTGUserApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+  MTGUserApi:
+    Description: "Api gateway"
+    Value: !Ref MTGUserApi
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-api'

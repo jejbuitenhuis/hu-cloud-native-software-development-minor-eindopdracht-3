@@ -1,21 +1,18 @@
-name: SonarQUbe scan of the front-end service
+name: Feature test web-application
 
 on:
-  workflow_call:
-    inputs:
-      path:
-        required: true
-        type: string
-    secrets:
-      sonarQube-token:
-        required: true
+  pull_request:
+    paths:
+      - 'front-end/**'
+  workflow_dispatch:
 
 jobs:
-  build:
+  run-sonarQube-scan-on-front-end:
     runs-on: ubuntu-latest
+
     defaults:
       run:
-        working-directory: ${{ inputs.path }}
+        working-directory: ./front-end
 
     steps:
       - uses: actions/checkout@v4
@@ -42,9 +39,6 @@ jobs:
 
       - name: Build the serverless application
         run: sam build
-            
-      - name: Build the web-application
-        run: npm run build
 
       - name: Build the web-application
         run: npm run build
@@ -53,11 +47,3 @@ jobs:
         run: |
           npm run test:coverage
           npm run test:e2e
-
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-        with:
-          projectBaseDir: ${{ inputs.path }}
-        env:
-          SONAR_TOKEN: ${{ secrets.sonarQube-token }}
-          SONAR_HOST_URL: https://sonar.cloud-native-minor.it
