@@ -180,6 +180,10 @@ Resources:
             ResponsePagePath: /index.html
             ErrorCachingMinTTL: 30
             ResponseCode: 200
+          - ErrorCode: 403
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 30
+            ResponseCode: 200
   # }}}
 
 Outputs:
