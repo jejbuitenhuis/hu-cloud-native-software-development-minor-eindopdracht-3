@@ -23,7 +23,7 @@ parameter_overrides = [
 capabilities = "CAPABILITY_IAM"
 resolve_s3 = true
 region = "us-east-1"
-confirm_changeset = true
+confirm_changeset = false
 image_repositories = []
 
 [staging.deploy.parameters]

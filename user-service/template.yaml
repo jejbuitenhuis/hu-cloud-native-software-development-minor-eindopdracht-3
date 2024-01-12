@@ -78,8 +78,6 @@ Resources:
       Schema:
         - Name: email
           AttributeDataType: String
-        - Name: username
-          AttributeDataType: String
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
@@ -116,6 +114,24 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AmazonCognitoPowerUser
 
+  LoginUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/login_user/
+      Events:
+        LoginUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGUserApi"
+            Path: /api/user/login
+            Method: post
+      Environment:
+        Variables:
+          USER_POOL_CLIENT_ID: !Ref UserPoolClient
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonCognitoPowerUser
+
 Outputs:
   UserPoolClientId:
     Description: UserPool Client Id
@@ -126,6 +142,15 @@ Outputs:
   RegisterUserFunction:
     Description: Function
     Value: !GetAtt RegisterUserFunction.Arn
+  LoginUserFunction:
+    Description: Function
+    Value: !GetAtt LoginUserFunction.Arn
   MTGUserApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+  MTGUserApi:
+    Description: "Api gateway"
+    Value: !Ref MTGUserApi
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-api'

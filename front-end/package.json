@@ -12,14 +12,16 @@
     "test:coverage": "vitest run --coverage",
     "test:coverage:ui": "vitest --ui",
     "test:e2e": "NODE_ENV='e2e' start-server-and-test preview http://localhost:4173 'cypress run --e2e --browser chromium --headless'",
+    "test:start-server": " start-server-and-test preview http://localhost:4173",
+    "test:e2e-windows": "set NODE_ENV=e2e && start-server-and-test preview http://localhost:4173 'cypress run --e2e --browser chrome --headless'",
     "test:e2e:dev": "start-server-and-test 'vite dev --port 4173' http://localhost:4173 'cypress open --e2e --browser chromium'",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
     "@shoelace-style/shoelace": "^2.12.0",
-    "@vitejs/plugin-basic-ssl": "^1.0.2",
     "pinia": "^2.1.7",
+    "uuid": "^9.0.1",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5"
   },

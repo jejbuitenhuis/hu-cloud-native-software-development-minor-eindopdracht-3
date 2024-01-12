@@ -2,15 +2,13 @@ import { fileURLToPath, URL } from "node:url";
 
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
-import path from "node:path";
-import basicSsl from "@vitejs/plugin-basic-ssl";
 
 export default defineConfig({
 	server: {
 		port: 8080,
 		proxy: {
 			'/api': {
-				target : "https://d24n8wcogmyxee.cloudfront.net/",
+				target : "https://d24n8wcogmyxee.cloudfront.net",
 				changeOrigin: true
 			}
 		}
@@ -39,8 +37,6 @@ export default defineConfig({
 				},
 			},
 		}),
-		// @ts-ignore fuck off typescript
-		basicSsl()
 	],
 	resolve: {
 		alias: {
