@@ -6,6 +6,12 @@ import vue from "@vitejs/plugin-vue";
 export default defineConfig({
 	server: {
 		port: 8080,
+		proxy: {
+			'/api': {
+				target : "https://d24n8wcogmyxee.cloudfront.net",
+				changeOrigin: true
+			}
+		}
 	},
 	plugins: [
 		vue({

@@ -1,46 +1,3 @@
-<template>
-<div class="container">
-    <sl-card class="login-card">
-    <h1>Register</h1>
-    <form id="login-form" @submit.prevent.submit="register">
-    <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="email" ref="emailInput"></sl-input>
-    <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
-    <sl-input label="Re-enter password" id="confirm" password-toggle placeholder="Confirm password" type="password" required v-model="confirmPassword" @sl-input="handleInput" ref="passwordConfirmInput"></sl-input>
-    <p class="error" id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
-    <sl-button id="submit" class="button" variant="primary" type="submit">Confirm</sl-button>
-    <sl-button id="login" class="button" variant="neutral" @click="router.push('/login')">To login</sl-button>
-</form>
-</sl-card>
-</div>
-
-</template>
-
-<!-- STYLE -->
-
-<style scoped lang="scss">
-
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 5rem;
-}
-
-.button {
-    width: 100%;
-    margin-top: 1rem;
-}
-
-.error {
-    color: var(--sl-color-red-200)
-}
-
-</style>
-
-
-<!-- SCRIPT -->
-
-
 <script setup lang="ts">
 import "@shoelace-style/shoelace/dist/components/input/input";
 import '@shoelace-style/shoelace/dist/components/card/card';
@@ -65,15 +22,15 @@ function register(){
     if (!isFormValid()) {
         return
     }
-    console.log("submitted");
     sendData(email.value, password.value)
         .then((response) => {
             if (response.status === 409){
                 showErrorMessage("This email adress has already been registered!");
-            }
-            if (response.ok) {
+            } else if (response.ok) {
                 alert("We have send you an email to verify your email adress.");
                 router.push("/login");
+            } else if (response.status === 400) {
+                alert(response.json().then((response) => showErrorMessage(response.error)))
             } else {
                 showErrorMessage(`Something went wrong: \n${response.statusText}`);
             }
@@ -89,14 +46,14 @@ function handleInput(){
     if (passwordConfirmInput.value === null || passwordInput.value === null) {
         throw "Where did my fields go?"
     }
-    
+
     // @ts-ignore typescript zeikt over dat hij niet weet dat het html element een value heeft
     confirmPassword.value = passwordConfirmInput.value.value;
     // @ts-ignore typescript zeikt over dat hij niet weet dat het html element een value heeft
     password.value = passwordInput.value.value;
 
     if (password.value.length >= 8) {
-        passwordInput.value.setCustomValidity('');
+        passwordInput.value.setCustomValidity(''); //Empty validity means it's valid
     } else {
         passwordInput.value.setCustomValidity('Password must be at least 8 characters long!')
         return //return so it can't be overwritten by other checks
@@ -129,7 +86,7 @@ function isFormValid() : boolean{
 }
 
 async function sendData(email : string, password : string){
-    return await fetch("/api/auth/register", {
+    return await fetch("/api/users", {
         "method" : "post",
         "mode" : "cors",
         "headers" : {
@@ -143,3 +100,42 @@ async function sendData(email : string, password : string){
     )
 }
 </script>
+
+<template>
+<div class="container">
+    <sl-card class="login-card">
+    <h1>Register</h1>
+    <form id="login-form" @submit.prevent.submit="register">
+    <sl-input label="Email" data-test-id="email" id="email" type="email" placeholder="Email" required v-model="email" ref="emailInput"></sl-input>
+    <sl-input label="Password" data-test-id="password" id="password" password-toggle placeholder="Password" type="password" required v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
+    <sl-input label="Re-enter password" data-test-id="confirm" id="confirm" password-toggle placeholder="Confirm password" type="password" required v-model="confirmPassword" @sl-input="handleInput" ref="passwordConfirmInput"></sl-input>
+    <p class="error" id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
+    <sl-button data-test-id="submit" id="submit" class="button" variant="primary" type="submit">Confirm</sl-button>
+    <sl-button id="login" class="button" variant="neutral" @click="router.push('/login')">To login</sl-button>
+</form>
+</sl-card>
+</div>
+
+</template>
+
+<!-- STYLE -->
+
+<style scoped lang="scss">
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5rem;
+}
+
+.button {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.error {
+    color: var(--sl-color-red-200)
+}
+
+</style>

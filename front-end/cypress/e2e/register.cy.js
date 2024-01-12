@@ -1,29 +1,78 @@
+import { v4 as uuidv4} from 'uuid';
+
 describe("Register page Test", () => {
-   
-    beforeEach(()=>{
-        cy.visit("/register");
-    })
-    
-    // it("Registers the user in correctly", () => {
-    //     cy.get('#email').find("input").type('test@example.com')
-    //     cy.get('#password').find("input").type('testtest')
-    //     cy.get('#confirm').find("input").type('testtest')
-    //     cy.get('#submit').find('button').click({ position: 'top' })
-    //     cy.contains("We have send you an email to verify your email adress.")
-    // })
-    //
-    // it("Registers when user already exists", () => {
-    //     cy.get('#email').find("input").type('test@example.com')
-    //     cy.get('#password').find("input").type('testtest')
-    //     cy.get('#confirm').find("input").type('testtest')
-    //     cy.get('#submit').find('button').click({ position: 'top' })
-    //
-    //
-    //     cy.get('#email').type('test@example.com')
-    //     cy.get('#password').type('testtest')
-    //     cy.get('#confirm').find('input').type('testtest')
-    //     cy.get('#submit').find('button').click({ position: 'top' })
-    //
-    //     cy.contains("This email adress has already been registered!")
-    // })
+	const firstEmail = `test-${uuidv4()}@example.com`;
+	const secondEmail = `test-${uuidv4()}@example.com`;
+
+	beforeEach(()=>{
+		cy.visit("/register");
+	});
+
+	it("Registers the user in correctly", () => {
+		cy.getByTestId('email')
+			.shadow()
+			.find("input")
+			.type(firstEmail);
+		cy.getByTestId('password')
+			.shadow()
+			.find("input")
+			.type('testtest');
+		cy.getByTestId('confirm')
+			.shadow()
+			.find("input")
+			.type('testtest');
+		cy.getByTestId('submit')
+			.shadow()
+			.find('button')
+			.clickAtTop();
+		cy.on('window:alert', (str) => {
+			expect(str).to.equal(`We have send you an email to verify your email adress.`)
+		  })
+	});
+
+	it("Registers when user already exists", () => {
+		cy.getByTestId('email')
+		.shadow()
+		.find("input")
+		.type(secondEmail)
+			// .typeInWebComponent(secondEmail);
+		cy.getByTestId('password')
+		.shadow()
+		.find("input")
+		.type('testtest')
+			// .typeInWebComponent('testtest');
+		cy.getByTestId('confirm')
+		.shadow()
+		.find("input")
+		.type('testtest')
+			// .typeInWebComponent('testtest');
+		cy.getByTestId('submit')
+			.shadow()
+			.find('button')
+			.clickAtTop();
+
+		cy.visit("/register");
+
+		cy.getByTestId('email')
+		.shadow()
+		.find("input")
+		.type(secondEmail)
+			// .typeInWebComponent(secondEmail);
+		cy.getByTestId('password')
+		.shadow()
+		.find("input")
+		.type('testtest')
+			// .typeInWebComponent('testtest');
+		cy.getByTestId('confirm')
+		.shadow()
+		.find("input")
+		.type('testtest')
+			// .typeInWebComponent('testtest');
+		cy.getByTestId('submit')
+			.shadow()
+			.find('button')
+			.clickAtTop();
+
+		cy.contains("This email adress has already been registered!");
+	});
 });
