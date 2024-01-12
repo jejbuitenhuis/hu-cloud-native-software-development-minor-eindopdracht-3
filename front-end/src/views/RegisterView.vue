@@ -88,7 +88,7 @@ function isFormValid() : boolean{
 }
 
 async function sendData(email : string, password : string){
-    return await fetch("/api/auth/register", {
+    return await fetch("/api/users", {
         "method" : "post",
         "mode" : "cors",
         "headers" : {

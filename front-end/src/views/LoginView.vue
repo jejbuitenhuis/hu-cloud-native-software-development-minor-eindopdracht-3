@@ -67,7 +67,7 @@ function handleInput() {
 }
 
 async function sendData(email: string, password: string) {
-  return await fetch("/api/auth/login", {
+  return await fetch("/api/users/login", {
         "method": "post",
         "mode": "no-cors", //Kan potentieel een pijnpunt zijn. Als er cors problemen zijn kijk hier.
         "headers": {
