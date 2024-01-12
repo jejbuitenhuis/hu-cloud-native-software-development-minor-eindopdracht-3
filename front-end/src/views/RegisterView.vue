@@ -26,12 +26,10 @@ function register(){
         .then((response) => {
             if (response.status === 409){
                 showErrorMessage("This email adress has already been registered!");
-            }
-            if (response.ok) {
+            } else if (response.ok) {
                 alert("We have send you an email to verify your email adress.");
                 router.push("/login");
-            }
-            if (response.status === 400) {
+            } else if (response.status === 400) {
                 alert(response.json().then((response) => showErrorMessage(response.error)))
             } else {
                 showErrorMessage(`Something went wrong: \n${response.statusText}`);
