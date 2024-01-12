@@ -83,3 +83,9 @@ Outputs:
   MTGWishlistApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGWishlistApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+  MTGWishlistApi:
+    Description: "Api gateway"
+    Value: !Ref MTGWishlistApi
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-api'

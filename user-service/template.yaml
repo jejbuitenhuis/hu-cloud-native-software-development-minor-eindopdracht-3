@@ -104,7 +104,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGUserApi"
-            Path: /api/user/register
+            Path: /auth/register
             Method: post
       Environment:
         Variables:
