@@ -3,6 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: Card-service
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+
 Globals:
   Function:
     Timeout: 3
@@ -17,6 +18,11 @@ Globals:
         EVENT_BUS_ARN:
           Fn::ImportValue:
             !Sub "common-service-${Stage}-MTGEventBus"
+        TABLE_NAME:
+          Fn::ImportValue:
+            !Sub "${Stage}-mtg-card-db"
+        #update frequency in days
+        CARDS_UPDATE_FREQUENCY: "7"
 
 Parameters:
   Stage:
@@ -51,7 +57,6 @@ Resources:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: !Sub "${Stage}-mtg-card-db"
       AttributeDefinitions:
         - AttributeName: PK
           AttributeType: S
@@ -67,6 +72,17 @@ Resources:
         Enabled: true
       BillingMode: PAY_PER_REQUEST
 
+  CardsDBUpdateEventBusScheduler:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      FlexibleTimeWindow:
+        Mode: "FLEXIBLE"
+        MaximumWindowInMinutes: 360
+      Target:
+        Arn: !Ref RenewEntitiesFunction.Arn
+        RoleArn: !Ref SchedulerRole.Arn
+      ScheduleExpression: !Sub "rate(${CARDS_UPDATE_FREQUENCY} days)"
+
   PingFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -79,6 +95,21 @@ Resources:
             Path: /ping
             Method: get
 
+  RenewEntitiesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/RenewEntities
+      Events:
+        UpdateCards:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCardAPI"
+            Path: /collections
+            Method: get
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCollectionDynamoDBTable
+
 Outputs:
   MTGCardApiUrl:
     Description: "API Gateway endpoint URL"
@@ -89,3 +120,9 @@ Outputs:
     Export:
       Name:
         'Fn::Sub': '${AWS::StackName}-api'
+  RenewEntitiesFunction:
+    Description: "Lambda function"
+    Value: !Ref RenewEntitiesFunction
+    Export:
+      Name:
+        'Fn::Sub': !GetAtt RenewEntitiesFunction.Arn
