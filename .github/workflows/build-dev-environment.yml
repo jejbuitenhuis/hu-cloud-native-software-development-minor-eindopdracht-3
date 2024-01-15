@@ -18,7 +18,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   deploy-front-end:
-    needs: functional-test-front-end
+    needs: deploy-backend-services
     uses: ./.github/workflows/release-front-end-pipeline.yml
     with:
       environment: ${{ inputs.environment }}
