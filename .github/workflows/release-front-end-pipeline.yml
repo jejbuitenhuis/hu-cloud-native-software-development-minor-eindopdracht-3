@@ -1,6 +1,12 @@
 name: Deploy the front-end
 
 on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: The environment name for the stack
+        required: true
+        type: string
   workflow_call:
     inputs:
       environment:
