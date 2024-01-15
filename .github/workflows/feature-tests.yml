@@ -26,11 +26,11 @@ jobs:
       coverage-file: coverage-${{ matrix.service }}.xml
       run-sonarQube-scan: false
     secrets:
-      sonarQube-token: ""
+      SONAR_QUBE_TOKEN: ""
 
   test-front-end:
     uses: ./.github/workflows/test-front-end-unit.yml
     with:
       run-sonarQube-scan: false
     secrets:
-      sonarQube-token: ""
+      SONAR_QUBE_TOKEN: ""
