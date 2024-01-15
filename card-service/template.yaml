@@ -62,6 +62,9 @@ Resources:
           KeyType: HASH
         - AttributeName: SK
           KeyType: RANGE
+      TimeToLiveSpecification:
+        AttributeName: RemoveAt
+        Enabled: true
       BillingMode: PAY_PER_REQUEST
 
   PingFunction:
