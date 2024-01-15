@@ -9,10 +9,13 @@ on:
       coverage-file:
         required: true
         type: string
+      run-sonarQube-scan:
+        type: boolean
+        default: true
+        required: false
     secrets:
       SONAR_QUBE_TOKEN:
         required: true
-
 
 jobs:
   build:
@@ -45,6 +48,7 @@ jobs:
           coverage xml -o target/${{ inputs.coverage-file }}
 
       - name: SonarQube Scan
+        if: ${{ inputs.run-sonarQube-scan }}
         uses: sonarsource/sonarqube-scan-action@master
         with:
           projectBaseDir: ${{ inputs.path }}
