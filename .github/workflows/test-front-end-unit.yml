@@ -2,6 +2,10 @@ name: Unit test the front-end service
 
 on:
   workflow_call:
+    inputs:
+      run-sonarQube-scan:
+        type: boolean
+        default: true
     secrets:
       sonarQube-token:
         required: true
@@ -47,6 +51,7 @@ jobs:
         run: npm run test:coverage
 
       - name: SonarQube Scan
+        if: ${{ inputs.run-sonarQube-scan }}
         uses: sonarsource/sonarqube-scan-action@master
         with:
           projectBaseDir: ${{ inputs.path }}
