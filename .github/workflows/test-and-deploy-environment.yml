@@ -1,4 +1,4 @@
-name: Test and deploy an entire environment
+name: Test and deploy an environment
 
 on:
   workflow_call:

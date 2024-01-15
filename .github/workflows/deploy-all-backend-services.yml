@@ -1,4 +1,4 @@
-name: Test and release back-end services
+name: Deploy all back-end services
 
 on:
   workflow_call:

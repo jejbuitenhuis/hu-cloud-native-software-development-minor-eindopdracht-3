@@ -1,4 +1,4 @@
-name: Deploy back-end service
+name: Deploy a back-end service
 
 on:
   workflow_call:

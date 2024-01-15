@@ -1,4 +1,4 @@
-name: Deploy web-application to proper environment
+name: Deploy the front-end
 
 on:
   workflow_call:
