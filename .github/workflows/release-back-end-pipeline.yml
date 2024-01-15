@@ -1,4 +1,4 @@
-name: Deploy back-end service
+name: Deploy a back-end service
 
 on:
   workflow_call:
@@ -47,4 +47,10 @@ jobs:
         run: sam build
 
       - name: Deploy the serverless application
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --config-env ${{ inputs.environment }}
+        run: >
+          sam deploy 
+          --no-confirm-changeset 
+          --no-fail-on-empty-changeset 
+          --parameter-overrides Stage=${{ inputs.environment }} 
+          --stack-name '${{inputs.service-name}}-${{inputs.environment}}' 
+          --s3-prefix '${{inputs.service-name}}-${{inputs.environment}}'

@@ -18,8 +18,7 @@ stack_name = "card-service-development"
 s3_prefix = "card-service-development"
 region = "us-east-1"
 parameter_overrides = [
-    "Stage=development",
-    "CommonStack=common-service-development",
+    "Stage=development"
 ]
 
 [default.package.parameters]
@@ -33,29 +32,3 @@ warm_containers = "EAGER"
 
 [default.local_start_lambda.parameters]
 warm_containers = "EAGER"
-
-[staging.deploy.parameters]
-capabilities = "CAPABILITY_IAM"
-confirm_changeset = false
-disable_rollback = false
-resolve_s3 = true
-stack_name = "card-service-staging"
-s3_prefix = "card-service-staging"
-region = "us-east-1"
-parameter_overrides = [
-    "Stage=staging",
-    "CommonStack=common-service-staging",
-]
-
-[production.deploy.parameters]
-capabilities = "CAPABILITY_IAM"
-confirm_changeset = false
-disable_rollback = false
-resolve_s3 = true
-stack_name = "card-service-production"
-s3_prefix = "card-service-production"
-region = "us-east-1"
-parameter_overrides = [
-    "Stage=production",
-    "CommonStack=common-service-production",
-]

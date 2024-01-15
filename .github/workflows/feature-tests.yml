@@ -1,17 +1,11 @@
-name: Feature pipeline test back-end services
+name: Run tests on feature
 
 on:
   pull_request:
-    paths:
-      - 'user-service/**'
-      - 'wishlist-service/**'
-      - 'deck-service/**'
-      - 'card-service/**'
-      - 'collection-service/**'
   workflow_dispatch:
 
 jobs:
-  back-end-sonarQube-matrix:
+  test-back-end-services:
     runs-on: ubuntu-latest
 
     strategy:
@@ -54,3 +48,10 @@ jobs:
           pip3 install -r tests/test-requirements.txt
           coverage run --source=. -m pytest tests -rap --junitxml target/testreport-coverage.xml
           coverage xml -o target/coverage-${{ matrix.service }}.xml
+
+  test-front-end:
+    uses: ./.github/workflows/test-front-end-unit.yml
+    with:
+      run-sonarQube-scan: false
+    secrets:
+      sonarQube-token: ""

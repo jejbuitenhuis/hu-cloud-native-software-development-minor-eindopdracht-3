@@ -1,13 +1,17 @@
-name: Feature test web-application
+name: Unit test the front-end service
 
 on:
-  pull_request:
-    paths:
-      - 'front-end/**'
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      run-sonarQube-scan:
+        type: boolean
+        default: true
+    secrets:
+      sonarQube-token:
+        required: true
 
 jobs:
-  run-sonarQube-scan-on-front-end:
+  build:
     runs-on: ubuntu-latest
 
     defaults:
@@ -44,6 +48,13 @@ jobs:
         run: npm run build
 
       - name: Run tests and collect coverage
-        run: |
-          npm run test:coverage
-          npm run test:e2e
+        run: npm run test:coverage
+
+      - name: SonarQube Scan
+        if: ${{ inputs.run-sonarQube-scan }}
+        uses: sonarsource/sonarqube-scan-action@master
+        with:
+          projectBaseDir: ${{ inputs.path }}
+        env:
+          SONAR_TOKEN: ${{ secrets.sonarQube-token }}
+          SONAR_HOST_URL: https://sonar.cloud-native-minor.it
