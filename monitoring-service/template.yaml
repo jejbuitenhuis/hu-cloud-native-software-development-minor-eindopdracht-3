@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: common-service
+Description: monitoring-service
 
 Globals:
   Function:
@@ -17,15 +17,145 @@ Globals:
 Parameters:
   Stage:
     Type: String
-    Default: staging
+    Default: development
 
 Resources:
-
-
-Outputs:
-  MTGEventBus:
-    Description: "Event bus"
-    Value: !Ref MTGEventBus
-    Export:
-      Name:
-        'Fn::Sub': '${AWS::StackName}-MTGEventBus'
+  DragonDashboard:
+    Type: 'AWS::CloudWatch::Dashboard'
+    Properties:
+      DashboardName: !Sub 'Dragon-Dashboard-${Stage}'
+      DashboardBody: !Sub
+        - '{
+               "widgets": [
+                   {
+                       "height": 6,
+                       "width": 11,
+                       "y": 0,
+                       "x": 0,
+                       "type": "metric",
+                       "properties": {
+                           "metrics": [
+                               [ { "expression": "FILL(METRICS(),0)", "label": "", "id": "e1", "region": "${AWS::Region}" } ],
+                               [ "AWS/ApiGateway", "Count", "ApiName", "${Stage}-mtg-user-api", "Stage", "${Stage}", { "yAxis": "left", "region": "${AWS::Region}", "id": "m1", "visible": false, "label": "${Stage}-mtg-user-api" } ],
+                               [ "...", "${Stage}-mtg-wishlist-api", ".", ".", { "yAxis": "left", "region": "${AWS::Region}", "id": "m2", "visible": false, "label": "${Stage}-mtg-wishlist-api" } ]
+                           ],
+                           "view": "timeSeries",
+                           "title": "All Requests per 15 mins",
+                           "region": "${AWS::Region}",
+                           "stat": "SampleCount",
+                           "period": 900,
+                           "setPeriodToTimeRange": false,
+                           "stacked": false,
+                           "sparkline": true,
+                           "trend": true,
+                           "liveData": true,
+                           "legend": {
+                               "position": "bottom"
+                           }
+                       }
+                   },
+                   {
+                       "height": 3,
+                       "width": 13,
+                       "y": 0,
+                       "x": 11,
+                       "type": "metric",
+                       "properties": {
+                           "metrics": [
+                               [ { "expression": "100*(m1)", "label": "User-Service", "id": "e1", "yAxis": "left", "region": "${AWS::Region}", "period": 900 } ],
+                               [ "AWS/ApiGateway", "5XXError", "ApiName", "${Stage}-mtg-user-api", { "region": "${AWS::Region}", "id": "m1", "visible": false } ],
+                               [ { "expression": "100*(m2)", "label": "Wishlist-Service", "id": "e2", "yAxis": "left", "region": "${AWS::Region}", "period": 900 } ],
+                               [ "AWS/ApiGateway", "5XXError", "ApiName", "${Stage}-mtg-wishlist-api", { "region": "${AWS::Region}", "id": "m2", "visible": false } ]
+                           ],
+                           "sparkline": false,
+                           "view": "singleValue",
+                           "region": "${AWS::Region}",
+                           "period": 900,
+                           "stat": "Average",
+                           "liveData": true,
+                           "title": "500 Errors per request in the last 15 mins in %",
+                           "singleValueFullPrecision": false
+                       }
+                   },
+                   {
+                       "height": 3,
+                       "width": 13,
+                       "y": 3,
+                       "x": 11,
+                       "type": "metric",
+                       "properties": {
+                           "metrics": [
+                               [ { "expression": "100*(m1)", "label": "User-Service", "id": "e1", "yAxis": "left", "region": "${AWS::Region}", "period": 86400 } ],
+                               [ "AWS/ApiGateway", "5XXError", "ApiName", "${Stage}-mtg-user-api", { "region": "${AWS::Region}", "id": "m1", "visible": false } ],
+                               [ { "expression": "100*(m2)", "label": "Wishlist-Service", "id": "e2", "yAxis": "left", "region": "${AWS::Region}", "period": 86400 } ],
+                               [ "AWS/ApiGateway", "5XXError", "ApiName", "${Stage}-mtg-wishlist-api", { "region": "${AWS::Region}", "id": "m2", "visible": false } ]
+                           ],
+                           "sparkline": false,
+                           "view": "singleValue",
+                           "region": "${AWS::Region}",
+                           "period": 86400,
+                           "stat": "Average",
+                           "liveData": true,
+                           "title": " 500 Errors per request today in %",
+                           "singleValueFullPrecision": false
+                       }
+                   },
+                   {
+                       "height": 5,
+                       "width": 11,
+                       "y": 6,
+                       "x": 0,
+                       "type": "metric",
+                       "properties": {
+                           "view": "timeSeries",
+                           "stacked": false,
+                           "metrics": [
+                               [ { "expression": "FILL(METRICS(), 0)", "label": "", "id": "e1", "region": "${AWS::Region}" } ],
+                               [ "AWS/ApiGateway", "Latency", "ApiName", "${Stage}-mtg-user-api", { "region": "${AWS::Region}", "id": "m1", "visible": false, "label": "${Stage}-mtg-user-api" }  ],
+                               [ "...", "${Stage}-mtg-wishlist-api", { "region": "${AWS::Region}", "id": "m2", "visible": false, "label": "${Stage}-mtg-wishlist-api" } ]
+                           ],
+                           "region": "${AWS::Region}"
+                       }
+                   },
+                   {
+                       "height": 7,
+                       "width": 7,
+                       "y": 6,
+                       "x": 11,
+                       "type": "metric",
+                       "properties": {
+                           "metrics": [
+                               [ { "expression": "FILL(METRICS(), 0)", "label": "", "id": "e1" } ],
+                               [ "AWS/CloudFront", "Requests", "Region", "Global", "DistributionId", "${CloudwatchDistributionId}", { "region": "${AWS::Region}", "id": "m1", "visible": false } ]
+                           ],
+                           "view": "timeSeries",
+                           "stacked": false,
+                           "region": "${AWS::Region}",
+                           "period": 300,
+                           "title": "Cloudfront - Total requests",
+                           "stat": "Average"
+                       }
+                   },
+                   {
+                       "type": "metric",
+                       "x": 18,
+                       "y": 6,
+                       "width": 6,
+                       "height": 7,
+                       "properties": {
+                           "metrics": [
+                               [ { "expression": "FILL(METRICS(), 0)", "label": "", "id": "e1" } ],
+                               [ "AWS/CloudFront", "TotalErrorRate", "Region", "Global", "DistributionId", "${CloudwatchDistributionId}", { "id": "m1", "visible": false } ]
+                           ],
+                           "view": "timeSeries",
+                           "stacked": false,
+                           "region": "${AWS::Region}",
+                           "stat": "Average",
+                           "title": "Cloudfront - Total Errors",
+                           "period": 300
+                       }
+                   }
+               ]
+           }'
+        - CloudwatchDistributionId: !ImportValue
+            'Fn::Sub': "front-end-staging-CloudFrontId"
