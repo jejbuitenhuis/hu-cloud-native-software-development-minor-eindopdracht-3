@@ -6,8 +6,6 @@ on:
 
 jobs:
   test-back-end-services:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
         include:
@@ -22,32 +20,13 @@ jobs:
           - service: collection
             path: ./collection-service
 
-    defaults:
-      run:
-        working-directory: ${{ matrix.path }}
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set Locale
-        run: echo "export LC_ALL=C.UTF-8" >> $GITHUB_ENV
-
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
-          cache: "pip"
-
-      - name: Set up SAM CLI
-        uses: aws-actions/setup-sam@v2
-
-      - name: Build the serverless application
-        run: sam build
-
-      - name: Test the serverless application
-        run: |
-          pip3 install -r tests/test-requirements.txt
-          coverage run --source=. -m pytest tests -rap --junitxml target/testreport-coverage.xml
-          coverage xml -o target/coverage-${{ matrix.service }}.xml
+    uses: ./.github/workflows/test-back-end.yml
+    with:
+      path: ${{ matrix.path }}
+      coverage-file: coverage-${{ matrix.service }}.xml
+      run-sonarQube-scan: false
+    secrets:
+      sonarQube-token: ""
 
   test-front-end:
     uses: ./.github/workflows/test-front-end-unit.yml

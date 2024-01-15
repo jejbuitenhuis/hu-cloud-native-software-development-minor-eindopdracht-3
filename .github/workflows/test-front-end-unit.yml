@@ -6,6 +6,7 @@ on:
       run-sonarQube-scan:
         type: boolean
         default: true
+        required: false
     secrets:
       sonarQube-token:
         required: true
