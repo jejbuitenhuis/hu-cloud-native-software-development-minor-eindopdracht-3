@@ -57,8 +57,14 @@ jobs:
       - name: Build the web-application
         run: sam build
 
-      - name: Deploy the web-application
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --config-env ${{ inputs.environment }}
+      - name: Deploy the web-application application infrastructure
+        run: >
+          sam deploy 
+          --no-confirm-changeset 
+          --no-fail-on-empty-changeset 
+          --parameter-overrides Stage=${{ inputs.environment }} 
+          --stack-name 'front-end-${{inputs.environment}}' 
+          --s3-prefix 'front-end-${{inputs.environment}}'
 
       - name: Retrieve SSM parameter
         id: parameters

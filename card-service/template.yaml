@@ -16,15 +16,12 @@ Globals:
       Variables:
         EVENT_BUS_ARN:
           Fn::ImportValue:
-            !Sub "${CommonStack}-MTGEventBus"
+            !Sub "common-service-${Stage}-MTGEventBus"
 
 Parameters:
   Stage:
     Type: String
-    Default: staging
-  CommonStack:
-    Type: String
-    Default: common-service
+    Default: development
 
 Resources:
   MTGCardApi:

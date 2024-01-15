@@ -11,9 +11,7 @@ Globals:
 Parameters:
   Stage:
     Type: String
-  FrontEndStack:
-    Type: String
-    Default: front-end
+    Default: development
 
 Resources:
   FrontEndS3Bucket: # {{{

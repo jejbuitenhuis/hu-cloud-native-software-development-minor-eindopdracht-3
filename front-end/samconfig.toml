@@ -17,39 +17,12 @@ lint = true
 stack_name = "front-end-development"
 s3_prefix = "front-end-development"
 parameter_overrides = [
-	"Stage=development",
-	"FrontEndStack=front-end-development"
+	"Stage=development"
 ]
 capabilities = "CAPABILITY_IAM"
 resolve_s3 = true
 region = "us-east-1"
 confirm_changeset = false
-image_repositories = []
-
-[staging.deploy.parameters]
-stack_name = "front-end-staging"
-s3_prefix = "front-end-staging"
-parameter_overrides = [
-	"Stage=staging",
-	"FrontEndStack=front-end-staging"
-]
-capabilities = "CAPABILITY_IAM"
-resolve_s3 = true
-region = "us-east-1"
-confirm_changeset = true
-image_repositories = []
-
-[production.deploy.parameters]
-stack_name = "front-end-production"
-s3_prefix = "front-end-production"
-parameter_overrides = [
-	"Stage=production",
-	"FrontEndStack=front-end-production"
-]
-capabilities = "CAPABILITY_IAM"
-resolve_s3 = true
-region = "us-east-1"
-confirm_changeset = true
 image_repositories = []
 
 [default.package.parameters]
