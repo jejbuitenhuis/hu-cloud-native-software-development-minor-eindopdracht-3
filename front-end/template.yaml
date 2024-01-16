@@ -180,9 +180,22 @@ Resources:
             ResponseCode: 200
   # }}}
 
+  CloudfrontParameter: # {{{
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/frontEnd/cloudFrontId
+      Type: String
+      Value: !Ref CloudFront
+  # }}}
+
 Outputs:
   FrontEndS3BucketDomainName:
     Description: Front-end S3 bucket domain name
     Value: !GetAtt FrontEndS3Bucket.DomainName
     Export:
       Name: !Sub ${AWS::StackName}-FrontEndS3BucketDomainName
+  CloudFrontId:
+    Description: CloudFront distribution id
+    Value: !Ref CloudFront
+    Export:
+      Name: !Sub ${AWS::StackName}-CloudFrontId

@@ -60,7 +60,7 @@ jobs:
   unit-test-front-end:
     uses: ./.github/workflows/test-front-end-unit.yml
     secrets:
-      sonarQube-token: ${{ secrets.SONAR_TOKEN_FRONT_END }}
+      SONAR_QUBE_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT_END }}
 
   deploy-backend-services:
     needs: [test-back-end-services, unit-test-front-end]
@@ -79,6 +79,17 @@ jobs:
     needs: functional-test-front-end
     uses: ./.github/workflows/release-front-end-pipeline.yml
     with:
+      environment: ${{ inputs.environment }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy-monitoring-service:
+    needs: deploy-front-end
+    uses: ./.github/workflows/release-back-end-pipeline.yml
+    with:
+      path: ./monitoring-service
+      service-name: monitoring-service
       environment: ${{ inputs.environment }}
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

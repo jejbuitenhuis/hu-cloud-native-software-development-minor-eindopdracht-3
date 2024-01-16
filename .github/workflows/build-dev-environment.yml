@@ -18,9 +18,20 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   deploy-front-end:
-    needs: functional-test-front-end
+    needs: deploy-backend-services
     uses: ./.github/workflows/release-front-end-pipeline.yml
     with:
+      environment: ${{ inputs.environment }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy-monitoring-service:
+    needs: deploy-front-end
+    uses: ./.github/workflows/release-back-end-pipeline.yml
+    with:
+      path: ./monitoring-service
+      service-name: monitoring-service
       environment: ${{ inputs.environment }}
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

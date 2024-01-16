@@ -8,11 +8,11 @@ on:
         default: true
         required: false
     secrets:
-      sonarQube-token:
+      SONAR_QUBE_TOKEN:
         required: true
 
 jobs:
-  build:
+  test-frontend-unit:
     runs-on: ubuntu-latest
 
     defaults:
@@ -57,5 +57,5 @@ jobs:
         with:
           projectBaseDir: ./front-end
         env:
-          SONAR_TOKEN: ${{ secrets.sonarQube-token }}
+          SONAR_TOKEN: ${{ secrets.SONAR_QUBE_TOKEN }}
           SONAR_HOST_URL: https://sonar.cloud-native-minor.it
