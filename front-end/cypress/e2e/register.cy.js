@@ -10,17 +10,11 @@ describe("Register page Test", () => {
 
 	it("Registers the user in correctly", () => {
 		cy.getByTestId('email')
-			.shadow()
-			.find("input")
-			.type(firstEmail);
+			.typeInWebComponent(firstEmail);
 		cy.getByTestId('password')
-			.shadow()
-			.find("input")
-			.type('testtest');
+			.typeInWebComponent("testtest");
 		cy.getByTestId('confirm')
-			.shadow()
-			.find("input")
-			.type('testtest');
+			.typeInWebComponent("testtest");
 		cy.getByTestId('submit')
 			.shadow()
 			.find('button')
@@ -35,17 +29,11 @@ describe("Register page Test", () => {
 
 	it("Registers when user already exists", () => {
 		cy.getByTestId('email')
-			.shadow()
-			.find("input")
-			.type(secondEmail);
+			.typeInWebComponent(secondEmail);
 		cy.getByTestId('password')
-			.shadow()
-			.find("input")
-			.type('testtest')
+			.typeInWebComponent("testtest");
 		cy.getByTestId('confirm')
-			.shadow()
-			.find("input")
-			.type('testtest');
+			.typeInWebComponent("testtest");
 		cy.getByTestId('submit')
 			.shadow()
 			.find('button')
@@ -56,17 +44,11 @@ describe("Register page Test", () => {
 		cy.visit("/#/register");
 
 		cy.getByTestId('email')
-			.shadow()
-			.find("input")
-			.type(secondEmail);
+			.typeInWebComponent(secondEmail);
 		cy.getByTestId('password')
-			.shadow()
-			.find("input")
-			.type('testtest');
+			.typeInWebComponent("testtest");
 		cy.getByTestId('confirm')
-			.shadow()
-			.find("input")
-			.type('testtest');
+			.typeInWebComponent("testtest");
 		cy.getByTestId('submit')
 			.shadow()
 			.find('button')
