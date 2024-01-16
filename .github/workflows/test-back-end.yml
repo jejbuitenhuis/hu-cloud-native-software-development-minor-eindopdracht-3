@@ -1,4 +1,4 @@
-name: SonarQUbe scan of the front-end service
+name: Test a back-end service
 
 on:
   workflow_call:
@@ -6,8 +6,15 @@ on:
       path:
         required: true
         type: string
+      coverage-file:
+        required: true
+        type: string
+      run-sonarQube-scan:
+        type: boolean
+        default: true
+        required: false
     secrets:
-      sonarQube-token:
+      SONAR_QUBE_TOKEN:
         required: true
 
 jobs:
@@ -19,17 +26,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Node.js v18.X
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18.X
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Validate Typescript typings
-        run: npm run type-check
+      - name: Set Locale
+        run: echo "export LC_ALL=C.UTF-8" >> $GITHUB_ENV
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
@@ -42,22 +40,18 @@ jobs:
 
       - name: Build the serverless application
         run: sam build
-            
-      - name: Build the web-application
-        run: npm run build
 
-      - name: Build the web-application
-        run: npm run build
-
-      - name: Run tests and collect coverage
+      - name: Test the serverless application
         run: |
-          npm run test:coverage
-          npm run test:e2e
+          pip3 install -r tests/test-requirements.txt
+          coverage run --source=. -m pytest tests -rap --junitxml target/testreport-coverage.xml
+          coverage xml -o target/${{ inputs.coverage-file }}
 
       - name: SonarQube Scan
+        if: ${{ inputs.run-sonarQube-scan }}
         uses: sonarsource/sonarqube-scan-action@master
         with:
           projectBaseDir: ${{ inputs.path }}
         env:
-          SONAR_TOKEN: ${{ secrets.sonarQube-token }}
+          SONAR_TOKEN: ${{ secrets.SONAR_QUBE_TOKEN }}
           SONAR_HOST_URL: https://sonar.cloud-native-minor.it

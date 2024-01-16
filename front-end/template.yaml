@@ -11,9 +11,7 @@ Globals:
 Parameters:
   Stage:
     Type: String
-  FrontEndStack:
-    Type: String
-    Default: front-end
+    Default: development
 
 Resources:
   FrontEndS3Bucket: # {{{
@@ -138,31 +136,31 @@ Resources:
         CacheBehaviors:
           # Card api gateway behavior
           - TargetOriginId: !Sub ${Stage}-card-api
-            PathPattern: /api/cards
+            PathPattern: /api/cards*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           # Collection api gateway behavior
           - TargetOriginId: !Sub ${Stage}-collection-api
-            PathPattern: /api/collections
+            PathPattern: /api/collections*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           # Deck api gateway behavior
           - TargetOriginId: !Sub ${Stage}-deck-api
-            PathPattern: /api/decks
+            PathPattern: /api/decks*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           # User api gateway behavior
           - TargetOriginId: !Sub ${Stage}-user-api
-            PathPattern: /api/users
+            PathPattern: /api/users*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           # Wishlist api gateway behavior
           - TargetOriginId: !Sub ${Stage}-wishlist-api
-            PathPattern: /api/wishlists
+            PathPattern: /api/wishlists*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
@@ -180,10 +178,14 @@ Resources:
             ResponsePagePath: /index.html
             ErrorCachingMinTTL: 30
             ResponseCode: 200
-          - ErrorCode: 403
-            ResponsePagePath: /index.html
-            ErrorCachingMinTTL: 30
-            ResponseCode: 200
+  # }}}
+
+  CloudfrontParameter: # {{{
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/frontEnd/cloudFrontId
+      Type: String
+      Value: !Ref CloudFront
   # }}}
 
 Outputs:
@@ -192,3 +194,8 @@ Outputs:
     Value: !GetAtt FrontEndS3Bucket.DomainName
     Export:
       Name: !Sub ${AWS::StackName}-FrontEndS3BucketDomainName
+  CloudFrontId:
+    Description: CloudFront distribution id
+    Value: !Ref CloudFront
+    Export:
+      Name: !Sub ${AWS::StackName}-CloudFrontId
