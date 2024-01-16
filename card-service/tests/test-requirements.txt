@@ -3,6 +3,7 @@ pytest
 coverage
 moto
 python-jose
+requests_mock
 
 # Function requirements
 boto3
