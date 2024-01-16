@@ -8,32 +8,21 @@ import requests_mock
 from boto3.dynamodb.conditions import Key, Attr
 from moto import mock_dynamodb
 
-@pytest.fixture(scope="function")
-@mock_dynamodb
-def table():
-    # Setup phase: Create table
-    dynamodb = boto3.resource('dynamodb', 'us-east-1')
-    table = dynamodb.create_table(
-        TableName='test-card-table',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
-                              {"AttributeName": "SK", "AttributeType": "S"}],
-        BillingMode='PAY_PER_REQUEST'
-    )
-    table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
-
-    # Provide the table to the test
-    yield table
-
-    # Teardown phase: Delete table
-    # table.delete()
-
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table"})
-def test_renew_cards_writes_correct_data_single_face(requests_mock, table):
+@mock_dynamodb
+def test_renew_cards_writes_correct_data_single_face(requests_mock):
     with patch('boto3.client') as mock_client:
         os.environ["DYNAMODB_TABLE_NAME"] = "test-card-table"
+        dynamodb = boto3.resource('dynamodb', 'us-east-1')
+        table = dynamodb.create_table(
+            TableName='test-card-table',
+            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+            AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
+                                  {"AttributeName": "SK", "AttributeType": "S"}, ],
+            BillingMode='PAY_PER_REQUEST'
+        )
         table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
 
         mock_event_bridge = MagicMock()
@@ -71,9 +60,18 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock, table):
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table"})
-def test_renew_cards_two_faced(requests_mock, table):
+@mock_dynamodb
+def test_renew_cards_two_faced(requests_mock):
     with patch('boto3.client') as mock_client:
         os.environ["DYNAMODB_TABLE_NAME"] = "test-card-table"
+        dynamodb = boto3.resource('dynamodb', 'us-east-1')
+        table = dynamodb.create_table(
+            TableName='test-card-table',
+            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+            AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
+                                  {"AttributeName": "SK", "AttributeType": "S"}, ],
+            BillingMode='PAY_PER_REQUEST'
+        )
         table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
 
         mock_event_bridge = MagicMock()
@@ -109,7 +107,8 @@ def test_renew_cards_two_faced(requests_mock, table):
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table"})
-def test_renew_cards_ten_cards(requests_mock, table):
+@mock_dynamodb
+def test_renew_cards_ten_cards(requests_mock):
     with patch('boto3.client') as mock_client:
         os.environ["DYNAMODB_TABLE_NAME"] = "test-card-table"
         dynamodb = boto3.resource('dynamodb', 'us-east-1')
@@ -153,10 +152,17 @@ def test_renew_cards_ten_cards(requests_mock, table):
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table"})
 @mock_dynamodb
-def test_renew_cards_thirty_cards(requests_mock, table):
+def test_renew_cards_thirty_cards(requests_mock):
     with patch('boto3.client') as mock_client:
         os.environ["DYNAMODB_TABLE_NAME"] = "test-card-table"
-
+        dynamodb = boto3.resource('dynamodb', 'us-east-1')
+        table = dynamodb.create_table(
+            TableName='test-card-table',
+            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+            AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
+                                  {"AttributeName": "SK", "AttributeType": "S"}, ],
+            BillingMode='PAY_PER_REQUEST'
+        )
         table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
 
         mock_event_bridge = MagicMock()
