@@ -1,3 +1,4 @@
+// @ts-ignore
 import { v4 as uuidv4} from 'uuid';
 
 describe("Register page Test", () => {
@@ -35,17 +36,17 @@ describe("Register page Test", () => {
 		.shadow()
 		.find("input")
 		.type(secondEmail)
-			// .typeInWebComponent(secondEmail);
+			
 		cy.getByTestId('password')
 		.shadow()
 		.find("input")
 		.type('testtest')
-			// .typeInWebComponent('testtest');
+
 		cy.getByTestId('confirm')
 		.shadow()
 		.find("input")
 		.type('testtest')
-			// .typeInWebComponent('testtest');
+
 		cy.getByTestId('submit')
 			.shadow()
 			.find('button')
@@ -57,17 +58,17 @@ describe("Register page Test", () => {
 		.shadow()
 		.find("input")
 		.type(secondEmail)
-			// .typeInWebComponent(secondEmail);
+
 		cy.getByTestId('password')
 		.shadow()
 		.find("input")
 		.type('testtest')
-			// .typeInWebComponent('testtest');
+
 		cy.getByTestId('confirm')
 		.shadow()
 		.find("input")
 		.type('testtest')
-			// .typeInWebComponent('testtest');
+
 		cy.getByTestId('submit')
 			.shadow()
 			.find('button')

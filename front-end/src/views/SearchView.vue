@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div id="search-container" class="container">
         <h1>Search a card:</h1>
         <form @submit.prevent.submit="findCards">
             <sl-input v-model="searchQuery"></sl-input>
