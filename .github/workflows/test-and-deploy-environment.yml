@@ -60,7 +60,7 @@ jobs:
   unit-test-front-end:
     uses: ./.github/workflows/test-front-end-unit.yml
     secrets:
-      sonarQube-token: ${{ secrets.SONAR_TOKEN_FRONT_END }}
+      SONAR_QUBE_TOKEN: ${{ secrets.SONAR_TOKEN_FRONT_END }}
 
   deploy-backend-services:
     needs: [test-back-end-services, unit-test-front-end]
