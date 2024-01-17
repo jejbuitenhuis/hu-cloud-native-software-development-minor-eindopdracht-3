@@ -19,7 +19,7 @@ on:
         required: true
 
 jobs:
-  build:
+  deploy-backend:
     runs-on: ubuntu-latest
     defaults:
       run:
