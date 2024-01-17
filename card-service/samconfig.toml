@@ -10,15 +10,15 @@ parallel = true
 lint = true
 
 [default.deploy.parameters]
-capabilities = "CAPABILITY_IAM"
+capabilities = "CAPABILITY_NAMED_IAM"
 confirm_changeset = false
 disable_rollback = false
 resolve_s3 = true
-stack_name = "card-service-development"
-s3_prefix = "card-service-development"
+stack_name = "card-service-scheduler-stack"
+s3_prefix = "card-service-scheduler-stack"
 region = "us-east-1"
 parameter_overrides = [
-    "Stage=development"
+    "Stage=scheduler-stack"
 ]
 
 [default.package.parameters]
