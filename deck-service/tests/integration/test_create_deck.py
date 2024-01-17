@@ -65,7 +65,7 @@ class TestCreateDeck(unittest.TestCase):
                 "name": expected_deck_name,
             }),
             "headers": {
-                "token": JWT_TOKEN,
+                "Authorization": f"Bearer {JWT_TOKEN}",
             },
         }
         mock_context = {}
@@ -84,7 +84,7 @@ class TestCreateDeck(unittest.TestCase):
     def test_invalid_request_is_returned_when_no_body_is_specified(self):
         mock_event = {
             "headers": {
-                "token": JWT_TOKEN,
+                "Authorization": f"Bearer {JWT_TOKEN}",
             },
         }
         mock_context = {}
@@ -103,7 +103,7 @@ class TestCreateDeck(unittest.TestCase):
         mock_event = {
             "body": json.dumps({}),
             "headers": {
-                "token": JWT_TOKEN,
+                "Authorization": f"Bearer {JWT_TOKEN}",
             },
         }
         mock_context = {}

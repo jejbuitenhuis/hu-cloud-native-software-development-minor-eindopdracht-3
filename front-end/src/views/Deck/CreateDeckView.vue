@@ -42,7 +42,9 @@ async function createDeck(): Promise<ReturnType<typeof router.push>> {
 
   const response = await fetch("/api/decks/", {
     method: "POST",
-    headers: { token },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify({
       name: deckName.value,
     }),

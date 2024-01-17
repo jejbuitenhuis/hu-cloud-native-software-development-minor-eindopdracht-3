@@ -26,7 +26,7 @@
       "post": {
         "parameters" : [
           {
-            "name": "jwt-token",
+            "name": "Authorization",
             "in": "header",
             "type": "string"
           },

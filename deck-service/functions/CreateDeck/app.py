@@ -18,7 +18,14 @@ DYNAMO_DB_USER_TABLE_NAME = os.getenv("DYNAMO_DB_USER_TABLE_NAME")
 USER_TABLE = DYNAMO_DB.Table(DYNAMO_DB_USER_TABLE_NAME)
 
 def get_user_id(event: dict) -> str:
-    claims = jwt.get_unverified_claims(event["headers"]["token"])
+    token_header: str = event["headers"]["Authorization"]
+
+    if not token_header.startswith("Bearer "):
+        raise Exception("Invalid authorization header")
+
+    token_header = token_header[len("Bearer "):]
+
+    claims = jwt.get_unverified_claims(token_header)
 
     return claims["sub"]
 
