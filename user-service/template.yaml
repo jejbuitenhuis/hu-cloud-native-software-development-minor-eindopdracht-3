@@ -95,6 +95,7 @@ Resources:
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Name: !Sub "${Stage}-RegisterUserFunction"
       CodeUri: functions/register_user/
       Events:
         RegisterUser:
@@ -114,6 +115,7 @@ Resources:
   LoginUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Name: !Sub "${Stage}-LoginUserFunction"
       CodeUri: functions/login_user/
       Events:
         LoginUser:
