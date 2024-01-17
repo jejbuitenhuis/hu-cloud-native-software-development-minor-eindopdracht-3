@@ -3,10 +3,7 @@ import os
 import pytest
 from moto import mock_dynamodb
 
-DYNAMODB_TABLE_NAME = "test-card-table"
-COGNITO_POOL_NAME = "TestUserPool"
-COGNITO_AUTO_VERIFIER_ATTRIBUTES = ["email"]
-COGINTO_CLIENT_NAME = "TestUserPoolClient"
+DYNAMODB_TABLE_NAME = "Collections"
 
 
 @pytest.fixture
@@ -21,7 +18,7 @@ def aws_credentials():
 
 @pytest.fixture()
 @mock_dynamodb
-def setup_dynamodb_deck(aws_credentials):
+def setup_dynamodb_(aws_credentials):
     with mock_dynamodb():
         dynamodb = boto3.resource("dynamodb")
         table = dynamodb.create_table(
@@ -45,7 +42,7 @@ def setup_dynamodb_deck_with_item(setup_dynamodb_deck):
     table = setup_dynamodb_deck
     table.put_item(
         Item={
-            "PK": {"S": "OracleId#562d71b9-1646-474e-9293-55da6947a758"},
+            "PK": {"S": "USER#1"},
             "SK": {"S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#2"},
             "OracleName": {"S": "Bessie, the Doctor's Roadster"},
         },
