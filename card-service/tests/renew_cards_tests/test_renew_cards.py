@@ -29,7 +29,8 @@ def setup_table():
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
-                         "DYNAMODB_TABLE_NAME": "test-card-table"})
+                         "DYNAMODB_TABLE_NAME": "test-card-table",
+                         "CARDS_UPDATE_FREQUENCY" : "7"})
 @mock_dynamodb
 def test_renew_cards_writes_correct_data_single_face(requests_mock):
     with patch('boto3.client') as mock_client:
@@ -69,7 +70,8 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
-                         "DYNAMODB_TABLE_NAME": "test-card-table"})
+                         "DYNAMODB_TABLE_NAME": "test-card-table",
+                         "CARDS_UPDATE_FREQUENCY" : "7"})
 @mock_dynamodb
 def test_renew_cards_two_faced(requests_mock):
     with patch('boto3.client') as mock_client:
@@ -107,7 +109,8 @@ def test_renew_cards_two_faced(requests_mock):
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
-                         "DYNAMODB_TABLE_NAME": "test-card-table"})
+                         "DYNAMODB_TABLE_NAME": "test-card-table",
+                         "CARDS_UPDATE_FREQUENCY" : "7"})
 @mock_dynamodb
 def test_renew_cards_ten_cards(requests_mock):
     with patch('boto3.client') as mock_client:
@@ -143,7 +146,8 @@ def test_renew_cards_ten_cards(requests_mock):
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
-                         "DYNAMODB_TABLE_NAME": "test-card-table"})
+                         "DYNAMODB_TABLE_NAME": "test-card-table",
+                         "CARDS_UPDATE_FREQUENCY" : "7"})
 @mock_dynamodb
 def test_renew_cards_thirty_cards(requests_mock):
     with patch('boto3.client') as mock_client:
@@ -179,9 +183,10 @@ def test_renew_cards_thirty_cards(requests_mock):
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
-                         "DYNAMODB_TABLE_NAME": "test-card-table"})
+                         "DYNAMODB_TABLE_NAME": "test-card-table",
+                         "CARDS_UPDATE_FREQUENCY" : "7"})
 @mock_dynamodb
-def test_renew_cards_has_future_ttl(requests_mock):
+def test_renew_cards_has_correct_ttl(requests_mock):
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -208,9 +213,12 @@ def test_renew_cards_has_future_ttl(requests_mock):
             KeyConditionExpression=Key('PK').eq('OracleId#44623693-51d6-49ad-8cd7-140505caf02f')
         )
 
+        CARDS_UPDATE_FREQUENCY = int(os.environ.get('CARDS_UPDATE_FREQUENCY'))*24*60*60
+        print(CARDS_UPDATE_FREQUENCY)
         assert requests_mock.called
         assert requests_mock.call_count == 2
         assert len(single_face_card['Items']) == 2
         for item in single_face_card['Items']:
-            assert item['RemoveAt'] > int(time.time())
-
+            print(item['RemoveAt'])
+            assert item['RemoveAt'] > int(time.time()) + CARDS_UPDATE_FREQUENCY
+            assert item['RemoveAt'] <= int(time.time()) + 2 * CARDS_UPDATE_FREQUENCY

@@ -14,13 +14,15 @@ if 'DISABLE_XRAY' not in environ:
 
 dynamodb = boto3.resource('dynamodb', 'us-east-1')
 DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
+update_frequency_days = os.getenv("CARDS_UPDATE_FREQUENCY")
+
 table = dynamodb.Table(DYNAMODB_TABLE_NAME)
 
 event_bus = boto3.client('events')
 logger = logging.getLogger()
 logger.setLevel("INFO")
 
-ttlOffSetSecs = (7*24*60*60 + 60*60)
+ttlOffSetSecs = (3*60*60)
 
 local_filename = "/tmp/default-cards.json"
 
@@ -96,13 +98,13 @@ def appendListAndSubmitIfNeeded(ttl, entryList=[], toAddList=[], toAddItem=None,
 
     return returnList
 
-def calculateTTL(offsetInSeconds):
+def calculateTTL(offsetInSeconds, update_frequency_days):
     currentEpochInSeconds = int(time.time())
-    return currentEpochInSeconds + offsetInSeconds
+    return currentEpochInSeconds + offsetInSeconds + int(update_frequency_days)*24*60*60
 
 
 def lambda_handler(event, context):
-    ttl = calculateTTL(ttlOffSetSecs)
+    ttl = calculateTTL(ttlOffSetSecs, update_frequency_days)
     logger.info(f'tablename: {DYNAMODB_TABLE_NAME}')
     with requests.get("https://api.scryfall.com/bulk-data") as response:
         if response.status_code == 200:
