@@ -47,6 +47,13 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
+  MTGDeckApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGDeckApi/url
+      Type: String
+      Value: !Sub "https://${MTGDeckApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
   MTGDeckDynamoDBTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
@@ -80,8 +87,6 @@ Outputs:
   MTGDeckApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGDeckApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
-    Export:
-      Name: "MTGDeckApiUrl"
   MTGDeckApi:
     Description: "Api gateway"
     Value: !Ref MTGDeckApi

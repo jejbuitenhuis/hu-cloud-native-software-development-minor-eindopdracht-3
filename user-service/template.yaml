@@ -47,6 +47,13 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
+  MTGUserApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGUserApi/url
+      Type: String
+      Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
   PingFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -147,8 +154,6 @@ Outputs:
   MTGUserApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
-    Export:
-      Name: "MTGUserApiUrl"
   MTGUserApi:
     Description: "Api gateway"
     Value: !Ref MTGUserApi

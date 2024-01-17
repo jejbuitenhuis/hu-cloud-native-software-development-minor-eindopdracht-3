@@ -47,6 +47,13 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
+  MTGCollectionApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGCollectionApi/url
+      Type: String
+      Value: !Sub "https://${MTGCollectionApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
   MTGCollectionDynamoDBTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
@@ -80,8 +87,6 @@ Outputs:
   MTGCollectionApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGCollectionApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
-    Export:
-      Name: "MTGCollectionApiUrl"
   MTGCollectionApi:
     Description: "Api gateway"
     Value: !Ref MTGCollectionApi

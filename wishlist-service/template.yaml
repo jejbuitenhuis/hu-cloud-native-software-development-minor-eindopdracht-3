@@ -47,6 +47,13 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
+  MTGWishlistApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGWishlistApi/url
+      Type: String
+      Value: !Sub "https://${MTGWishlistApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
   MTGWishlistDynamoDBTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
@@ -80,8 +87,6 @@ Outputs:
   MTGWishlistApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGWishlistApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
-    Export:
-      Name: "MTGWishlistApiUrl"
   MTGWishlistApi:
     Description: "Api gateway"
     Value: !Ref MTGWishlistApi
