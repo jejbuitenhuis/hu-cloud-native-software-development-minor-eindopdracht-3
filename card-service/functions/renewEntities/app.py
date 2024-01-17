@@ -146,7 +146,7 @@ def lambda_handler(event, context):
                     cardFaces = createCardFaces(card["card_faces"], card["oracle_id"], card['id'])
                     processedCards = appendListAndSubmitIfNeeded(entryList=processedCards, toAddList=cardFaces, table=table, ttl=ttl)
             except Exception as error:
-                logger.error(f"An error has occurred while processing card: \n{card} \n Error: \n {error}")
+                logger.error(f"An error has occurred while processing card: \nId: {card['id']}, Name: {card['name']} \n Error: \n {error.with_traceback()}")
 
         writeBatchToDb(processedCards, table=table, ttl=ttl) #because appendListAndSubmitIfNeeded only submits when the item count is >= 25 we need to write away the last few cards
         logger.info("Finished!")
