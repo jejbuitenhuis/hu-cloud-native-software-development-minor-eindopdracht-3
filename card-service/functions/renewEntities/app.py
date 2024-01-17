@@ -1,3 +1,4 @@
+import json
 import os
 import time
 import traceback
@@ -73,12 +74,18 @@ def createCardInfo(card):
 
 # Can only handle 25 items at a time!
 def writeBatchToDb(items, table, ttl):
-    with table.batch_writer() as batch:
-        for item in items:
-            item['RemoveAt'] = ttl
-            response = batch.put_item(
-                Item=item
-            )
+    with open('result.json', 'a') as fp:
+        fp.write("[")
+
+        with table.batch_writer() as batch:
+            for item in items:
+                json.dump(item, fp)
+                item['RemoveAt'] = ttl
+                response = batch.put_item(
+                    Item=item
+                )
+                fp.write(",")
+        fp.write("],\n")
 
 
 # will submit several times if needed
@@ -104,7 +111,7 @@ def calculateTTL(offsetInSeconds, update_frequency_days):
 
 def lambda_handler(event, context):
     ttl = calculateTTL(ttlOffSetSecs, update_frequency_days)
-    logger.info(f'tablename: {DYNAMODB_TABLE_NAME}')
+
     with requests.get("https://api.scryfall.com/bulk-data") as response:
         if response.status_code == 200:
             bulk_data_items = response.json()
@@ -158,6 +165,8 @@ def lambda_handler(event, context):
                 logger.error(f"An error has occurred while processing card: \nId: {card['id']}, Name: {card['name']} \n "
                              f"Error: \n {tb}"
                              f"\nThe following data could still be processed:\n {recoveredData}")
+                logger.info(processedCards)
+
         writeBatchToDb(processedCards, table=table, ttl=ttl) #because appendListAndSubmitIfNeeded only submits when the item count is >= 25 we need to write away the last few cards
         logger.info("Finished!")
     return True
