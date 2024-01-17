@@ -1,5 +1,6 @@
 import os
 import time
+import traceback
 from os import environ
 from aws_xray_sdk.core import patch_all
 import boto3
@@ -137,7 +138,6 @@ def lambda_handler(event, context):
             try:
                 cardInfo = createCardInfo(card)
                 processedCards = appendListAndSubmitIfNeeded(entryList=processedCards, toAddItem=cardInfo, table=table, ttl=ttl)
-
                 # If a card only has multiple faces the face data is put in card_faces.
                 if card.get("card_faces") == None:
                     cardFace = createCardFace(card)
@@ -146,8 +146,18 @@ def lambda_handler(event, context):
                     cardFaces = createCardFaces(card["card_faces"], card["oracle_id"], card['id'])
                     processedCards = appendListAndSubmitIfNeeded(entryList=processedCards, toAddList=cardFaces, table=table, ttl=ttl)
             except Exception as error:
-                logger.error(f"An error has occurred while processing card: \nId: {card['id']}, Name: {card['name']} \n Error: \n {error.with_traceback()}")
+                tb = traceback.format_exc()
+                recoveredData = []
+                try: recoveredData.append(cardInfo)
+                except: pass
+                try: recoveredData.append(cardFace)
+                except: pass
+                try: recoveredData.append(cardFaces)
+                except: pass
 
+                logger.error(f"An error has occurred while processing card: \nId: {card['id']}, Name: {card['name']} \n "
+                             f"Error: \n {tb}"
+                             f"\nThe following data could still be processed:\n {recoveredData}")
         writeBatchToDb(processedCards, table=table, ttl=ttl) #because appendListAndSubmitIfNeeded only submits when the item count is >= 25 we need to write away the last few cards
         logger.info("Finished!")
     return True

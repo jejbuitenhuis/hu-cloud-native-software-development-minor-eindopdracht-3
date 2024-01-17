@@ -175,7 +175,7 @@ def test_renew_cards_thirty_cards(requests_mock):
         cards = table.scan(
             FilterExpression=Attr("DataType").eq("Card")
         )
-
+        assert False
         assert len(cards['Items']) == 30
         assert requests_mock.called
         assert requests_mock.call_count == 2
@@ -239,3 +239,4 @@ def test_renew_cards_has_correct_ttl(requests_mock):
 #         import functions.renewEntities.app
 #         importlib.reload(functions.renewEntities.app)
 #         functions.renewEntities.app.lambda_handler({}, {})
+#     assert False
