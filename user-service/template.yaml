@@ -114,7 +114,7 @@ Resources:
   RegisterUserFunctionPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: RegisterUserFunctionPolicy
+      ManagedPolicyName: !Sub "${Stage}-RegisterUserFunctionPolicy"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -145,7 +145,7 @@ Resources:
   LoginFunctionPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: LoginFunctionPolicy
+      ManagedPolicyName: !Sub "${Stage}-LoginFunctionPolicy"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
