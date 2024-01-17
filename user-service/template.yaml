@@ -109,7 +109,20 @@ Resources:
           USER_POOL_ID: !Ref UserPool
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AmazonCognitoPowerUser
+        - !Ref RegisterUserFunctionPolicy
+
+  RegisterUserFunctionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${Stage}-RegisterUserFunctionPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - cognito-idp:SignUp
+              - cognito-idp:AdminGetUser
+            Resource: "*"
 
   LoginUserFunction:
     Type: AWS::Serverless::Function
@@ -127,7 +140,19 @@ Resources:
           USER_POOL_CLIENT_ID: !Ref UserPoolClient
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AmazonCognitoPowerUser
+        - !Ref LoginFunctionPolicy
+
+  LoginFunctionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${Stage}-LoginFunctionPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - cognito-idp:InitiateAuth
+            Resource: "*"
 
 Outputs:
   UserPoolClientId:
