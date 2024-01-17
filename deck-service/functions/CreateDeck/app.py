@@ -32,9 +32,9 @@ def get_user_id(event: dict) -> str:
 def lambda_handler(event, context):
     LOGGER.info("Starting create deck lambda")
 
-    print(event)
-
     if not "body" in event or event["body"] == None:
+        LOGGER.info("Missing body in request")
+
         return {
             "statusCode": 400,
             "body": json.dumps({
@@ -45,6 +45,8 @@ def lambda_handler(event, context):
     body = json.loads( event["body"] )
 
     if not "name" in body:
+        LOGGER.info("Missing 'name' in request")
+
         return {
             "statusCode": 400,
             "body": json.dumps({
@@ -57,6 +59,8 @@ def lambda_handler(event, context):
     user_id = get_user_id(event)
     deck_id = str( uuid4() )
 
+    LOGGER.info(f"Creating deck for user '{user_id}' with id '{deck_id}' and name '{deck_name}'")
+
     USER_TABLE.put_item(Item={
         "PK": f"USER#{user_id}",
         "SK": f"DECK#{deck_id}",
@@ -66,6 +70,8 @@ def lambda_handler(event, context):
         "deck_id": f"DECK#{deck_id}",
         "deck_name": deck_name,
     })
+
+    LOGGER.info("Successfully created new deck")
 
     return {
         "statusCode": 201,
