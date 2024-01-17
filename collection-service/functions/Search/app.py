@@ -2,9 +2,11 @@ import boto3
 import logging
 import json
 
+from jose import jwt
 from aws_xray_sdk.core import patch_all
 from os import environ
 from botocore.exceptions import ClientError
+from boto3.dynamodb.conditions import Key
 
 if "DISABLE_XRAY" not in environ:
     patch_all()
@@ -21,23 +23,33 @@ SEARCH_ATTRIBUTE_NAMES = ["OracleName", "OracleText"]
 def lambda_handler(event, context):
     logger.info(f"{event} {type(event)}")
 
-    auth_token = event["headers"]["token"]
-    logger.info(f"Auth token: {auth_token}")
+    # Cogintio username
+    token = event["headers"]["token"]
+    claims = jwt.get_unverified_claims(token)
+    coginito_username = claims["cognito:username"]
+    logger.info(f"Coginito_username: {coginito_username}")
+
+    # Search query
     search_query = event["queryStringParameters"]["q"]
-    logger.info(f"Search query: {search_query}")
+    logger.info(f"Search query {search_query}")
+    attribute_query = {":search_string": search_query}
+    logger.info(f"Attribute query: {attribute_query}")
 
     filter_expression = create_filter_expression(SEARCH_ATTRIBUTE_NAMES)
     logger.info(f"Filter expression query: {filter_expression}")
-    attribute_query = create_search_string(search_query)
-    logger.info(f"Attribute query: {attribute_query}")
 
     result = search_for_querystring(
         table=collection_table,
+        key_expression=coginito_username,
         filter_expression=filter_expression,
         attribute_query=attribute_query,
     )
 
-    if result is None:
+    items = result["Items"]
+
+    logger.info(f"All of the items returned: {items}")
+
+    if items is None:
         return {
             "statuscode": 404,
             "body": json.dumps({"message": "Not found"}),
@@ -46,12 +58,13 @@ def lambda_handler(event, context):
             },
         }
 
-    return {"statuscode": 200, "body": json.dumps(result)}
+    return {"statuscode": 200, "body": json.dumps()}
 
 
-def search_for_querystring(table, filter_expression, attribute_query):
+def search_for_querystring(table, key_expression, filter_expression, attribute_query):
     try:
-        table.scan(
+        table.query(
+            KeyConditionExpression=Key("PK").eq("USER#" + key_expression),
             FilterExpression=filter_expression,
             ExpressionAttributeValues=attribute_query,
         )
@@ -61,13 +74,3 @@ def search_for_querystring(table, filter_expression, attribute_query):
     except:
         logger.error(f"Error occured while scanning, { e }")
         raise
-
-
-def create_filter_expression(attribute_names) -> str:
-    filter_clauses = [f"contains({attr}, :search_string)" for attr in attribute_names]
-    filter_expression = " OR ".join(filter_clauses)
-    return filter_expression
-
-
-def create_search_string(query: str):
-    return {":search_string": query}
