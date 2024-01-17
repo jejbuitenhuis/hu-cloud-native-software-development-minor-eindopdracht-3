@@ -1,5 +1,6 @@
 import importlib
 import json
+import time
 from unittest.mock import patch, MagicMock
 import os
 import pytest
@@ -174,3 +175,42 @@ def test_renew_cards_thirty_cards(requests_mock):
         assert len(cards['Items']) == 30
         assert requests_mock.called
         assert requests_mock.call_count == 2
+
+
+@patch.dict(os.environ, {"DISABLE_XRAY": "True",
+                         "EVENT_BUS_ARN": "",
+                         "DYNAMODB_TABLE_NAME": "test-card-table"})
+@mock_dynamodb
+def test_renew_cards_has_future_ttl(requests_mock):
+    with patch('boto3.client') as mock_client:
+        table = setup_table()
+        mock_event_bridge = MagicMock()
+        mock_client.return_value = mock_event_bridge
+
+        bulk_data_mock_response = {
+            "data": [
+                {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
+            ]
+        }
+        with open('functions/renewEntities/single_face_card_list.json', 'r') as file:
+            json_data = json.load(file)
+        mock_file_content = json.dumps(json_data).encode('utf-8')
+
+        requests_mock.get("https://api.scryfall.com/bulk-data", json=bulk_data_mock_response)
+        requests_mock.get("https://data.scryfall.io/default-cards/default-cards-20240116100428.json", content=mock_file_content)
+
+        # Invoke the lambda handler
+        import functions.renewEntities.app
+        importlib.reload(functions.renewEntities.app)
+        functions.renewEntities.app.lambda_handler({}, {})
+
+        single_face_card = table.query(
+            KeyConditionExpression=Key('PK').eq('OracleId#44623693-51d6-49ad-8cd7-140505caf02f')
+        )
+
+        assert requests_mock.called
+        assert requests_mock.call_count == 2
+        assert len(single_face_card['Items']) == 2
+        for item in single_face_card['Items']:
+            assert item['RemoveAt'] > int(time.time())
+

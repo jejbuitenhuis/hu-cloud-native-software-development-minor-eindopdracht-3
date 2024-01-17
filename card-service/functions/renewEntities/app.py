@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import time
 from os import environ
 from aws_xray_sdk.core import patch_all
 import boto3
@@ -19,7 +20,7 @@ event_bus = boto3.client('events')
 logger = logging.getLogger()
 logger.setLevel("INFO")
 
-ttlOffSetSecs = (7*24*60 + 60)
+ttlOffSetSecs = (7*24*60*60 + 60*60)
 
 local_filename = "/tmp/default-cards.json"
 
@@ -70,16 +71,17 @@ def createCardInfo(card):
 
 
 # Can only handle 25 items at a time!
-def writeBatchToDb(items, table):
+def writeBatchToDb(items, table, ttl):
     with table.batch_writer() as batch:
         for item in items:
+            item['RemoveAt'] = ttl
             response = batch.put_item(
                 Item=item
             )
 
 
 # will submit several times if needed
-def appendListAndSubmitIfNeeded(entryList=[], toAddList=[], toAddItem=None, table=None):
+def appendListAndSubmitIfNeeded(ttl, entryList=[], toAddList=[], toAddItem=None, table=None):
     returnList = entryList.copy()
 
     if toAddItem != None:
@@ -89,13 +91,18 @@ def appendListAndSubmitIfNeeded(entryList=[], toAddList=[], toAddItem=None, tabl
     if len(returnList) >= 25:
         # cuts the list into pieces of 25 leaving the rest that is below 25
         for i in range(len(returnList) // 25):
-            writeBatchToDb(returnList[:25], table)
+            writeBatchToDb(returnList[:25], table, ttl)
             del returnList[:25]
 
     return returnList
 
+def calculateTTL(offsetInSeconds):
+    currentEpochInSeconds = int(time.time())
+    return currentEpochInSeconds + offsetInSeconds
+
 
 def lambda_handler(event, context):
+    ttl = calculateTTL(ttlOffSetSecs)
     logger.info(f'tablename: {DYNAMODB_TABLE_NAME}')
     with requests.get("https://api.scryfall.com/bulk-data") as response:
         if response.status_code == 200:
@@ -119,7 +126,7 @@ def lambda_handler(event, context):
         else:
             logger.info(f"Failed to download. Status code: {response.status_code}")
 
-    # Check faces object exists, extract them from the single card JSON notation using for loop
+                    # Check faces object exists, extract them from the single card JSON notation using for loop
     # AWS BatchWriteItem per batch item
 
     with open(local_filename, "rb") as file:
@@ -129,18 +136,19 @@ def lambda_handler(event, context):
         for card in cards:
             try:
                 cardInfo = createCardInfo(card)
-                processedCards = appendListAndSubmitIfNeeded(processedCards, toAddItem=cardInfo, table=table)
+                processedCards = appendListAndSubmitIfNeeded(entryList=processedCards, toAddItem=cardInfo, table=table, ttl=ttl)
 
                 # If a card only has multiple faces the face data is put in card_faces.
                 if card.get("card_faces") == None:
                     cardFace = createCardFace(card)
-                    processedCards = appendListAndSubmitIfNeeded(processedCards, toAddItem=cardFace, table=table)
+                    processedCards = appendListAndSubmitIfNeeded(entryList=processedCards, toAddItem=cardFace, table=table, ttl=ttl)
                 else:
                     cardFaces = createCardFaces(card["card_faces"], card["oracle_id"], card['id'])
-                    processedCards = appendListAndSubmitIfNeeded(processedCards, toAddList=cardFaces, table=table)
+                    processedCards = appendListAndSubmitIfNeeded(entryList=processedCards, toAddList=cardFaces, table=table, ttl=ttl)
             except Exception as error:
                 logger.error(f"An error has occurred while processing card: \n{card} \n Error: \n {error}")
 
-        writeBatchToDb(processedCards, table=table) #because appendListAndSubmitIfNeeded only submits when the item count is >= 25 we need to write away the last few cards
+        writeBatchToDb(processedCards, table=table, ttl=ttl) #because appendListAndSubmitIfNeeded only submits when the item count is >= 25 we need to write away the last few cards
         logger.info("Finished!")
     return True
+
