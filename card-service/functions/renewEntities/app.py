@@ -19,6 +19,7 @@ event_bus = boto3.client('events')
 logger = logging.getLogger()
 logger.setLevel("INFO")
 
+ttlOffSetSecs = (7*24*60 + 60)
 
 local_filename = "/tmp/default-cards.json"
 
@@ -96,7 +97,11 @@ def appendListAndSubmitIfNeeded(entryList=[], toAddList=[], toAddItem=None, tabl
 
 def lambda_handler(event, context):
     logger.info(f'tablename: {DYNAMODB_TABLE_NAME}')
-    bulk_data_items = requests.get("https://api.scryfall.com/bulk-data").json()
+    with requests.get("https://api.scryfall.com/bulk-data") as response:
+        if response.status_code == 200:
+            bulk_data_items = response.json()
+        else:
+            logger.info(f'Failed to fetch bulk data information. Status code: {response.status_code}')
 
     # Because we fetch a json file with multiple items with different types we first need to find the one with the type default_card
     for item in bulk_data_items["data"]:
