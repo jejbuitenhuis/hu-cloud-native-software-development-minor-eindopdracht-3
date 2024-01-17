@@ -23,8 +23,8 @@ describe("Register page Test", () => {
 		cy.url().should("contain", "/#/login");
 
 		cy.on('window:alert', (str) => {
-			expect(str).to.equal(`We have send you an email to verify your email adress.`)
-		  })
+			expect(str).to.equal(`We have send you an email to verify your email adress.`);
+		});
 	});
 
 	it("Registers when user already exists", () => {

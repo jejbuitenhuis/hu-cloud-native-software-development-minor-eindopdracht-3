@@ -74,13 +74,21 @@ async function createDeck(): Promise<ReturnType<typeof router.push>> {
           v-model="deckName"
           placeholder="My amazing deck"
           ref="nameInput"
+          data-test-id="deck-name"
         />
 
-        <p v-show="!!error" class="error">
+        <p v-show="!!error" class="error" data-test-id="errors">
           {{ error }}
         </p>
 
-        <sl-button variant="primary" type="submit" :loading="loading">Create</sl-button>
+        <sl-button
+          variant="primary"
+          type="submit"
+          :loading="loading"
+          data-test-id="submit"
+        >
+          Create
+        </sl-button>
       </form>
     </sl-card>
   </div>

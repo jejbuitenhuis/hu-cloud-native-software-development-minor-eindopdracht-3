@@ -21,7 +21,7 @@ function createDeck(): void {
     <div class="header">
       <h1>Decks</h1>
 
-      <sl-button @click="createDeck()">
+      <sl-button @click="createDeck()" data-test-id="create-deck">
         <sl-icon slot="prefix" name="plus" />
 
         New deck
