@@ -18,6 +18,21 @@ Parameters:
   Stage:
     Type: String
     Default: development
+  UserApiUrl:
+    Type: String
+    Default: !ImportValue "MTGUserApiUrl"
+  WishlistApiUrl:
+    Type: String
+    Default: !ImportValue "MTGWishlistApiUrl"
+  CardApiUrl:
+    Type: String
+    Default: !ImportValue "MTGCardApiUrl"
+  CollectionApiUrl:
+    Type: String
+    Default: !ImportValue "MTGCollectionApiUrl"
+  DeckApiUrl:
+    Type: String
+    Default: !ImportValue "MTGDeckApiUrl"
 
 Resources:
   DragonDashboard:

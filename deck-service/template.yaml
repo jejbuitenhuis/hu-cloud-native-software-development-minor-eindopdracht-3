@@ -80,6 +80,8 @@ Outputs:
   MTGDeckApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGDeckApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+    Export:
+      Name: "MTGDeckApiUrl"
   MTGDeckApi:
     Description: "Api gateway"
     Value: !Ref MTGDeckApi

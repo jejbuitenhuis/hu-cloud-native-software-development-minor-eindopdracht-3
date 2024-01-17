@@ -80,6 +80,8 @@ Outputs:
   MTGCollectionApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGCollectionApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+    Export:
+      Name: "MTGCollectionApiUrl"
   MTGCollectionApi:
     Description: "Api gateway"
     Value: !Ref MTGCollectionApi
