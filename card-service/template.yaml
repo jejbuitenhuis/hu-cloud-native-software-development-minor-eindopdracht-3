@@ -72,21 +72,27 @@ Resources:
         Enabled: true
       BillingMode: PAY_PER_REQUEST
 
-  CardsDBUpdateEventBusScheduler:
-    Type: AWS::Scheduler::Schedule
-    Properties:
-      FlexibleTimeWindow:
-        Mode: "FLEXIBLE"
-        MaximumWindowInMinutes: 360
-      Target:
-        Arn: !Ref RenewEntitiesFunction.Arn
-        RoleArn: !Ref SchedulerRole.Arn
-      ScheduleExpression: !Sub "rate(${CARDS_UPDATE_FREQUENCY} days)"
+#  CardsDBUpdateEventBusScheduler:
+#    Type: AWS::Scheduler::Schedule
+#    Properties:
+#      FlexibleTimeWindow:
+#        Mode: "FLEXIBLE"
+#        MaximumWindowInMinutes: 360
+#      Target:
+#        Arn: !Ref RenewEntitiesFunction.Arn
+#        RoleArn: !Ref SchedulerRole.Arn
+#      ScheduleExpression: !Sub "rate(${CARDS_UPDATE_FREQUENCY} days)"
+
+#  event_rule
+#  role_arn
+#  rule_arn
 
   RenewEntitiesFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/renewEntities
+      MemorySize: 500
+      Timeout: 180
       Events:
         UpdateCards:
           Type: Api
@@ -108,9 +114,9 @@ Outputs:
     Export:
       Name:
         'Fn::Sub': '${AWS::StackName}-api'
-  RenewEntitiesFunction:
-    Description: "Lambda function"
-    Value: !Ref RenewEntitiesFunction
-    Export:
-      Name:
-        'Fn::Sub': !GetAtt RenewEntitiesFunction.Arn
+#  RenewEntitiesFunction:
+#    Description: "Lambda function"
+#    Value: !Ref RenewEntitiesFunction
+#    Export:
+#      Name:
+#        'Fn::Sub': !GetAtt RenewEntitiesFunction.Arn

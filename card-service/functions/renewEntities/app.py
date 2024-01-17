@@ -19,6 +19,7 @@ event_bus = boto3.client('events')
 logger = logging.getLogger()
 logger.setLevel("INFO")
 
+
 local_filename = "/tmp/default-cards.json"
 
 def createCardFaces(cardFaces, oracleId, scryfallId):
@@ -136,4 +137,5 @@ def lambda_handler(event, context):
                 logger.error(f"An error has occurred while processing card: \n{card} \n Error: \n {error}")
 
         writeBatchToDb(processedCards, table=table) #because appendListAndSubmitIfNeeded only submits when the item count is >= 25 we need to write away the last few cards
+        logger.info("Finished!")
     return True

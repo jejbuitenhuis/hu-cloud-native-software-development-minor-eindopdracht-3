@@ -36,24 +36,24 @@ Resources:
         Action: "events:PutEvents"
         Resource: !GetAtt MTGEventBus.Arn
 
-  SchedulerRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service: "scheduler.amazonaws.com"
-            Action: "sts:AssumeRole"
-      Policies:
-        - PolicyName: "InvokeLambdaFunction"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Action: "lambda:InvokeFunction"
-                Effect: "Allow"
-                Resource: !GetAtt RenewEntitiesFunction.Arn
+#  SchedulerRole:
+#    Type: AWS::IAM::Role
+#    Properties:
+#      AssumeRolePolicyDocument:
+#        Version: "2012-10-17"
+#        Statement:
+#          - Effect: "Allow"
+#            Principal:
+#              Service: "events.amazonaws.com"
+#            Action: "sts:AssumeRole"
+#      Policies:
+#        - PolicyName: "InvokeLambdaFunction"
+#          PolicyDocument:
+#            Version: "2012-10-17"
+#            Statement:
+#              - Action: "lambda:InvokeFunction"
+#                Effect: "Allow"
+#                Resource: !GetAtt RenewEntitiesFunction.Arn
 
 Outputs:
   MTGEventBus:
@@ -62,9 +62,9 @@ Outputs:
     Export:
       Name:
         'Fn::Sub': '${AWS::StackName}-MTGEventBus'
-  SchedulerRole:
-    Description: "Role the scheduler uses to invoke lambda"
-    Value: !Ref SchedulerRole
-    Export:
-      Name:
-        'Fn::Sub': !GetAtt SchedulerRole.Arn
+#  SchedulerRole:
+#    Description: "Role the scheduler uses to invoke lambda"
+#    Value: !Ref SchedulerRole
+#    Export:
+#      Name:
+#        'Fn::Sub': !GetAtt SchedulerRole.Arn
