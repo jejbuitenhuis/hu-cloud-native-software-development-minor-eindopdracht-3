@@ -107,6 +107,37 @@ Resources:
         Variables:
           DYNAMODB_TABLE_NAME: !Ref MTGCollectionDynamoDBTable
 
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Stage}-scheduler--trigger-function-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "scheduler.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "InvokeLambdaFunction"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action: "lambda:InvokeFunction"
+                Effect: "Allow"
+                Resource: !GetAtt RenewEntitiesFunction.Arn
+
+  CardSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: !Sub "${Stage}-card-schedule"
+      FlexibleTimeWindow:
+        Mode: OFF
+      ScheduleExpression: "cron(0 5 * * ? *)"
+      Target:
+        Arn: !GetAtt RenewEntitiesFunction.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+
 Outputs:
   MTGCardApiUrl:
     Description: "API Gateway endpoint URL"
@@ -117,9 +148,3 @@ Outputs:
     Export:
       Name:
         'Fn::Sub': '${AWS::StackName}-api'
-#  RenewEntitiesFunction:
-#    Description: "Lambda function"
-#    Value: !Ref RenewEntitiesFunction
-#    Export:
-#      Name:
-#        'Fn::Sub': !GetAtt RenewEntitiesFunction.Arn
