@@ -54,6 +54,6 @@ describe("Register page Test", () => {
 			.find('button')
 			.clickAtTop();
 
-		cy.contains("This email adress has already been registered!");
+		cy.contains("This email address has already been registered!");
 	});
 });
