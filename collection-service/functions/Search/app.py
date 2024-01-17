@@ -1,11 +1,9 @@
 import boto3
-import jwt
 import logging
 import json
 
 from aws_xray_sdk.core import patch_all
 from os import environ
-from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import ClientError
 
 if "DISABLE_XRAY" not in environ:
@@ -15,9 +13,9 @@ logger = logging.getLogger()
 logger.setLevel("INFO")
 
 dynamodb = boto3.resource("dynamodb")
-collection_table = dynamodb.table("Collections")
+collection_table = dynamodb.Table("Collections")
 
-SEARCH_ATTRIBUTE_NAMES = [""]
+SEARCH_ATTRIBUTE_NAMES = ["OracleName", "OracleText"]
 
 
 def lambda_handler(event, context):

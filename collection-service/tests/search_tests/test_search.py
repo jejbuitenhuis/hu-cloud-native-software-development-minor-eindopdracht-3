@@ -7,7 +7,7 @@ COGINTO_PASSWORD = "NewPassword456!"
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True", "EVENT_BUS_ARN": ""})
-def test_search_works(setup_dynamodb_deck_with_item):
+def test_search_works(setup_dynamodb_collection_with_items):
     from functions.Search.app import lambda_handler
 
     event = {
@@ -25,7 +25,7 @@ def test_search_works(setup_dynamodb_deck_with_item):
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True", "EVENT_BUS_ARN": ""})
-def test_search_not_found(setup_dynamodb_deck):
+def test_search_not_found(setup_dynamodb_collection):
     from functions.Search.app import lambda_handler
 
     # Arrange
