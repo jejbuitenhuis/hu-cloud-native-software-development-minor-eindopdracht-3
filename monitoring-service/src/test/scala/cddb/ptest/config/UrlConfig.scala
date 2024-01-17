@@ -3,12 +3,26 @@ package cddb.ptest.config
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
+
+import com.typesafe.config.ConfigFactory
+
 object UrlConfig {
+  private val ssmClient: SsmClient = SsmClient.create()
 
-  val userApiUrl: String = "${UserApiUrl}"
-  val wishlistApiUrl: String = "${WishlistApiUrl}"
-  val cardApiUrl: String = "${CardApiUrl}"
-  val collectionApiUrl: String = "${CollectionApiUrl}"
-  val deckApiUrl: String = "${DeckApiUrl}"
+  val stage: String = ConfigFactory.load().getString("Stage")
 
+  val userApiUrl: String = retrieveParameterValue(s"/$stage/MTGUserApi/url")
+  val wishlistApiUrl: String = retrieveParameterValue(s"/$stage/MTGWishlistApi/url")
+  val cardApiUrl: String = retrieveParameterValue(s"/$stage/MTGCardApi/url")
+  val collectionApiUrl: String = retrieveParameterValue(s"/$stage/MTGCollectionApi/url")
+  val deckApiUrl: String = retrieveParameterValue(s"/$stage/MTGDeckApi/url")
+
+  private def retrieveParameterValue(parameterName: String): String = {
+    val request = GetParameterRequest.builder()
+      .name(parameterName)
+      .build()
+
+    val response = ssmClient.getParameter(request)
+    response.parameter().value()
+  }
 }
