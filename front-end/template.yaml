@@ -67,6 +67,11 @@ Resources:
       DistributionConfig:
         Enabled: true
         DefaultRootObject: "index.html"
+        Comment: !Sub ${Stage}
+        ViewerCertificate:
+          AcmCertificateArn: arn:aws:acm:us-east-1:861259332787:certificate/44d5935d-16b5-4faf-bb0b-98b37a142d33
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
         Origins:
           # Front-end S3 bucket
           - Id: !Sub ${Stage}-front-end
