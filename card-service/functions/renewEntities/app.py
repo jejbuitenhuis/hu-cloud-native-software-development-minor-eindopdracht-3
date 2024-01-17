@@ -13,7 +13,6 @@ if 'DISABLE_XRAY' not in environ:
 
 dynamodb = boto3.resource('dynamodb', 'us-east-1')
 DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
-table = dynamodb.Table(DYNAMODB_TABLE_NAME)
 
 event_bus = boto3.client('events')
 logger = logging.getLogger()
@@ -68,7 +67,7 @@ def createCardInfo(card):
 
 
 # Can only handle 25 items at a time!
-def writeBatchToDb(items):
+def writeBatchToDb(items, table):
     with table.batch_writer() as batch:
         for item in items:
             response = batch.put_item(
@@ -77,7 +76,7 @@ def writeBatchToDb(items):
 
 
 # will submit several times if needed
-def appendListAndSubmitIfNeeded(entryList=[], toAddList=[], toAddItem=None):
+def appendListAndSubmitIfNeeded(entryList=[], toAddList=[], toAddItem=None, table=None):
     returnList = entryList.copy()
 
     if toAddItem != None:
@@ -87,13 +86,14 @@ def appendListAndSubmitIfNeeded(entryList=[], toAddList=[], toAddItem=None):
     if len(returnList) >= 25:
         # cuts the list into pieces of 25 leaving the rest that is below 25
         for i in range(len(returnList) // 25):
-            writeBatchToDb(returnList[:25])
+            writeBatchToDb(returnList[:25], table)
             del returnList[:25]
 
     return returnList
 
 
 def lambda_handler(event, context):
+    table = dynamodb.Table(DYNAMODB_TABLE_NAME)
     bulk_data_items = requests.get("https://api.scryfall.com/bulk-data").json()
 
     # Because we fetch a json file with multiple items with different types we first need to find the one with the type default_card
@@ -122,15 +122,15 @@ def lambda_handler(event, context):
         for card in cards:
             try:
                 cardInfo = createCardInfo(card)
-                processedCards = appendListAndSubmitIfNeeded(processedCards, toAddItem=cardInfo)
+                processedCards = appendListAndSubmitIfNeeded(processedCards, toAddItem=cardInfo, table=table)
 
                 # If a card only has multiple faces the face data is put in card_faces.
                 if card.get("card_faces") == None:
                     cardFace = createCardFace(card)
-                    processedCards = appendListAndSubmitIfNeeded(processedCards, toAddItem=cardFace)
+                    processedCards = appendListAndSubmitIfNeeded(processedCards, toAddItem=cardFace, table=table)
                 else:
                     cardFaces = createCardFaces(card["card_faces"], card["oracle_id"], card['id'])
-                    processedCards = appendListAndSubmitIfNeeded(processedCards, toAddList=cardFaces)
+                    processedCards = appendListAndSubmitIfNeeded(processedCards, toAddList=cardFaces, table=table)
             except Exception as error:
                 logger.error(f"An error has occurred while processing card: \n{card} \n Error: \n {error}")
 

@@ -8,23 +8,34 @@ import requests_mock
 from boto3.dynamodb.conditions import Key, Attr
 from moto import mock_dynamodb
 
+
+@pytest.fixture(scope="function")
+@mock_dynamodb
+def table():
+    # Setup phase: Create table
+    dynamodb = boto3.resource('dynamodb', 'us-east-1')
+    table = dynamodb.create_table(
+        TableName='test-card-table',
+        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
+        AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
+                              {"AttributeName": "SK", "AttributeType": "S"}],
+        BillingMode='PAY_PER_REQUEST'
+    )
+    table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
+
+    # Provide the table to the test
+    yield table
+
+    # Teardown phase: Delete table
+    table.delete()
+
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table"})
 @mock_dynamodb
-def test_renew_cards_writes_correct_data_single_face(requests_mock):
+def test_renew_cards_writes_correct_data_single_face(requests_mock, table):
     with patch('boto3.client') as mock_client:
         os.environ["DYNAMODB_TABLE_NAME"] = "test-card-table"
-        dynamodb = boto3.resource('dynamodb', 'us-east-1')
-        table = dynamodb.create_table(
-            TableName='test-card-table',
-            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-            AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
-                                  {"AttributeName": "SK", "AttributeType": "S"}, ],
-            BillingMode='PAY_PER_REQUEST'
-        )
-        table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
-
         mock_event_bridge = MagicMock()
         mock_client.return_value = mock_event_bridge
 
@@ -61,19 +72,9 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table"})
 @mock_dynamodb
-def test_renew_cards_two_faced(requests_mock):
+def test_renew_cards_two_faced(requests_mock, table):
     with patch('boto3.client') as mock_client:
         os.environ["DYNAMODB_TABLE_NAME"] = "test-card-table"
-        dynamodb = boto3.resource('dynamodb', 'us-east-1')
-        table = dynamodb.create_table(
-            TableName='test-card-table',
-            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-            AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
-                                  {"AttributeName": "SK", "AttributeType": "S"}, ],
-            BillingMode='PAY_PER_REQUEST'
-        )
-        table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
-
         mock_event_bridge = MagicMock()
         mock_client.return_value = mock_event_bridge
 
@@ -108,19 +109,9 @@ def test_renew_cards_two_faced(requests_mock):
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table"})
 @mock_dynamodb
-def test_renew_cards_ten_cards(requests_mock):
+def test_renew_cards_ten_cards(requests_mock, table):
     with patch('boto3.client') as mock_client:
         os.environ["DYNAMODB_TABLE_NAME"] = "test-card-table"
-        dynamodb = boto3.resource('dynamodb', 'us-east-1')
-        table = dynamodb.create_table(
-            TableName='test-card-table',
-            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-            AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
-                                  {"AttributeName": "SK", "AttributeType": "S"}, ],
-            BillingMode='PAY_PER_REQUEST'
-        )
-        table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
-
         mock_event_bridge = MagicMock()
         mock_client.return_value = mock_event_bridge
 
@@ -152,19 +143,9 @@ def test_renew_cards_ten_cards(requests_mock):
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table"})
 @mock_dynamodb
-def test_renew_cards_thirty_cards(requests_mock):
+def test_renew_cards_thirty_cards(requests_mock, table):
     with patch('boto3.client') as mock_client:
         os.environ["DYNAMODB_TABLE_NAME"] = "test-card-table"
-        dynamodb = boto3.resource('dynamodb', 'us-east-1')
-        table = dynamodb.create_table(
-            TableName='test-card-table',
-            KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-            AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
-                                  {"AttributeName": "SK", "AttributeType": "S"}, ],
-            BillingMode='PAY_PER_REQUEST'
-        )
-        table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
-
         mock_event_bridge = MagicMock()
         mock_client.return_value = mock_event_bridge
 
@@ -181,7 +162,6 @@ def test_renew_cards_thirty_cards(requests_mock):
         requests_mock.get("https://data.scryfall.io/default-cards/default-cards-20240116100428.json", content=mock_file_content)
 
         # Invoke the lambda handler
-        from functions.renewEntities.app import lambda_handler
         lambda_handler({}, {})
 
         cards = table.scan(
