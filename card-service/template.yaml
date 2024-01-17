@@ -116,7 +116,8 @@ Resources:
     Properties:
       FlexibleTimeWindow:
         Mode: 'OFF'
-      ScheduleExpression: "cron(0 5 * * ? *)"
+      ScheduleExpression: "cron(0/5 * * * ? *)" #for testing, every 5 minutes
+      #      ScheduleExpression: "cron(0 5 * * THU *)"
       ScheduleExpressionTimezone: "GMT+1"
       Target:
         Arn: !GetAtt RenewEntitiesFunction.Arn

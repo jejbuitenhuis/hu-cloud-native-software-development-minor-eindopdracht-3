@@ -1,6 +1,4 @@
-import json
 import os
-import shutil
 import time
 from os import environ
 from aws_xray_sdk.core import patch_all
