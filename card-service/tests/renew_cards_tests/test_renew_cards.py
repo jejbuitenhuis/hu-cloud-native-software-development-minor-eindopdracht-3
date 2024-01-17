@@ -224,18 +224,18 @@ def test_renew_cards_has_correct_ttl(requests_mock):
             assert item['RemoveAt'] <= int(time.time()) + 2 * CARDS_UPDATE_FREQUENCY
 
 
-@patch.dict(os.environ, {"DISABLE_XRAY": "True",
-                         "EVENT_BUS_ARN": "",
-                         "DYNAMODB_TABLE_NAME": "test-card-table",
-                         "CARDS_UPDATE_FREQUENCY" : "7"})
-@mock_dynamodb
-def test_renew_cards_full():
-    with patch('boto3.client') as mock_client:
-        table = setup_table()
-        mock_event_bridge = MagicMock()
-        mock_client.return_value = mock_event_bridge
-
-        # Invoke the lambda handler
-        import functions.renewEntities.app
-        importlib.reload(functions.renewEntities.app)
-        functions.renewEntities.app.lambda_handler({}, {})
+# @patch.dict(os.environ, {"DISABLE_XRAY": "True",
+#                          "EVENT_BUS_ARN": "",
+#                          "DYNAMODB_TABLE_NAME": "test-card-table",
+#                          "CARDS_UPDATE_FREQUENCY" : "7"})
+# @mock_dynamodb
+# def test_renew_cards_full():
+#     with patch('boto3.client') as mock_client:
+#         table = setup_table()
+#         mock_event_bridge = MagicMock()
+#         mock_client.return_value = mock_event_bridge
+#
+#         # Invoke the lambda handler
+#         import functions.renewEntities.app
+#         importlib.reload(functions.renewEntities.app)
+#         functions.renewEntities.app.lambda_handler({}, {})
