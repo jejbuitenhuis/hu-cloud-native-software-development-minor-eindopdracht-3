@@ -85,7 +85,17 @@ Resources:
 
 #  event_rule
 #  role_arn
-#  rule_arn
+
+  renewEntitiesRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Rule to trigger RenewEntitiesFunction, to renew the card database"
+      Name: !Sub "${Stage}-renew-entities-rule"
+      ScheduleExpression: "cron(0 4 * * ? *)"
+      Targets:
+        - Arn: !GetAtt RenewEntitiesFunction.Arn
+          Id: !Sub "${Stage}-renew-entities-rule-target"
+#      RoleArn:
 
   RenewEntitiesFunction:
     Type: AWS::Serverless::Function
@@ -93,13 +103,6 @@ Resources:
       CodeUri: functions/renewEntities
       MemorySize: 500
       Timeout: 180
-      Events:
-        UpdateCards:
-          Type: Api
-          Properties:
-            RestApiId: !Ref "MTGCardAPI"
-            Path: /collections
-            Method: get
       Environment:
         Variables:
           DYNAMODB_TABLE_NAME: !Ref MTGCollectionDynamoDBTable
