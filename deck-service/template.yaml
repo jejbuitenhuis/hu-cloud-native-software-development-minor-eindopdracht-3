@@ -86,7 +86,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGDeckApi"
-            Path: /
+            Path: /api/decks/
             Method: POST
       Policies:
         - AmazonDynamoDBFullAccess

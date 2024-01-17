@@ -22,7 +22,7 @@
       }
     },
 
-    "/": {
+    "/api/decks/": {
       "post": {
         "parameters" : [
           {
