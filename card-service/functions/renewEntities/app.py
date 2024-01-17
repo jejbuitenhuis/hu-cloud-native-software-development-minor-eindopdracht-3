@@ -13,6 +13,7 @@ if 'DISABLE_XRAY' not in environ:
 
 dynamodb = boto3.resource('dynamodb', 'us-east-1')
 DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
+table = dynamodb.Table(DYNAMODB_TABLE_NAME)
 
 event_bus = boto3.client('events')
 logger = logging.getLogger()
@@ -93,7 +94,7 @@ def appendListAndSubmitIfNeeded(entryList=[], toAddList=[], toAddItem=None, tabl
 
 
 def lambda_handler(event, context):
-    table = dynamodb.Table(DYNAMODB_TABLE_NAME)
+    logger.info(f'tablename: {DYNAMODB_TABLE_NAME}')
     bulk_data_items = requests.get("https://api.scryfall.com/bulk-data").json()
 
     # Because we fetch a json file with multiple items with different types we first need to find the one with the type default_card
@@ -134,5 +135,5 @@ def lambda_handler(event, context):
             except Exception as error:
                 logger.error(f"An error has occurred while processing card: \n{card} \n Error: \n {error}")
 
-        writeBatchToDb(processedCards) #because appendListAndSubmitIfNeeded only submits when the item count is >= 25 we need to write away the last few cards
+        writeBatchToDb(processedCards, table=table) #because appendListAndSubmitIfNeeded only submits when the item count is >= 25 we need to write away the last few cards
     return True
