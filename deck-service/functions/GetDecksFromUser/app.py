@@ -53,6 +53,6 @@ def lambda_handler(event, context):
     LOGGER.info(f"Returning {len(decks)} decks for user with id '{user_id}'")
 
     return {
-        "statusCode": 201,
+        "statusCode": 200,
         "body": json.dumps(decks),
     }
