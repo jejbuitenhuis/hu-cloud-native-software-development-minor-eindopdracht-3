@@ -243,3 +243,4 @@ Resources:
             }'
         - CloudFrontDistributionId: !ImportValue
             'Fn::Sub': "front-end-${Stage}-CloudFrontId"
+
