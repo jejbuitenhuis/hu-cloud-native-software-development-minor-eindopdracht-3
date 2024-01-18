@@ -136,7 +136,7 @@ Resources:
     Properties:
       FlexibleTimeWindow:
         Mode: 'OFF'
-      ScheduleExpression: "cron(0 5 * * * *)"
+      ScheduleExpression: "cron(0 5 * * ? *)"
       ScheduleExpressionTimezone: "GMT+1"
       Target:
         Arn: !GetAtt RenewEntitiesFunction.Arn
