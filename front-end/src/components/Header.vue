@@ -12,7 +12,7 @@
 
   watch(() => route.fullPath, () => {
     userSignedIn.value = isUserSignedIn();
-    if (!userSignedIn.value && !["/", "/login", "/register"].includes(route.fullPath)) {
+    if (!userSignedIn.value && !["/login", "/register"].includes(route.fullPath)) {
       router.push("/login");
     }
   })
