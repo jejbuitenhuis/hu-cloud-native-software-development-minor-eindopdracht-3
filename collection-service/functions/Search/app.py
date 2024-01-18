@@ -21,17 +21,13 @@ SEARCH_ATTRIBUTE_NAMES = ["OracleName", "OracleText"]
 
 
 def lambda_handler(event, context):
-    logger.info(f"{event} {type(event)}")
-
     # Cogintio username
-    token = event["headers"]["token"]
-    claims = jwt.get_unverified_claims(token)
-    coginito_username = claims["cognito:username"]
+    coginito_username = extract_cognito_username(event["headers"["Authorization"]])
+
     logger.info(f"Coginito_username: {coginito_username}")
 
     # Search query
     search_query = event["queryStringParameters"]["q"]
-    logger.info(f"Search query {search_query}")
     attribute_query = {":search_string": search_query}
     logger.info(f"Attribute query: {attribute_query}")
 
@@ -59,6 +55,27 @@ def lambda_handler(event, context):
         }
 
     return {"statuscode": 200, "body": json.dumps()}
+
+
+def extract_cognito_username(jwt_token, secret_key):
+    try:
+        # Decode the JWT token
+        decoded_token = jwt.decode(jwt_token, secret_key, algorithms=["HS256"])
+
+        # Extract the 'cognito:username' value from the payload
+        cognito_username = decoded_token.get("cognito:username")
+
+        return cognito_username
+    except jwt.ExpiredSignatureError:
+        print("Token has expired.")
+    except jwt.JWTError as e:
+        print(f"Error decoding token: {e}")
+
+
+def create_filter_expression(attribute_names) -> str:
+    filter_clauses = [f"contains({attr}, :search_string)" for attr in attribute_names]
+    filter_expression = " OR ".join(filter_clauses)
+    return filter_expression
 
 
 def search_for_querystring(table, key_expression, filter_expression, attribute_query):
