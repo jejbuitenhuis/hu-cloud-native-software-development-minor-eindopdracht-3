@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import "@shoelace-style/shoelace/dist/components/input/input";
-import "@shoelace-style/shoelace/dist/components/button/button";
-import Header from "@/components/Header.vue";
+import "@shoelace-style/shoelace/dist/components/card/card";
 import {ref} from "vue";
 
 type CardInstanceCard = {
@@ -19,31 +17,35 @@ type CardInstanceFace = {
   ImageLink: string,
 }
 type CardInstance = CardInstanceCard | CardInstanceFace;
+type CombinedCardInstance = CardInstanceCard & {
+  FrontFace: CardInstanceFace,
+  BackFace: CardInstanceFace | undefined,
+}
 type Collection = {
-  [key: string]: [CardInstanceCard & {
-    FrontFace: CardInstanceFace;
-    BackFace: CardInstanceFace | undefined;
-  }],
+  [key: string]: CombinedCardInstance[],
 }
 
 const collection = ref<Collection>({});
+const collectionLoading = ref<boolean>(true);
 
 async function getCollection() {
-  const response = await fetch("/api/collections", {headers: {Authorization: localStorage.getItem("jwtToken")}});
+  const token = localStorage.getItem("jwtToken");
+  if (!token) return;
+  const response = await fetch("/api/collections", {headers: {Authorization: token}});
   if (!response.ok) {
     console.error(`Failed collections fetch. Status: ${response.status}`)
     return;
   }
   const data = await response.json() as CardInstance[];
-  const newCollection: Collection = {}
-  const instanceCards: CardInstanceCard[] = data.filter(v => v.DataType == "Card")
-  const instanceFaces: CardInstanceFace[] = data.filter(v => v.DataType == "Face")
+  const newCollection: Collection = {};
+  const instanceCards = data.filter(v => v.DataType == "Card") as CardInstanceCard[];
+  const instanceFaces = data.filter(v => v.DataType == "Face") as CardInstanceFace[];
 
   for (const instanceCard of instanceCards) {
-    const frontFace = instanceFaces.find(v => v.FaceType === "Front" && v.CardInstanceId === instanceCard.CardInstanceId);
+    const frontFace = instanceFaces.find(v => v.FaceType === "Front" && v.CardInstanceId === instanceCard.CardInstanceId) as CardInstanceFace;
     const backFace = instanceFaces.find(v => v.FaceType === "Back" && v.CardInstanceId === instanceCard.CardInstanceId);
 
-    const newInstance = {
+    const newInstance: CombinedCardInstance = {
       ...instanceCard,
       FrontFace: frontFace,
       BackFace: backFace,
@@ -55,23 +57,27 @@ async function getCollection() {
     }
     newCollection[instanceCard.PrintId] = [newInstance]
   }
-  collection.value = newCollection
+  collection.value = newCollection;
+  collectionLoading.value = false;
 }
 getCollection();
 </script>
 
 <template>
-  <Header />
-
   <div class="collection-wrapper">
-    <p v-if="collection.length > 0">
-    Your collection is empty.
-    </p>
-    <section v-else class="cards-container">
+    <section class="cards-container">
+      <p v-if="Object.keys(collection).length === 0 && !collectionLoading">
+        Your collection is empty.
+      </p>
+      <p v-if="collectionLoading">
+        Loading
+      </p>
+
       <!--TODO: Replace with card component-->
-      <div v-for="(card, _) in collection" class="card">
-        <img :src="card[0]['FrontFace']['ImageLink']" alt="MTG - Card face">
-      </div>
+      <sl-card v-for="(card, _) in collection" class="card">
+        <img slot="image" :src="card[0]['FrontFace']['ImageLink']" alt="MTG - Card face">
+        <div>Instances: {{card.length}}</div>
+      </sl-card>
     </section>
   </div>
 </template>
@@ -89,9 +95,10 @@ getCollection();
 }
 .card {
   margin: 1rem;
-  height: 20rem;
+  width: 15rem;
   img {
     height: inherit;
+    border-radius: 1rem;
   }
 }
 </style>
