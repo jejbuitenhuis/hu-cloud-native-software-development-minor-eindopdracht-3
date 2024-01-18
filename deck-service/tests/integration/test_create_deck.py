@@ -41,15 +41,15 @@ class TestCreateDeck(unittest.TestCase):
         self.monkeypatch.setenv("AWS_SESSION_TOKEN", "testing")
         self.monkeypatch.setenv("AWS_DEFAULT_REGION", "us-east-1")
 
-        self.DYNAMO_DB_USER_TABLE_NAME = "table_decks"
+        self.DYNAMO_DB_DECK_TABLE_NAME = "table_decks"
 
         self.monkeypatch.setenv("DISABLE_XRAY", "true")
-        self.monkeypatch.setenv("DYNAMO_DB_USER_TABLE_NAME", self.DYNAMO_DB_USER_TABLE_NAME)
+        self.monkeypatch.setenv("DYNAMO_DB_DECK_TABLE_NAME", self.DYNAMO_DB_DECK_TABLE_NAME)
 
         self.dynamodb_client = boto3.client("dynamodb")
 
         self.dynamodb_client.create_table( # {{{
-            TableName=self.DYNAMO_DB_USER_TABLE_NAME,
+            TableName=self.DYNAMO_DB_DECK_TABLE_NAME,
             KeySchema=[
                 {
                     "AttributeName": "PK",

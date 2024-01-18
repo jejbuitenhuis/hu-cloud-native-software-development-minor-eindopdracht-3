@@ -61,7 +61,7 @@ def lambda_handler(event, context):
 
     LOGGER.info(f"Creating deck for user '{user_id}' with id '{deck_id}' and name '{deck_name}'")
 
-    USER_TABLE.put_item(Item={
+    DECK_TABLE.put_item(Item={
         "PK": f"USER#{user_id}",
         "SK": f"DECK#{deck_id}",
 
