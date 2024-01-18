@@ -25,9 +25,9 @@ function register(){
     sendData(email.value, password.value)
         .then((response) => {
             if (response.status === 409){
-                showErrorMessage("This email adress has already been registered!");
+                showErrorMessage("This email address has already been registered!");
             } else if (response.ok) {
-                alert("We have send you an email to verify your email adress.");
+                alert("We have send you an email to verify your email address.");
                 router.push("/login");
             } else if (response.status === 400) {
                 alert(response.json().then((response) => showErrorMessage(response.error)))
