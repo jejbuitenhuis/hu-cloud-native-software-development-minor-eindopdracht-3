@@ -6,6 +6,7 @@ import {vi} from "vitest";
 vi.mock('vue-router')
 
 describe("Title component", () => {
+	// @ts-ignore
 	useRoute.mockReturnValue({
     	path: "/",
   	})

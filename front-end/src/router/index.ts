@@ -22,6 +22,7 @@ const router = createRouter({
 		{
 			path: "/decks",
 			name: "decks",
+			component: () => import(/* webpackChunkName: "login" */ "../views/Deck/DeckView.vue"),
 			children: [
 				{
 					path: "new",
