@@ -30,7 +30,8 @@ def setup_table():
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
-                         "CARDS_UPDATE_FREQUENCY" : "7"})
+                         "CARDS_UPDATE_FREQUENCY" : "7",
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/single_faced_cards.json"})
 @mock_dynamodb
 def test_renew_cards_writes_correct_data_single_face(requests_mock):
     with patch('boto3.client') as mock_client:
@@ -65,13 +66,15 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
         assert len(single_face_card['Items']) == 1
         assert single_face_card['Items'][0]['PK'] == "OracleId#44623693-51d6-49ad-8cd7-140505caf02f"
         assert single_face_card['Items'][0]['SK'] == "PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe#Face#1"
+        os.remove('tests/renew_cards_tests/single_faced_cards.json')
 
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
-                         "CARDS_UPDATE_FREQUENCY" : "7"})
+                         "CARDS_UPDATE_FREQUENCY" : "7",
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/two_faced_cards.json"})
 @mock_dynamodb
 def test_renew_cards_two_faced(requests_mock):
     with patch('boto3.client') as mock_client:
@@ -103,14 +106,14 @@ def test_renew_cards_two_faced(requests_mock):
         assert requests_mock.called
         assert requests_mock.call_count == 2
         assert len(double_card_faces['Items']) == 3
-
-
+        os.remove('tests/renew_cards_tests/two_faced_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
-                         "CARDS_UPDATE_FREQUENCY" : "7"})
+                         "CARDS_UPDATE_FREQUENCY" : "7",
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/ten_cards.json"})
 @mock_dynamodb
 def test_renew_cards_ten_cards(requests_mock):
     with patch('boto3.client') as mock_client:
@@ -142,12 +145,14 @@ def test_renew_cards_ten_cards(requests_mock):
         assert requests_mock.called
         assert requests_mock.call_count == 2
         assert len(cards['Items']) == 10
+        os.remove('tests/renew_cards_tests/ten_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
-                         "CARDS_UPDATE_FREQUENCY" : "7"})
+                         "CARDS_UPDATE_FREQUENCY" : "7",
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/thirty_cards.json"})
 @mock_dynamodb
 def test_renew_cards_thirty_cards(requests_mock):
     with patch('boto3.client') as mock_client:
@@ -175,16 +180,17 @@ def test_renew_cards_thirty_cards(requests_mock):
         cards = table.scan(
             FilterExpression=Attr("DataType").eq("Card")
         )
-        assert False
         assert len(cards['Items']) == 30
         assert requests_mock.called
         assert requests_mock.call_count == 2
+        os.remove('tests/renew_cards_tests/thirty_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
-                         "CARDS_UPDATE_FREQUENCY" : "7"})
+                         "CARDS_UPDATE_FREQUENCY" : "7",
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/correct_ttl.json"})
 @mock_dynamodb
 def test_renew_cards_has_correct_ttl(requests_mock):
     with patch('boto3.client') as mock_client:
@@ -222,6 +228,7 @@ def test_renew_cards_has_correct_ttl(requests_mock):
             print(item['RemoveAt'])
             assert item['RemoveAt'] > int(time.time()) + CARDS_UPDATE_FREQUENCY
             assert item['RemoveAt'] <= int(time.time()) + 2 * CARDS_UPDATE_FREQUENCY
+        os.remove('tests/renew_cards_tests/correct_ttl.json')
 
 
 # @patch.dict(os.environ, {"DISABLE_XRAY": "True",

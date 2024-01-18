@@ -1,4 +1,3 @@
-import json
 import os
 import time
 import traceback
@@ -8,6 +7,7 @@ import boto3
 import logging
 import requests
 import ijson
+import json
 
 if 'DISABLE_XRAY' not in environ:
     patch_all()
@@ -22,91 +22,80 @@ event_bus = boto3.client('events')
 logger = logging.getLogger()
 logger.setLevel("INFO")
 
-ttlOffSetSecs = (3*60*60)
+ttlOffSetSecs = (3 * 60 * 60)
+local_filename = os.getenv("CARD_JSON_LOCATION", "/tmp/default-cards.json")
 
-local_filename = "/tmp/default-cards.json"
 
-def createCardFaces(cardFaces, oracleId, scryfallId):
-    faces = []
-    for cardFace in cardFaces:
-        index = cardFaces.index(cardFace) + 1
-        faces.append({
-            "PK": f'OracleId#{oracleId}',
-            "SK": f'PrintId#{scryfallId}#Face#{index}',
-            "OracleText": cardFace.get('oracle_text', ''),
-            "ManaCost": cardFace.get('mana_cost', ''),
-            "TypeLine": cardFace.get('type_line', ''),
-            "FaceName": cardFace.get('name', ''),
-            "FlavorText": cardFace.get('flavor_text', ''),
-            "ImageUrl": cardFace['image_uris'].get('png', ''),
-            "Colors": str(cardFace.get('colors', [])), #Colors will return a list so we convert it to a string before handing it over to the database
-            "DataType": "Face"
-            # TODO: add ttl
-        })
-    return faces
-
-def createCardFace(card):
+def createCardFace(card, oracle_id, scryfall_id, face_count=1):
+    image_uris = card.get('image_uris', {})  # Check if 'image_uris' exists, provide an empty dictionary as default
     return {
-        "PK": f'OracleId#{card["oracle_id"]}', #PK and sk don't have default values because if they aren't there throwing and error would be correct
-        "SK": f'PrintId#{card["id"]}#Face#1',
-        "OracleText": card.get('oracle_text', ''), #we set default values in case a field isn't specified
+        "PK": f'OracleId#{oracle_id}',
+        # PK and sk don't have default values because if they aren't there throwing and error would be correct
+        "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
+        "OracleText": card.get('oracle_text', ''),  # we set default values in case a field isn't specified
         "ManaCost": card.get('mana_cost', ''),
         "TypeLine": card.get('type_line', ''),
         "FaceName": card.get('name', ''),
         "FlavorText": card.get('flavor_text', ''),
-        "ImageUrl": card['image_uris'].get('png', ''),
-        "Colors": str(card.get('colors', [])), #Colors will return a list so we convert it to a string before handing it over to the database
+        "ImageUrl": image_uris.get('png', ''),
+        "Colors": str(card.get('colors', [])),
         "DataType": "Face"
     }
 
-def createCardInfo(card):
-    return {
-        "PK": f'OracleId#{card["oracle_id"]}',
-        "SK": f'PrintId#{card["id"]}#Card',
-        "OracleName": card['name'],
-        "SetName": card['set_name'],
-        "ReleasedAt": card['released_at'],
-        "Rarity": card['rarity'],
-        "Price": card['prices']['eur'],
-        "DataType": "Card"
-    }
+
+def getOracleFromCard(card):
+    if card.get('layout', '') == 'reversible_card':
+        return card['card_faces'][0]['oracle_id']
+    else:
+        return card['oracle_id']
+
+
+def createCardInfo(card, oracle_id):
+    try:
+        return {
+            "PK": f'OracleId#{oracle_id}',
+            "SK": f'PrintId#{card["id"]}#Card',
+            "OracleName": card['name'],
+            "SetName": card['set_name'],
+            "ReleasedAt": card['released_at'],
+            "Rarity": card['rarity'],
+            "Price": card['prices']['eur'],
+            "DataType": "Card"
+        }
+    except Exception as error:
+        logger.error(f"An error has occurred while processing card: \n{card}\n "
+                     f"Error: \n {error}")
 
 
 # Can only handle 25 items at a time!
 def writeBatchToDb(items, table, ttl):
-    with open('result.json', 'a') as fp:
-        fp.write("[")
+    with table.batch_writer() as batch:
+        for item in items:
+            item['RemoveAt'] = ttl
+            response = batch.put_item(
+                Item=item
+            )
 
-        with table.batch_writer() as batch:
-            for item in items:
-                json.dump(item, fp)
-                item['RemoveAt'] = ttl
-                response = batch.put_item(
-                    Item=item
-                )
-                fp.write(",")
-        fp.write("],\n")
-
-
-# will submit several times if needed
-def appendListAndSubmitIfNeeded(ttl, entryList=[], toAddList=[], toAddItem=None, table=None):
-    returnList = entryList.copy()
-
-    if toAddItem != None:
-        toAddList.append(toAddItem)
-    returnList.extend(toAddList)
-
-    if len(returnList) >= 25:
-        # cuts the list into pieces of 25 leaving the rest that is below 25
-        for i in range(len(returnList) // 25):
-            writeBatchToDb(returnList[:25], table, ttl)
-            del returnList[:25]
-
-    return returnList
 
 def calculateTTL(offsetInSeconds, update_frequency_days):
     currentEpochInSeconds = int(time.time())
-    return currentEpochInSeconds + offsetInSeconds + int(update_frequency_days)*24*60*60
+    return currentEpochInSeconds + offsetInSeconds + int(update_frequency_days) * 24 * 60 * 60
+
+
+def cutTheListAndPersist(item_list, ttl):
+    if len(item_list) < 25:
+        return item_list
+
+    to_be_persisted = item_list[:25]
+    to_be_continued = item_list[25:]
+
+    writeBatchToDb(to_be_persisted, table, ttl)
+    return to_be_continued
+
+
+def countPersistedItems(amount):
+    global persistedCounter
+    persistedCounter += amount
 
 
 def lambda_handler(event, context):
@@ -123,7 +112,6 @@ def lambda_handler(event, context):
         if item["type"] == "default_cards":
             default_cards_uri = item["download_uri"]
 
-
     with requests.get(default_cards_uri, stream=True) as response:
         if response.status_code == 200:
             # wb for write bytes
@@ -134,40 +122,29 @@ def lambda_handler(event, context):
         else:
             logger.info(f"Failed to download. Status code: {response.status_code}")
 
-                    # Check faces object exists, extract them from the single card JSON notation using for loop
-    # AWS BatchWriteItem per batch item
-
-    with open(local_filename, "rb") as file:
+    with open(f'{local_filename}', "rb") as file:
         cards = ijson.items(file, 'item')
 
-        processedCards = []
+        item_list = []
         for card in cards:
-            try:
-                cardInfo = createCardInfo(card)
-                processedCards = appendListAndSubmitIfNeeded(entryList=processedCards, toAddItem=cardInfo, table=table, ttl=ttl)
-                # If a card only has multiple faces the face data is put in card_faces.
-                if card.get("card_faces") == None:
-                    cardFace = createCardFace(card)
-                    processedCards = appendListAndSubmitIfNeeded(entryList=processedCards, toAddItem=cardFace, table=table, ttl=ttl)
-                else:
-                    cardFaces = createCardFaces(card["card_faces"], card["oracle_id"], card['id'])
-                    processedCards = appendListAndSubmitIfNeeded(entryList=processedCards, toAddList=cardFaces, table=table, ttl=ttl)
-            except Exception as error:
-                tb = traceback.format_exc()
-                recoveredData = []
-                try: recoveredData.append(cardInfo)
-                except: pass
-                try: recoveredData.append(cardFace)
-                except: pass
-                try: recoveredData.append(cardFaces)
-                except: pass
+            oracle_id = getOracleFromCard(card)
+            card_info = createCardInfo(card, oracle_id)
+            card_faces = []
+            item_list.append(card_info)
 
-                logger.error(f"An error has occurred while processing card: \nId: {card['id']}, Name: {card['name']} \n "
-                             f"Error: \n {tb}"
-                             f"\nThe following data could still be processed:\n {recoveredData}")
-                logger.info(processedCards)
+            if card.get("card_faces") != None:
+                face_count = 0
+                for face in card['card_faces']:
+                    face_count += 1
+                    card_faces.append(createCardFace(card, oracle_id, card['id'], face_count))
+            else:
+                card_faces.append(createCardFace(card, oracle_id, card['id']))
 
-        writeBatchToDb(processedCards, table=table, ttl=ttl) #because appendListAndSubmitIfNeeded only submits when the item count is >= 25 we need to write away the last few cards
+            item_list.extend(card_faces)
+            item_list = cutTheListAndPersist(item_list, ttl)
+
+        item_list = cutTheListAndPersist(item_list, ttl)
+
+        writeBatchToDb(item_list, table, ttl)
         logger.info("Finished!")
     return True
-

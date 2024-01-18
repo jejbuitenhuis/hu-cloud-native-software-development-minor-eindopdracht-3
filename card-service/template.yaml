@@ -83,8 +83,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/renewEntities
-      MemorySize: 500
-      Timeout: 180
+      MemorySize: 550
+      Timeout: 360
       Environment:
         Variables:
           DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
