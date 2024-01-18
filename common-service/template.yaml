@@ -28,14 +28,13 @@ Resources:
   EventBusPolicy:
     Type: AWS::Events::EventBusPolicy
     Properties:
-      EventBusName:
-        Ref: "MTGEventBus"
+      EventBusName: MTGEventBus
       StatementId: !Sub "${Stage}AllowToPutEvents"
       Statement:
         Effect: "Allow"
         Principal: "*"
         Action: "events:PutEvents"
-        Resource: !GetAtt "MTGEventBus.Arn"
+        Resource: !GetAtt MTGEventBus.Arn
 
 Outputs:
   MTGEventBus:
