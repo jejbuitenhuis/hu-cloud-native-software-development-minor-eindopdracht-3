@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import Hello from "../Title.vue";
+import Hello from "../Header.vue";
 
 describe("Title component", () => {
 	let element: ReturnType<typeof mount>;
@@ -12,7 +12,7 @@ describe("Title component", () => {
 		expect(element).toBeTruthy();
 	});
 
-	it("should contain the text 'Hello, World!'", () => {
-		expect( element.text() ).toEqual("Hello, World!");
+	it("should contain the title of the application", () => {
+		expect( element.text() ).toEqual("Dragons MTG Card Collection System");
 	});
 });

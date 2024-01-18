@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import "@shoelace-style/shoelace/dist/components/input/input";
 import "@shoelace-style/shoelace/dist/components/button/button";
-import Title from "@/components/Title.vue";
+import Title from "@/components/Header.vue";
 
 const test = ref("");
 

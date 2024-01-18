@@ -2,7 +2,7 @@ describe("My First Test", () => {
 	it("visits the app root url and types into the input field", () => {
 		cy.visit("/");
 
-		cy.contains("h1", "Hello, World!");
+		cy.contains("h1", "Dragons MTG Card Collection System");
 
 		const toType = "My First Test";
 
