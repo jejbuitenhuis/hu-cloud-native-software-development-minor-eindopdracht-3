@@ -77,16 +77,6 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       TableName: !Sub "${Stage}-mtg-card-db"
 
-  renewEntitiesRule:
-    Type: AWS::Events::Rule
-    Properties:
-      Description: "Rule to trigger RenewEntitiesFunction, to renew the card database"
-      Name: !Sub "${Stage}-renew-entities-rule"
-      ScheduleExpression: "cron(0 4 * * ? *)"
-      Targets:
-        - Arn: !GetAtt RenewEntitiesFunction.Arn
-          Id: !Sub "${Stage}-renew-entities-rule-target"
-
   RenewEntitiesFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -136,7 +126,7 @@ Resources:
     Properties:
       FlexibleTimeWindow:
         Mode: 'OFF'
-      ScheduleExpression: "cron(0 5 * * * *)"
+      ScheduleExpression: "cron(0 5 * * ? *)"
       ScheduleExpressionTimezone: "GMT+1"
       Target:
         Arn: !GetAtt RenewEntitiesFunction.Arn
