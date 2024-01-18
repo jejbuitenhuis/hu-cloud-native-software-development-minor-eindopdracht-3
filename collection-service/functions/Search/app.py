@@ -6,7 +6,7 @@ from jose import jwt
 from aws_xray_sdk.core import patch_all
 from os import environ
 from botocore.exceptions import ClientError
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Key, Attr
 
 if "DISABLE_XRAY" not in environ:
     patch_all()
@@ -17,67 +17,57 @@ logger.setLevel("INFO")
 dynamodb = boto3.resource("dynamodb")
 collection_table = dynamodb.Table(environ["DYNAMODB_TABLE"])
 
-SEARCH_ATTRIBUTE_NAMES = ["OracleName", "OracleText"]
-
 
 def lambda_handler(event, context):
-    # Cogintio username
-    coginito_username = extract_cognito_username(event["headers"]["Authorization"])
-
-    logger.info(f"Coginito_username: {coginito_username}")
+    # Cognito username
+    decoded_token = jwt.get_unverified_claims(event["headers"]["Authorization"])
+    cognito_username = decoded_token.get("cognito:username")
+    logger.info(f"Cognito_username: {cognito_username}")
 
     # Search query
     search_query = event["queryStringParameters"]["q"]
-    logger.info(f"Attribute query: {search_query}")
-    attribute_query = {":search_string": search_query}
-    logger.info(f"Attribute query: {attribute_query}")
-
-    filter_expression = create_filter_expression(SEARCH_ATTRIBUTE_NAMES)
-    logger.info(f"Filter expression query: {filter_expression}")
+    search_query = search_query.casefold()
+    logger.info(f"Search_query: {search_query}")
 
     result = search_for_querystring(
         table=collection_table,
-        key_expression=coginito_username,
-        filter_expression=filter_expression,
-        attribute_query=attribute_query,
+        key_expression=cognito_username,
+        search_query=search_query,
     )
 
-    logger.info(f"All of the items returned: {result}")
-
+    logger.info(f"Query success: {result}")
     items = result["Items"]
-    # logger.info(f"All of the items returned: {items}")
+    logger.info(f"All of the items returned: {items}")
 
-    if items is None:
+    if not items:
         return {
-            "statuscode": 404,
-            "body": json.dumps({"message": "Not found"}),
             "headers": {
                 "Content-Type": "application/json",
             },
+            "statuscode": 404,
+            "body": json.dumps({"message": "Not found"}),
         }
 
-    return {"statuscode": 200, "body": json.dumps()}
+    return {
+        "headers": {
+            "Content-Type": "application/json",
+        },
+        "statuscode": 200,
+        "body": json.dumps({"Items": items}),
+    }
 
 
-def extract_cognito_username(jwt_token):
-    decoded_token = jwt.get_unverified_claims(jwt_token)
-    cognito_username = decoded_token.get("cognito:username")
-
-    return cognito_username
-
-
-def create_filter_expression(attribute_names) -> str:
-    filter_clauses = [f"contains({attr}, :search_string)" for attr in attribute_names]
-    filter_expression = " OR ".join(filter_clauses)
-    return filter_expression
-
-
-def search_for_querystring(table, key_expression, filter_expression, attribute_query):
+def search_for_querystring(table, key_expression, search_query):
     try:
         return table.query(
             KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
-            # FilterExpression=filter_expression,
-            # ExpressionAttributeValues=attribute_query,
+            FilterExpression=
+            # # Facename and OracleText
+            Attr("Facename").contains(search_query)
+            & Attr("OracleText").contains(search_query)
+            # OracleName
+            | Attr("OracleName").contains(search_query),
+            ExpressionAttributeValues={":query": search_query},
         )
     except ClientError as e:
         logger.error(f"ClientError occured while scanning, { e }")

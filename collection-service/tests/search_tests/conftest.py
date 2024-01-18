@@ -58,8 +58,7 @@ def setup_dynamodb_collection_with_items(setup_dynamodb_collection):
         Item={
             "PK": "USER#test-user",
             "SK": "CardInstance#1Face#1",
-            "OracleName": "Bessie, the Doctor's Roadster",
-            "OracleText": "Haste Whenever Bessie attacks, another target legendary creature can’t be blocked this turn. Crew 2 (Tap any number of creatures you control with total power 2 or more: This Vehicle becomes an artifact creature until end of turn. ",
+            "OracleName": "bessie, the doctor's roadster",
             "DataType": "Card",
         },
     )
@@ -68,8 +67,9 @@ def setup_dynamodb_collection_with_items(setup_dynamodb_collection):
         Item={
             "PK": "USER#test-user",
             "SK": "CardInstance#1#Card",
-            "OracleName": "Bessie, the Doctor's Roadster",
-            "DataType": "Card",
+            "FaceName": "bessie, the doctor's roadster",
+            "OracleText": "haste whenever bessie attacks, another target legendary creature can’t be blocked this turn. crew 2 (tap any number of creatures you control with total power 2 or more: this vehicle becomes an artifact creature until end of turn.",
+            "DataType": "Face",
         },
     )
 

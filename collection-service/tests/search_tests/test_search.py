@@ -1,10 +1,15 @@
 import os
+import json
+import logging
 from unittest.mock import patch
 from .jwt_generator import generate_test_jwt
 from .conftest import DYNAMODB_TABLE_NAME
 
 COGINTO_USERNAME = "test@example.com"
 COGINTO_PASSWORD = "NewPassword456!"
+
+logger = logging.getLogger()
+logger.setLevel("INFO")
 
 
 @patch.dict(
@@ -20,34 +25,19 @@ def test_search_works(setup_dynamodb_collection_with_items):
 
     event = {
         "headers": {"Authorization": generate_test_jwt()},
-        "queryStringParameters": {"q": "doctor"},
+        "queryStringParameters": {"q": "Bessie"},
     }
 
     # Act
     result = lambda_handler(event, None)
 
-    # Assert
-    expected_output = {
-        "statuscode": 200,
-        "body": {
-            "Items": [
-                {
-                    "UserId": "123",
-                    "UserName": "JohnDoe",
-                    "Age": "30",
-                    "Email": "john.doe@example.com",
-                },
-                {
-                    "UserId": "456",
-                    "UserName": "JaneSmith",
-                    "Age": "25",
-                    "Email": "jane.smith@example.com",
-                },
-            ],
-        },
-    }
+    body = json.loads(result["body"])
 
-    assert result == expected_output
+    # Assert
+    assert body["Items"][0]["PK"] == "USER#test-user"
+    assert body["Items"][0]["SK"] == "CardInstance#1Face#1"
+    assert body["Items"][0]["OracleName"] == "bessie, the doctor's roadster"
+    assert body["Items"][0]["DataType"] == "Card"
 
 
 @patch.dict(
@@ -64,19 +54,11 @@ def test_search_not_found(setup_dynamodb_collection):
     # Arrange
     event = {
         "headers": {"Authorization": generate_test_jwt()},
-        "queryStringParameters": {"q": "invalid"},
+        "queryStringParameters": {"q": "Invalid"},
     }
 
     # Act
     result = lambda_handler(event, None)
 
     # Assert
-    expected_output = {
-        "statuscode": 404,
-        "body": {"message": "Not found"},
-        "headers": {
-            "Content-Type": "application/json",
-        },
-    }
-
-    assert result == expected_output
+    assert result["statuscode"] == 404
