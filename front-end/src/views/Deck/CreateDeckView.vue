@@ -66,7 +66,7 @@ async function createDeck(): Promise<ReturnType<typeof router.push>> {
 <template>
   <div id="CreateDeck">
     <sl-card class="container">
-      <h1>Create new deck</h1>
+      <h2>Create new deck</h2>
 
       <form @submit.prevent="createDeck()">
         <sl-input
