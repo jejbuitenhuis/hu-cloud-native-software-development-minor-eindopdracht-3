@@ -1207,7 +1207,7 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card#CardInstanceId#1"
+                "S": "CardInstanceId#1#Card"
               },
               "DeckId": {
                 "S": "1"
@@ -1222,7 +1222,7 @@
                 "S": "Card"
               },
               "GSI1SK": {
-                "S": "DeckId#1PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card#CardInstanceId#1"
+                "S": "DeckId#1"
               }
             },
             {
@@ -1230,7 +1230,7 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#1#CardInstanceId#1"
+                "S": "CardInstanceId#1#Face#1"
               },
               "DeckId": {
                 "S": "1"
@@ -1245,7 +1245,7 @@
                 "S": "Face"
               },
               "GSI1SK": {
-                "S": "DeckId#1PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#1#CardInstanceId#1"
+                "S": "CardInstanceId#1#Face#2"
               }
             },
             {
@@ -1253,7 +1253,7 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#2CardInstanceId#1"
+                "S": "CardInstanceId#1#Face#2"
               },
               "DeckId": {
                 "S": "1"
@@ -1268,7 +1268,7 @@
                 "S": "Face"
               },
               "GSI1SK": {
-                "S": "DeckId#1PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#2CardInstanceId#1"
+                "S": "DeckId#1"
               }
             },
             {
@@ -1276,7 +1276,7 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card#CardInstanceId#2"
+                "S": "CardInstanceId#2#Card"
               },
               "CardInstanceId": {
                 "S": "2"
@@ -1293,7 +1293,7 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#1#CardInstanceId#2"
+                "S": "CardInstanceId#2#Face#1"
               },
               "CardInstanceId": {
                 "S": "2"
@@ -1310,7 +1310,7 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#2CardInstanceId#2"
+                "S": "CardInstanceId#2#Face#2"
               },
               "CardInstanceId": {
                 "S": "2"
