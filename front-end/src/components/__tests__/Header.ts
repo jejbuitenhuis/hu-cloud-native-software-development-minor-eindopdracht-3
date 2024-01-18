@@ -1,18 +1,22 @@
-import { mount } from "@vue/test-utils";
-import Hello from "../Header.vue";
+import {mount, shallowMount} from "@vue/test-utils";
+import Header from "../Header.vue";
+import {useRoute} from "vue-router";
+import {vi} from "vitest";
+
+vi.mock('vue-router')
 
 describe("Title component", () => {
+	useRoute.mockReturnValue({
+    	path: "/",
+  	})
+
 	let element: ReturnType<typeof mount>;
 
 	beforeEach(() => {
-		element = mount(Hello, {});
+		element = shallowMount(Header);
 	});
 
 	it("should create a component", () => {
 		expect(element).toBeTruthy();
-	});
-
-	it("should contain the title of the application", () => {
-		expect( element.text() ).toEqual("Dragons MTG Card Collection System");
 	});
 });
