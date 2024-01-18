@@ -66,8 +66,8 @@ def lambda_handler(event, context):
         "SK": f"DECK#{deck_id}",
 
         "data_type": "DECK",
-        "user_id": f"USER#{user_id}",
-        "deck_id": f"DECK#{deck_id}",
+        "user_id": user_id,
+        "deck_id": deck_id,
         "deck_name": deck_name,
     })
 

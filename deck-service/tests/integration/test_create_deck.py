@@ -1,6 +1,7 @@
 from _pytest.monkeypatch import MonkeyPatch
 import json
 import boto3
+from boto3.dynamodb.conditions import Key
 import uuid
 from moto import mock_dynamodb
 import time
@@ -76,8 +77,10 @@ class TestCreateDeck(unittest.TestCase):
             },
         )
         # }}}
+        self.dynamodb_table = boto3.resource("dynamodb").Table(self.DYNAMO_DB_DECK_TABLE_NAME)
 
-        self.jwt_token = self.generate_jwt_token()
+        self.user_id = "test-user"
+        self.jwt_token = self.generate_jwt_token(user_id=self.user_id)
 
         self.sut = self.get_sut()
 
@@ -104,6 +107,18 @@ class TestCreateDeck(unittest.TestCase):
         assert "id" in body
         assert body["id"] != None
         assert body["name"] == expected_deck_name
+
+        db_items = self.dynamodb_table.query(
+            KeyConditionExpression=Key("PK").eq(f"USER#{self.user_id}") & Key("SK").begins_with("DECK#"),
+        )["Items"]
+
+        assert len(db_items) == 1
+        assert db_items[0]["PK"] == f"USER#{self.user_id}"
+        assert db_items[0]["SK"] == f"DECK#{body['id']}"
+        assert db_items[0]["data_type"] == "DECK"
+        assert db_items[0]["user_id"] == self.user_id
+        assert db_items[0]["deck_id"] == body["id"]
+        assert db_items[0]["deck_name"] == expected_deck_name
 
     def test_invalid_request_is_returned_when_no_body_is_specified(self):
         mock_event = {
