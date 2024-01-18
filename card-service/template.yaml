@@ -52,6 +52,7 @@ Resources:
 
   MTGCardDynamoDBTable:
     Type: AWS::DynamoDB::Table
+    Name: !Sub "${Stage}-mtg-card-db"
     DeletionPolicy: Retain
     Properties:
       AttributeDefinitions:
@@ -116,8 +117,7 @@ Resources:
     Properties:
       FlexibleTimeWindow:
         Mode: 'OFF'
-      ScheduleExpression: "cron(0/5 * * * ? *)" #for testing, every 5 minutes
-      #      ScheduleExpression: "cron(0 5 * * THU *)"
+      ScheduleExpression: "cron(0 5 * * * *)"
       ScheduleExpressionTimezone: "GMT+1"
       Target:
         Arn: !GetAtt RenewEntitiesFunction.Arn

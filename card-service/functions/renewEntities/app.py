@@ -30,7 +30,6 @@ def createCardFace(card, oracle_id, scryfall_id, face_count=1):
     image_uris = card.get('image_uris', {})  # Check if 'image_uris' exists, provide an empty dictionary as default
     return {
         "PK": f'OracleId#{oracle_id}',
-        # PK and sk don't have default values because if they aren't there throwing and error would be correct
         "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
         "OracleText": card.get('oracle_text', ''),  # we set default values in case a field isn't specified
         "ManaCost": card.get('mana_cost', ''),
