@@ -3,8 +3,8 @@ import "@shoelace-style/shoelace/dist/components/input/input";
 import '@shoelace-style/shoelace/dist/components/card/card';
 import type SlInput from "@shoelace-style/shoelace/dist/components/input/input";
 
-import {ref, type Ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import { ref, type Ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const email = ref('');
 const password = ref('');
@@ -15,6 +15,7 @@ const passwordInput: Ref<null> | Ref<HTMLObjectElement> = ref(null);
 const errorMessage = ref('');
 
 const router = useRouter();
+const route = useRoute();
 
 function login() {
   if (!isFormValid()) {
@@ -24,15 +25,18 @@ function login() {
       .then((response) => {
         if (response.ok) {
           response.json()
-              .then((body) => {
-                storeSessionToken(body.token);
-              })
-          router.push("/home");
-        }
-        if (response.status === 403) {
+            .then((body) => {
+              storeSessionToken(body.token);
+
+              const returnUrl = !!router.currentRoute.value.query.redirect_url
+                ? router.currentRoute.value.query.redirect_url as string
+                : "/";
+
+              router.push(returnUrl);
+            });
+        } else if (response.status === 403) {
           showErrorMessage('Invalid credentials!')
-        }
-        if (response.status === 400) {
+        } else if (response.status === 400) {
           showErrorMessage('Please verify your account with the confirmation email!')
         } else {
           showErrorMessage('Something went wrong!');
@@ -116,6 +120,6 @@ async function sendData(email: string, password: string) {
 }
 
 .error {
-  color: var(--sl-color-red-200)
+  color: var(--sl-color-red-200);
 }
 </style>
