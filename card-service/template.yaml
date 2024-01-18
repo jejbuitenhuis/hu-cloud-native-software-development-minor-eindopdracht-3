@@ -47,6 +47,13 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
+  MTGCardApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGCardApi/url
+      Type: String
+      Value: !Sub "https://${MTGCardApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
   MTGCardDynamoDBTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain

@@ -21,7 +21,7 @@
         }
       }
     },
-    "/auth/register": {
+    "/api/users": {
       "post": {
         "parameters" : [],
         "responses" : {
@@ -40,7 +40,7 @@
         }
       }
     },
-    "/auth/login": {
+    "/api/users/login": {
       "post": {
         "parameters" : [],
         "responses" : {

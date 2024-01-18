@@ -1,30 +1,40 @@
-import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
-import RegisterView from "../views/RegisterView.vue";
-import LoginView from "../views/LoginView.vue";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 const router = createRouter({
-	history: createWebHistory(import.meta.env.BASE_URL),
+	history: createWebHashHistory(),
 	routes: [
 		{
 			path: "/",
 			name: "home",
-			component: HomeView,
+			component: () => import(/* webpackChunkName: "home" */ "../views/HomeView.vue"),
 		},
 		{
 			path: "/register",
 			name: "register",
-			component: RegisterView,
+			component: () => import(/* webpackChunkName: "register" */ "../views/RegisterView.vue"),
 		},
 		{
 			path: "/login",
 			name: "login",
-			component: LoginView,
+			component: () => import(/* webpackChunkName: "login" */ "../views/LoginView.vue"),
 		},
+
+		{
+			path: "/decks",
+			name: "decks",
+			children: [
+				{
+					path: "new",
+					name: "create-deck",
+					component: () => import(/* webpackChunkName: "create-deck" */ "../views/Deck/CreateDeckView.vue"),
+				},
+			],
+		},
+
 		{
 			path: "/:pathMatch(.*)*",
 			name: "not-found",
-			component: () => import("../views/NotFoundView.vue"),
+			component: () => import(/* webpackChunkName: "not-found" */ "../views/NotFoundView.vue"),
 		},
 	],
 });
