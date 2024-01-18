@@ -87,11 +87,11 @@ async function sendData(email: string, password: string) {
       <h1>Login</h1>
       <form id="login-form" @submit.prevent.submit="login">
         <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="email"
-                  ref="emailInput"></sl-input>
+                  ref="emailInput" data-test-id="email"></sl-input>
         <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required
-                  v-model="password" ref="passwordInput"></sl-input>
+                  v-model="password" ref="passwordInput" data-test-id="password"></sl-input>
         <p class="error" id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
-        <sl-button id="login" class="button" variant="primary" type="submit">Login</sl-button>
+        <sl-button id="login" class="button" variant="primary" type="submit" data-test-id="submit">Login</sl-button>
       </form>
     </sl-card>
   </div>

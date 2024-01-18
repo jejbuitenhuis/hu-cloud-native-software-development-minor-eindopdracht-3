@@ -12,7 +12,7 @@ const router = useRouter();
 const decks = ref<{ id: string }[]>([]);
 
 function createDeck(): void {
-  void router.push("/decks/new/");
+  void router.push("/decks/new");
 }
 </script>
 
