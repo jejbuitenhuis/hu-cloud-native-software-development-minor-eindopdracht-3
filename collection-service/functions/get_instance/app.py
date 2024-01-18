@@ -19,7 +19,7 @@ def lambda_handler(event, context):
     claims = jwt.get_unverified_claims(event['headers']['Authorization'].replace("Bearer ", ""))
 
     response = table.query(
-        KeyConditionExpression=Key('PK').eq(f"USER#{claims['cognito:username']}") & Key('SK').begins_with(f"CardInstanceId#{event['pathParameters']['instance_id']}"),
+        KeyConditionExpression=Key('PK').eq(f"USER#{claims['cognito:username']}") & Key('SK').eq(f"CardInstanceId#{event['pathParameters']['instance_id']}"),
     )
 
     if len(response['Items']) == 0:
