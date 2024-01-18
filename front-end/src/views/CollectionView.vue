@@ -65,14 +65,15 @@ getCollection();
 
 <template>
   <div class="collection-wrapper">
-    <section class="cards-container">
-      <p v-if="Object.keys(collection).length === 0 && !collectionLoading">
-        Your collection is empty.
-      </p>
-      <p v-if="collectionLoading">
-        Loading
-      </p>
+    <p v-if="Object.keys(collection).length === 0 && !collectionLoading" class="centered-content">
+      Your collection is empty.
+    </p>
 
+    <p v-if="collectionLoading" class="centered-content">
+      Loading
+    </p>
+
+    <section class="cards-container">
       <!--TODO: Replace with card component-->
       <sl-card v-for="(card, _) in collection" class="card">
         <img slot="image" :src="card[0]['FrontFace']['ImageLink']" alt="MTG - Card face">
@@ -100,5 +101,9 @@ getCollection();
     height: inherit;
     border-radius: 1rem;
   }
+}
+.centered-content {
+  margin-top: 20%;
+  text-align: center;
 }
 </style>
