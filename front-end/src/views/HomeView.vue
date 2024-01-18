@@ -1,31 +1,58 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import "@shoelace-style/shoelace/dist/components/input/input";
+import { useRouter } from "vue-router";
+
 import "@shoelace-style/shoelace/dist/components/button/button";
-import Title from "@/components/Title.vue";
+import "@shoelace-style/shoelace/dist/components/card/card";
+import "@shoelace-style/shoelace/dist/components/icon/icon";
 
-const test = ref("");
+const router = useRouter();
 
-function click(): void {
+// temporary
+const decks = ref<{ id: string }[]>([]);
 
-  alert(`Mooie knop: ${test.value}`);
+function createDeck(): void {
+  void router.push("/decks/new/");
 }
 </script>
 
 <template>
-  <Title />
+  <main id="HomeView">
+    <div class="header">
+      <h1>Decks</h1>
 
-  <sl-input maxlength="255" label="Test value" v-model="test" data-test-id="input" />
+      <sl-button @click="createDeck()" data-test-id="create-deck">
+        <sl-icon slot="prefix" name="plus" />
 
-  <sl-button @click="click()">Mooie knop</sl-button>
+        New deck
+      </sl-button>
+    </div>
 
-  <p data-test-id="something"><strong>Output:</strong> {{ test }}</p>
-
-  <p>Hi!</p>
+    <div class="deck-list">
+      <sl-card
+        v-for="deck in decks"
+        :key="deck.id"
+      >
+        Deck id: {{ deck.id }}
+      </sl-card>
+    </div>
+  </main>
 </template>
 
 <style scoped lang="scss">
 #HomeView {
-	text-align: center;
+  width: 60%;
+  margin: 0 auto;
+
+  div.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 2em;
+
+    h1 {
+      margin: 0;
+    }
+  }
 }
 </style>

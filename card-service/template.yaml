@@ -3,6 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Description: Card-service
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+
 Globals:
   Function:
     Timeout: 3
@@ -17,6 +18,8 @@ Globals:
         EVENT_BUS_ARN:
           Fn::ImportValue:
             !Sub "common-service-${Stage}-MTGEventBus"
+        #update frequency in days
+        CARDS_UPDATE_FREQUENCY: "7"
 
 Parameters:
   Stage:
@@ -47,11 +50,17 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
+  MTGCardApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGCardApi/url
+      Type: String
+      Value: !Sub "https://${MTGCardApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
   MTGCardDynamoDBTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: !Sub "${Stage}-mtg-card-db"
       AttributeDefinitions:
         - AttributeName: PK
           AttributeType: S
@@ -62,7 +71,23 @@ Resources:
           KeyType: HASH
         - AttributeName: SK
           KeyType: RANGE
+      TimeToLiveSpecification:
+        AttributeName: RemoveAt
+        Enabled: true
       BillingMode: PAY_PER_REQUEST
+      TableName: !Sub "${Stage}-mtg-card-db"
+
+  RenewEntitiesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/renewEntities
+      MemorySize: 550
+      Timeout: 360
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBFullAccess
 
   PingFunction:
     Type: AWS::Serverless::Function
@@ -75,6 +100,37 @@ Resources:
             RestApiId: !Ref "MTGCardApi"
             Path: /ping
             Method: get
+
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Stage}-scheduler--trigger-function-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "scheduler.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: !Sub "${Stage}-InvokeLambdaFunctionPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Action: "lambda:InvokeFunction"
+                Effect: "Allow"
+                Resource: !GetAtt RenewEntitiesFunction.Arn
+
+  CardSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      ScheduleExpression: "cron(0 5 * * ? *)"
+      ScheduleExpressionTimezone: "GMT+1"
+      Target:
+        Arn: !GetAtt RenewEntitiesFunction.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
 
 Outputs:
   MTGCardApiUrl:

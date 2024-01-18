@@ -13,6 +13,9 @@ Parameters:
     Type: String
     Default: development
 
+Conditions:
+  IsProductionStage: !Equals [!Ref Stage, production]
+
 Resources:
   FrontEndS3Bucket: # {{{
     Type: AWS::S3::Bucket
@@ -67,7 +70,8 @@ Resources:
       DistributionConfig:
         Enabled: true
         DefaultRootObject: "index.html"
-        Comment: !Ref ${Stage}
+        Comment: !Sub ${Stage}
+        Aliases: !If [IsProductionStage, ["www.dragons.cloud-native-minor.it"], !Ref "AWS::NoValue"]
         ViewerCertificate:
           AcmCertificateArn: arn:aws:acm:us-east-1:861259332787:certificate/44d5935d-16b5-4faf-bb0b-98b37a142d33
           SslSupportMethod: sni-only
@@ -143,30 +147,35 @@ Resources:
           - TargetOriginId: !Sub ${Stage}-card-api
             PathPattern: /api/cards*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           # Collection api gateway behavior
           - TargetOriginId: !Sub ${Stage}-collection-api
             PathPattern: /api/collections*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           # Deck api gateway behavior
           - TargetOriginId: !Sub ${Stage}-deck-api
             PathPattern: /api/decks*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           # User api gateway behavior
           - TargetOriginId: !Sub ${Stage}-user-api
             PathPattern: /api/users*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           # Wishlist api gateway behavior
           - TargetOriginId: !Sub ${Stage}-wishlist-api
             PathPattern: /api/wishlists*
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
         DefaultCacheBehavior:

@@ -20,6 +20,57 @@
           "type" : "aws_proxy"
         }
       }
+    },
+
+    "/api/decks/": {
+      "post": {
+        "parameters" : [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [ "name" ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses" : {
+          "201": {
+            "description": "OK",
+            "examples": {
+              "application/json": {
+                "id": "5df9b472-2e57-497f-9b4c-787f4486497d",
+                "name": "Mooi deck"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "examples": {
+              "application/json": {
+                "message": "Missing 'name'"
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CreateDeckFunction.Arn}/invocations"},
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
+      }
     }
   }
 }
+
