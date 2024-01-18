@@ -47,6 +47,13 @@ Resources:
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
 
+  MTGUserApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGUserApi/url
+      Type: String
+      Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
   PingFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -95,6 +102,7 @@ Resources:
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${Stage}-RegisterUserFunction"
       CodeUri: functions/register_user/
       Events:
         RegisterUser:
@@ -127,6 +135,7 @@ Resources:
   LoginUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${Stage}-LoginUserFunction"
       CodeUri: functions/login_user/
       Events:
         LoginUser:
