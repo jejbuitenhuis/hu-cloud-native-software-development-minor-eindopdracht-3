@@ -23,6 +23,9 @@ Parameters:
     Type: String
     Default: development
 
+Conditions:
+  IsProductionStage: !Equals [!Ref Stage, production]
+
 Resources:
   MTGUserApi:
     Type: AWS::Serverless::Api
@@ -46,6 +49,13 @@ Resources:
 
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
+
+  MTGUserApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGUserApi/url
+      Type: String
+      Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
 
   PingFunction:
     Type: AWS::Serverless::Function
@@ -75,6 +85,10 @@ Resources:
       Schema:
         - Name: email
           AttributeDataType: String
+      EmailConfiguration:
+        EmailSendingAccount: DEVELOPER
+        SourceArn: arn:aws:ses:us-east-1:861259332787:identity/dragons.cloud-native-minor.it
+        From: !If [IsProductionStage, "verify@dragons.cloud-native-minor.it", !Sub "verify-${Stage}@dragons.cloud-native-minor.it"]
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
@@ -95,6 +109,7 @@ Resources:
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${Stage}-RegisterUserFunction"
       CodeUri: functions/register_user/
       Events:
         RegisterUser:
@@ -127,6 +142,7 @@ Resources:
   LoginUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${Stage}-LoginUserFunction"
       CodeUri: functions/login_user/
       Events:
         LoginUser:
