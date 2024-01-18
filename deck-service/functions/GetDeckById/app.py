@@ -36,15 +36,16 @@ def lambda_handler(event, context):
     LOGGER.info(f"Getting decks for user with id '{user_id}'")
 
     db_items = DECK_TABLE.query(
-        KeyConditionExpression=Key("PK").eq(f"USER#{user_id}") & Key("SK").begins_with("DECK#"),
+        KeyConditionExpression=Key("PK").eq(f"USER#{user_id}") & Key("SK").eq(f"DECK#{event['pathParameters']['deck_id']}"),
         ProjectionExpression="deck_id, deck_name",
     )
 
-    decks = [ parse_deck(item) for item in db_items["Items"] ]
-
-    LOGGER.info(f"Returning {len(decks)} decks for user with id '{user_id}'")
+    if len(db_items["Items"]) == 0:
+        return {
+            "statusCode": 404,
+        }
 
     return {
         "statusCode": 200,
-        "body": json.dumps(decks),
+        "body": json.dumps(parse_deck(db_items["Items"][0])),
     }
