@@ -22,7 +22,7 @@ SEARCH_ATTRIBUTE_NAMES = ["OracleName", "OracleText"]
 
 def lambda_handler(event, context):
     # Cogintio username
-    coginito_username = extract_cognito_username(event["headers"["Authorization"]])
+    coginito_username = extract_cognito_username(event["headers"]["Authorization"])
 
     logger.info(f"Coginito_username: {coginito_username}")
 
@@ -57,19 +57,15 @@ def lambda_handler(event, context):
     return {"statuscode": 200, "body": json.dumps()}
 
 
-def extract_cognito_username(jwt_token, secret_key):
-    try:
-        # Decode the JWT token
-        decoded_token = jwt.decode(jwt_token, secret_key, algorithms=["HS256"])
+def extract_cognito_username(jwt_token):
 
-        # Extract the 'cognito:username' value from the payload
-        cognito_username = decoded_token.get("cognito:username")
+    decoded_token = jwt.get_unverified_claims(jwt_token)
 
-        return cognito_username
-    except jwt.ExpiredSignatureError:
-        print("Token has expired.")
-    except jwt.JWTError as e:
-        print(f"Error decoding token: {e}")
+    # Extract the 'cognito:username' value from the payload
+    cognito_username = decoded_token.get("cognito:username")
+
+    return cognito_username
+    
 
 
 def create_filter_expression(attribute_names) -> str:

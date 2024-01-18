@@ -5,12 +5,15 @@
     "version": "1.0"
   },
   "paths": {
-    "/ping": {
+    "/search": {
       "get": {
         "parameters" : [],
         "responses" : {
           "200": {
             "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
           }
         },
         "x-amazon-apigateway-integration" : {
