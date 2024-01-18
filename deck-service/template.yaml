@@ -17,6 +17,7 @@ Globals:
         EVENT_BUS_ARN:
           Fn::ImportValue:
             !Sub "common-service-${Stage}-MTGEventBus"
+        DYNAMO_DB_USER_TABLE_NAME: !Ref MTGDeckDynamoDBTable
 
 Parameters:
   Stage:
@@ -82,6 +83,20 @@ Resources:
             RestApiId: !Ref "MTGDeckApi"
             Path: /ping
             Method: get
+
+  CreateDeckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/CreateDeck/
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGDeckApi"
+            Path: /api/decks/
+            Method: POST
+      Policies:
+        - AmazonDynamoDBFullAccess
 
 Outputs:
   MTGDeckApiUrl:

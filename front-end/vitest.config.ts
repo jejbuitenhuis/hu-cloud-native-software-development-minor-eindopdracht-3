@@ -9,6 +9,7 @@ export default mergeConfig(
 			coverage: {
 				reportsDirectory: "coverage",
 			},
+			passWithNoTests: true,
 			globals: true,
 			environment: "jsdom",
 			include: [ "**/__tests__/**.ts" ],
