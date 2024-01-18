@@ -10,9 +10,9 @@
   const route = useRoute();
   const userSignedIn = ref<boolean>(isUserSignedIn());
 
-  watch(() => route.fullPath, () => {
+  watch(() => route.path, () => {
     userSignedIn.value = isUserSignedIn();
-    if (!userSignedIn.value && !["/login", "/register"].includes(route.fullPath)) {
+    if (!userSignedIn.value && !["/login", "/register"].includes(route.path)) {
       router.push("/login");
     }
   })
