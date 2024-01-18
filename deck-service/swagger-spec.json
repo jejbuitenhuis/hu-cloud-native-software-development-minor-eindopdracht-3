@@ -103,6 +103,46 @@
           "type" : "aws_proxy"
         }
       }
+    },
+    "/api/decks/{deck_id}": {
+      "get": {
+        "parameters" : [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "deck_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses" : {
+          "200": {
+            "description": "OK",
+            "examples": {
+              "application/json": [
+                {
+                  "id": "96b33355-d381-4368-bea9-baaa995857cb",
+                  "name": "Deck 1"
+                },
+                {
+                  "id": "20c2ad18-7470-4301-a74b-2b5cb2fe9837",
+                  "name": "Deck 2"
+                }
+              ]
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetDeckByIdFunction.Arn}/invocations"},
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
+      }
     }
   }
 }

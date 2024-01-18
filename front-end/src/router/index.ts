@@ -21,6 +21,11 @@ const router = createRouter({
 		{
 			path: "/decks",
 			name: "decks",
+			component: () => import(/* webpackChunkName: "decks-view" */ "../views/Deck/DecksView.vue"),
+		},
+		{
+			path: "/decks/:deck_id",
+			name: "deck",
 			component: () => import(/* webpackChunkName: "deck-view" */ "../views/Deck/DeckView.vue"),
 		},
 		{
