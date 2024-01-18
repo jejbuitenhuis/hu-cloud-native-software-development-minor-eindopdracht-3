@@ -13,6 +13,9 @@ Parameters:
     Type: String
     Default: development
 
+Conditions:
+  IsProductionStage: !Equals [!Ref Stage, production]
+
 Resources:
   FrontEndS3Bucket: # {{{
     Type: AWS::S3::Bucket
@@ -68,6 +71,7 @@ Resources:
         Enabled: true
         DefaultRootObject: "index.html"
         Comment: !Sub ${Stage}
+        Aliases: !If [IsProductionStage, ["www.dragons.cloud-native-minor.it"], !Ref "AWS::NoValue"]
         ViewerCertificate:
           AcmCertificateArn: arn:aws:acm:us-east-1:861259332787:certificate/44d5935d-16b5-4faf-bb0b-98b37a142d33
           SslSupportMethod: sni-only
