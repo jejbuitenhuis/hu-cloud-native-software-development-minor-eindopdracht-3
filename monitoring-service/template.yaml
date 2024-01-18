@@ -228,7 +228,7 @@ Resources:
                     "height": 6,
                     "properties": {
                         "metrics": [
-                            [ "AWS/Lambda", "Invocations", "FunctionName", "d", { "region": "us-east-1", "yAxis": "left" } ]
+                            [ "AWS/Lambda", "Invocations", "FunctionName", "card-service-scheduler-stack-RenewEntitiesFunction-b9VeXPnWcdhb", { "region": "us-east-1", "yAxis": "left" } ]
                         ],
                         "view": "timeSeries",
                         "stacked": false,
