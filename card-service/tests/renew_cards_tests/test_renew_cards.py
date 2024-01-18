@@ -21,7 +21,7 @@ def setup_table():
         BillingMode='PAY_PER_REQUEST'
     )
 
-    table = boto3.resource("dynamodb").Table('test-card-table')
+    table = boto3.resource("dynamodb", region_name='us-east-1').Table('test-card-table')
     table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
 
     # Provide the table to the test
