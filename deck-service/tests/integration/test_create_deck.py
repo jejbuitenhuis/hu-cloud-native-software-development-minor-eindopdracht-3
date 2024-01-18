@@ -3,14 +3,30 @@ import json
 import boto3
 import uuid
 from moto import mock_dynamodb
+import time
+from jose import jwt
 import unittest
-
-# JWT token {{{
-JWT_TOKEN = "eyJraWQiOiJ5cDRXM3o0Rng4Z3FUZ0JDeXh0MkFcLzBZb2Q1Y2hFakd2Sk13MTk3RzhVST0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyYjdlM2VmNS03ZTc4LTQ4NTQtOGFjNS1lZTdmOTRjMDI1ZDUiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiaXNzIjoiaHR0cHM6XC9cL2NvZ25pdG8taWRwLnVzLWVhc3QtMS5hbWF6b25hd3MuY29tXC91cy1lYXN0LTFfZTBCVzNWUXJXIiwiY29nbml0bzp1c2VybmFtZSI6IjJiN2UzZWY1LTdlNzgtNDg1NC04YWM1LWVlN2Y5NGMwMjVkNSIsIm9yaWdpbl9qdGkiOiIwZTFhYTA3ZS01YmM4LTQ5NzctOGE3Zi0yMDdlMzQwYzM3YmIiLCJhdWQiOiJtbDlkMnU3YXAzM3Z0dXNhMzl2dnM4bnA1IiwiZXZlbnRfaWQiOiI4YjUwMDk1Zi01YTBlLTRjYTEtOGZiNy1lMjcyNTgxNmQ5NzgiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTcwNTMzMzA3MywiZXhwIjoxNzA1MzM2NjczLCJpYXQiOjE3MDUzMzMwNzMsImp0aSI6IjFlMTNmODg5LWVmYWMtNGU1Ni1iOWRkLWJjMTdhYjRkM2Y1NiIsImVtYWlsIjoiam9yYW0uYnVpdGVuaHVpc0BzdHVkZW50Lmh1Lm5sIn0.Yl9B-63AIRoneShr6-TpyjEpIUuOvg7Tas1NCr8AQpFhFNo4S5eB-6H26JMd3pEawmWaWcNuhmXp7Y8K2IYR6FjLFF2ciUS9B-xNKVLH_9MUWdHqioLdlI39fWFeWDpbNXsF7LMM79H5DTFH_1EwnPNghsZMgNLpFhJtfb4ofoOG0AIG0xQXuYO1tzCHSeIilNbp1W_ITruQEQrqDknxIx98M2tHdxm69m27WPSCVFZaGSJq0GNdCVg7DtYbEzJ20vSn4k-BP6OtdUa7wL_mg5CzWeIUxdCkMixQ8Tnefdi2U9MVJdkoAGo1DRRLS45Hx5uDBkZZJCLRH7-M33LStA"
-# }}}
 
 @mock_dynamodb
 class TestCreateDeck(unittest.TestCase):
+    def generate_jwt_token(self, user_id: str = "test-user", secret_key: str = "secret", algorithm: str = "HS256", claims: dict = {}) -> str:
+        default_claims = {
+            'iss': 'test_issuer',
+            'sub': user_id,
+            'aud': 'test_audience',
+            'exp': int(time.time()) + 3600,
+            'iat': int(time.time()),
+            'cognito:username': user_id
+        }
+
+        # Merge default and user-provided claims
+        all_claims = {**default_claims, **claims}
+
+        # Generate JWT
+        token = jwt.encode(all_claims, secret_key, algorithm=algorithm)
+
+        return token
+
     def get_sut(self):
         from functions.CreateDeck import app
 
@@ -61,6 +77,8 @@ class TestCreateDeck(unittest.TestCase):
         )
         # }}}
 
+        self.jwt_token = self.generate_jwt_token()
+
         self.sut = self.get_sut()
 
     def test_deck_is_created(self):
@@ -71,7 +89,7 @@ class TestCreateDeck(unittest.TestCase):
                 "name": expected_deck_name,
             }),
             "headers": {
-                "Authorization": f"Bearer {JWT_TOKEN}",
+                "Authorization": f"Bearer {self.jwt_token}",
             },
         }
         mock_context = {}
@@ -90,7 +108,7 @@ class TestCreateDeck(unittest.TestCase):
     def test_invalid_request_is_returned_when_no_body_is_specified(self):
         mock_event = {
             "headers": {
-                "Authorization": f"Bearer {JWT_TOKEN}",
+                "Authorization": f"Bearer {self.jwt_token}",
             },
         }
         mock_context = {}
@@ -109,7 +127,7 @@ class TestCreateDeck(unittest.TestCase):
         mock_event = {
             "body": json.dumps({}),
             "headers": {
-                "Authorization": f"Bearer {JWT_TOKEN}",
+                "Authorization": f"Bearer {self.jwt_token}",
             },
         }
         mock_context = {}
