@@ -18,19 +18,21 @@ const router = createRouter({
 			name: "login",
 			component: () => import(/* webpackChunkName: "login" */ "../views/LoginView.vue"),
 		},
-
 		{
 			path: "/decks",
 			name: "decks",
-			children: [
-				{
-					path: "new",
-					name: "create-deck",
-					component: () => import(/* webpackChunkName: "create-deck" */ "../views/Deck/CreateDeckView.vue"),
-				},
-			],
+			component: () => import(/* webpackChunkName: "deck-view" */ "../views/Deck/DeckView.vue"),
 		},
-
+		{
+			path: "/decks/new",
+			name: "create-deck",
+			component: () => import(/* webpackChunkName: "create-deck" */ "../views/Deck/CreateDeckView.vue"),
+		},
+		{
+			path: "/collection",
+			name: "collection",
+			component: () => import(/* webpackChunkName: "login" */ "../views/CollectionView.vue"),
+		},
 		{
 			path: "/:pathMatch(.*)*",
 			name: "not-found",

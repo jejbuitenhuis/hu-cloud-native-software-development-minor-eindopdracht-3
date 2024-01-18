@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onBeforeMount, onBeforeUnmount } from "vue";
+import { onBeforeMount } from "vue";
 import { RouterView } from "vue-router";
+import Header from "@/components/Header.vue";
 
 const HTML_ELEMENT_CLASS_LIST = document.documentElement.classList;
 
@@ -23,9 +24,11 @@ onBeforeMount(() => {
 </script>
 
 <template>
-	<RouterView />
+  <Header/>
+  <main>
+	  <RouterView />
+  </main>
 </template>
-
 
 <style lang="scss">
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");

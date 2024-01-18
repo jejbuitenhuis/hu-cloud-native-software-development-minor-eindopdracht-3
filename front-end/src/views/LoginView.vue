@@ -15,7 +15,6 @@ const passwordInput: Ref<null> | Ref<HTMLObjectElement> = ref(null);
 const errorMessage = ref('');
 
 const router = useRouter();
-const route = useRoute();
 
 function login() {
   if (!isFormValid()) {
@@ -30,7 +29,7 @@ function login() {
 
               const returnUrl = !!router.currentRoute.value.query.redirect_url
                 ? router.currentRoute.value.query.redirect_url as string
-                : "/";
+                : "/collection";
 
               router.push(returnUrl);
             });
@@ -49,7 +48,7 @@ function storeSessionToken(token: string) {
 }
 
 function showErrorMessage(error: string) {
-  console.log(error);
+  console.error(error);
   errorMessage.value = error;
 }
 
@@ -64,10 +63,6 @@ function isFormValid(): boolean {
   }
 
   return true;
-}
-
-function handleInput() {
-  console.log("handle input");
 }
 
 async function sendData(email: string, password: string) {
@@ -92,11 +87,11 @@ async function sendData(email: string, password: string) {
       <h1>Login</h1>
       <form id="login-form" @submit.prevent.submit="login">
         <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="email"
-                  ref="emailInput"></sl-input>
+                  ref="emailInput" data-test-id="email"></sl-input>
         <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required
-                  v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
+                  v-model="password" ref="passwordInput" data-test-id="password"></sl-input>
         <p class="error" id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
-        <sl-button id="login" class="button" variant="primary" type="submit">Login</sl-button>
+        <sl-button id="login" class="button" variant="primary" type="submit" data-test-id="submit">Login</sl-button>
       </form>
     </sl-card>
   </div>

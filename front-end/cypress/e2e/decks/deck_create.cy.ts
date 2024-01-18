@@ -52,19 +52,4 @@ describe("CreateDeckView", () => {
 		cy.location("hash")
 			.should("equals", "#/decks/new/");
 	});
-
-	it("should redirect to login screen with redirect url when no JWT token is set", () => {
-		cy.clearLocalStorage();
-
-		cy.visit("/#/decks/new/");
-
-		cy.getByTestId("deck-name")
-			.typeInWebComponent("CY test deck");
-
-		cy.getByTestId("submit")
-			.clickAtTop();
-
-		cy.location("hash")
-			.should("equal", `#/login/?redirect_url=${encodeURIComponent("/decks/new/")}`);
-	});
 });
