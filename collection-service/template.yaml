@@ -90,7 +90,7 @@ Resources:
   GetCollection:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/get-collection/
+      CodeUri: functions/get_collection/
       Events:
         HelloWorld:
           Type: Api
@@ -107,7 +107,7 @@ Resources:
   GetCollectionInstance:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/get-instance/
+      CodeUri: functions/get_instance/
       Events:
         HelloWorld:
           Type: Api
