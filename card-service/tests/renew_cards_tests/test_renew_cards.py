@@ -44,7 +44,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('functions/renewEntities/single_face_card_list.json', 'r') as file:
+        with open(r'tests/renew_cards_tests/json_test_files/10_cards.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -87,7 +87,7 @@ def test_renew_cards_two_faced(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('functions/renewEntities/double_faced_card_list.json', 'r') as file:
+        with open('tests/renew_cards_tests/json_test_files/double_faced_card_list.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -126,7 +126,7 @@ def test_renew_cards_ten_cards(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('functions/renewEntities/10_cards.json', 'r') as file:
+        with open('tests/renew_cards_tests/json_test_files/10_cards.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -165,7 +165,7 @@ def test_renew_cards_thirty_cards(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('functions/renewEntities/30_cards.json', 'r') as file:
+        with open('tests/renew_cards_tests/json_test_files/30_cards.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -203,7 +203,7 @@ def test_renew_cards_has_correct_ttl(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('functions/renewEntities/single_face_card_list.json', 'r') as file:
+        with open('tests/renew_cards_tests/json_test_files/single_face_card_list.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -229,21 +229,3 @@ def test_renew_cards_has_correct_ttl(requests_mock):
             assert item['RemoveAt'] > int(time.time()) + CARDS_UPDATE_FREQUENCY
             assert item['RemoveAt'] <= int(time.time()) + 2 * CARDS_UPDATE_FREQUENCY
         os.remove('tests/renew_cards_tests/correct_ttl.json')
-
-
-# @patch.dict(os.environ, {"DISABLE_XRAY": "True",
-#                          "EVENT_BUS_ARN": "",
-#                          "DYNAMODB_TABLE_NAME": "test-card-table",
-#                          "CARDS_UPDATE_FREQUENCY" : "7"})
-# @mock_dynamodb
-# def test_renew_cards_full():
-#     with patch('boto3.client') as mock_client:
-#         table = setup_table()
-#         mock_event_bridge = MagicMock()
-#         mock_client.return_value = mock_event_bridge
-#
-#         # Invoke the lambda handler
-#         import functions.renewEntities.app
-#         importlib.reload(functions.renewEntities.app)
-#         functions.renewEntities.app.lambda_handler({}, {})
-#     assert False
