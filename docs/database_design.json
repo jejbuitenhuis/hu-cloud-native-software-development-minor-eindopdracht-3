@@ -1,0 +1,185 @@
+{
+  "ModelName": "CNSDM Module 3 Eindopdracht DB Design",
+  "ModelMetadata": {
+    "Author": "Team Dragons",
+    "DateCreated": "Jan 18, 2024, 10:08 AM",
+    "DateLastModified": "Jan 18, 2024, 10:12 AM",
+    "Description": "",
+    "AWSService": "Amazon DynamoDB",
+    "Version": "3.0"
+  },
+  "DataModel": [
+    {
+      "TableName": "Deck",
+      "KeyAttributes": {
+        "PartitionKey": {
+          "AttributeName": "PK",
+          "AttributeType": "S"
+        },
+        "SortKey": {
+          "AttributeName": "SK",
+          "AttributeType": "S"
+        }
+      },
+      "NonKeyAttributes": [
+        {
+          "AttributeName": "data_type",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "user_id",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "deck_id",
+          "AttributeType": "S"
+        },
+        {
+          "AttributeName": "deck_name",
+          "AttributeType": "S"
+        }
+      ],
+      "TableFacets": [
+        {
+          "FacetName": "Deck",
+          "KeyAttributeAlias": {
+            "PartitionKeyAlias": "PK",
+            "SortKeyAlias": "SK"
+          },
+          "TableData": [],
+          "NonKeyAttributes": [
+            "data_type",
+            "user_id",
+            "deck_id",
+            "deck_name"
+          ],
+          "DataAccess": {
+            "MySql": {}
+          }
+        }
+      ],
+      "TableData": [
+        {
+          "PK": {
+            "S": "USER#76b5b90e-3085-407c-b1f7-52a9fdd532d7"
+          },
+          "SK": {
+            "S": "DECK#73507c26-9bac-4aa0-951a-c0f6f2510ab8"
+          },
+          "data_type": {
+            "S": "DECK"
+          },
+          "user_id": {
+            "S": "76b5b90e-3085-407c-b1f7-52a9fdd532d7"
+          },
+          "deck_id": {
+            "S": "73507c26-9bac-4aa0-951a-c0f6f2510ab8"
+          },
+          "deck_name": {
+            "S": "User 1 Deck 1"
+          }
+        },
+        {
+          "PK": {
+            "S": "USER#76b5b90e-3085-407c-b1f7-52a9fdd532d7"
+          },
+          "SK": {
+            "S": "DECK#d52500e4-9cdc-4869-9dc6-635b61b3ec7b"
+          },
+          "data_type": {
+            "S": "DECK"
+          },
+          "user_id": {
+            "S": "76b5b90e-3085-407c-b1f7-52a9fdd532d7"
+          },
+          "deck_id": {
+            "S": "d52500e4-9cdc-4869-9dc6-635b61b3ec7b"
+          },
+          "deck_name": {
+            "S": "User 1 Deck 2"
+          }
+        },
+        {
+          "PK": {
+            "S": "USER#7259f3d3-9318-46c6-9019-c0611a8a9c48"
+          },
+          "SK": {
+            "S": "DECK#de54bf62-00d7-4024-a86f-f0a02f8432ce"
+          },
+          "data_type": {
+            "S": "DECK"
+          },
+          "user_id": {
+            "S": "7259f3d3-9318-46c6-9019-c0611a8a9c48"
+          },
+          "deck_id": {
+            "S": "de54bf62-00d7-4024-a86f-f0a02f8432ce"
+          },
+          "deck_name": {
+            "S": "User 2 Deck 1"
+          }
+        },
+        {
+          "PK": {
+            "S": "USER#7259f3d3-9318-46c6-9019-c0611a8a9c48"
+          },
+          "SK": {
+            "S": "DECK#5eb82ace-cd41-43f1-afaf-0d0cc1edc06b"
+          },
+          "data_type": {
+            "S": "DECK"
+          },
+          "user_id": {
+            "S": "7259f3d3-9318-46c6-9019-c0611a8a9c48"
+          },
+          "deck_id": {
+            "S": "5eb82ace-cd41-43f1-afaf-0d0cc1edc06b"
+          },
+          "deck_name": {
+            "S": "User 2 Deck 2"
+          }
+        }
+      ],
+      "DataAccess": {
+        "MySql": {}
+      },
+      "SampleDataFormats": {
+        "user_id": [
+          "identifiers",
+          "UUID"
+        ],
+        "deck_id": [
+          "identifiers",
+          "UUID"
+        ]
+      },
+      "BillingMode": "PROVISIONED",
+      "ProvisionedCapacitySettings": {
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 5,
+          "WriteCapacityUnits": 5
+        },
+        "AutoScalingRead": {
+          "ScalableTargetRequest": {
+            "MinCapacity": 1,
+            "MaxCapacity": 10,
+            "ServiceRole": "AWSServiceRoleForApplicationAutoScaling_DynamoDBTable"
+          },
+          "ScalingPolicyConfiguration": {
+            "TargetValue": 70
+          }
+        },
+        "AutoScalingWrite": {
+          "ScalableTargetRequest": {
+            "MinCapacity": 1,
+            "MaxCapacity": 10,
+            "ServiceRole": "AWSServiceRoleForApplicationAutoScaling_DynamoDBTable"
+          },
+          "ScalingPolicyConfiguration": {
+            "TargetValue": 70
+          }
+        }
+      }
+    }
+  ]
+}
