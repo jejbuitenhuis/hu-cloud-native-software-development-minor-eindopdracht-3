@@ -44,7 +44,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open(r'tests/renew_cards_tests/json_test_files/10_cards.json', 'r') as file:
+        with open(r'tests/renew_cards_tests/json_test_files/10_cards.json', 'r', encoding='utf-8') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -56,16 +56,40 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
         importlib.reload(functions.renewEntities.app)
         functions.renewEntities.app.lambda_handler({}, {})
 
-        single_face_card = table.query(
+        single_face_card_info = table.query(
+            KeyConditionExpression=Key('PK').eq('OracleId#44623693-51d6-49ad-8cd7-140505caf02f') & Key('SK').eq(
+                'PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe#Card')
+        )
+        single_face_card_face_info = table.query(
             KeyConditionExpression=Key('PK').eq('OracleId#44623693-51d6-49ad-8cd7-140505caf02f') & Key('SK').eq(
                 'PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe#Face#1')
         )
 
+
         assert requests_mock.called
         assert requests_mock.call_count == 2
-        assert len(single_face_card['Items']) == 1
-        assert single_face_card['Items'][0]['PK'] == "OracleId#44623693-51d6-49ad-8cd7-140505caf02f"
-        assert single_face_card['Items'][0]['SK'] == "PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe#Face#1"
+        assert len(single_face_card_info['Items']) == 1
+        assert single_face_card_info['Items'][0]['PK'] == "OracleId#44623693-51d6-49ad-8cd7-140505caf02f"
+        assert single_face_card_info['Items'][0]['SK'] == "PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe#Card"
+        assert single_face_card_info['Items'][0]['OracleName'] == "Fury Sliver"
+        assert single_face_card_info['Items'][0]['SetName'] == "Time Spiral"
+        assert single_face_card_info['Items'][0]['ReleasedAt'] == "2006-10-06"
+        assert single_face_card_info['Items'][0]['Rarity'] == "uncommon"
+        assert single_face_card_info['Items'][0]['Price'] == "0.04"
+        assert single_face_card_info['Items'][0]['DataType'] == "Card"
+
+        assert len(single_face_card_face_info['Items']) == 1
+        assert single_face_card_face_info['Items'][0]['PK'] == "OracleId#44623693-51d6-49ad-8cd7-140505caf02f"
+        assert single_face_card_face_info['Items'][0]['SK'] == "PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe#Face#1"
+        assert single_face_card_face_info['Items'][0]['OracleText'] == "All Sliver creatures have double strike."
+        assert single_face_card_face_info['Items'][0]['ManaCost'] == "{5}{R}"
+        assert single_face_card_face_info['Items'][0]['TypeLine'] == "Creature — Sliver"
+        assert single_face_card_face_info['Items'][0]['FaceName'] == "Fury Sliver"
+        assert single_face_card_face_info['Items'][0]['FlavorText'] == "\"A rift opened, and our arrows were abruptly stilled. To move was to push the world. But the sliver's claw still twitched, red wounds appeared in Thed's chest, and ribbons of blood hung in the air.\"\n—Adom Capashen, Benalish hero"
+        assert single_face_card_face_info['Items'][0]['ImageUrl'] == "https://cards.scryfall.io/png/front/0/0/0000579f-7b35-4ed3-b44c-db2a538066fe.png?1562894979"
+        assert single_face_card_face_info['Items'][0]['Colors'] == ["R"]
+        assert single_face_card_face_info['Items'][0]['DataType'] == "Face"
+
         os.remove('tests/renew_cards_tests/single_faced_cards.json')
 
 
@@ -87,7 +111,7 @@ def test_renew_cards_two_faced(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('tests/renew_cards_tests/json_test_files/double_faced_card_list.json', 'r') as file:
+        with open('tests/renew_cards_tests/json_test_files/double_faced_card_list.json', 'r', encoding='utf-8') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -99,13 +123,57 @@ def test_renew_cards_two_faced(requests_mock):
         importlib.reload(functions.renewEntities.app)
         functions.renewEntities.app.lambda_handler({}, {})
 
-        double_card_faces = table.query(
-            KeyConditionExpression=Key('PK').eq('OracleId#562d71b9-1646-474e-9293-55da6947a758')
+        double_face_card_info = table.query(
+            KeyConditionExpression=Key('PK').eq('OracleId#562d71b9-1646-474e-9293-55da6947a758') & Key('SK').eq(
+                'PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card')
+        )
+        double_face_card_face_1_info = table.query(
+            KeyConditionExpression=Key('PK').eq('OracleId#562d71b9-1646-474e-9293-55da6947a758') & Key('SK').eq(
+                'PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#1')
+        )
+
+        double_face_card_face_2_info = table.query(
+            KeyConditionExpression=Key('PK').eq('OracleId#562d71b9-1646-474e-9293-55da6947a758') & Key('SK').eq(
+                'PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#2')
         )
 
         assert requests_mock.called
         assert requests_mock.call_count == 2
-        assert len(double_card_faces['Items']) == 3
+
+        assert len(double_face_card_info['Items']) == 1
+        assert double_face_card_info['Items'][0]['PK'] == "OracleId#562d71b9-1646-474e-9293-55da6947a758"
+        assert double_face_card_info['Items'][0]['SK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card"
+        assert double_face_card_info['Items'][0]['OracleName'] == "Agadeem's Awakening // Agadeem, the Undercrypt"
+        assert double_face_card_info['Items'][0]['SetName'] == "Zendikar Rising"
+        assert double_face_card_info['Items'][0]['ReleasedAt'] == "2020-09-25"
+        assert double_face_card_info['Items'][0]['Rarity'] == "mythic"
+        assert double_face_card_info['Items'][0]['Price'] == "18.27"
+        assert double_face_card_info['Items'][0]['DataType'] == "Card"
+
+        assert len(double_face_card_face_1_info['Items']) == 1
+        assert double_face_card_face_1_info['Items'][0]['PK'] == "OracleId#562d71b9-1646-474e-9293-55da6947a758"
+        assert double_face_card_face_1_info['Items'][0]['SK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#1"
+        assert double_face_card_face_1_info['Items'][0]['OracleText'] == "Return from your graveyard to the battlefield any number of target creature cards that each have a different mana value X or less."
+        assert double_face_card_face_1_info['Items'][0]['ManaCost'] == "{X}{B}{B}{B}"
+        assert double_face_card_face_1_info['Items'][0]['TypeLine'] == "Sorcery"
+        assert double_face_card_face_1_info['Items'][0]['FaceName'] == "Agadeem's Awakening"
+        assert double_face_card_face_1_info['Items'][0]['FlavorText'] == '\"Now is the death-hour, just before dawn. Wake, sleepers, and haunt the living!\"\n—Vivias, Witch Vessel'
+        assert double_face_card_face_1_info['Items'][0]['ImageUrl'] == "https://cards.scryfall.io/png/front/6/7/67f4c93b-080c-4196-b095-6a120a221988.png?1604195226"
+        assert double_face_card_face_1_info['Items'][0]['Colors'] == ["B"]
+        assert double_face_card_face_1_info['Items'][0]['DataType'] == "Face"
+
+        assert len(double_face_card_face_2_info['Items']) == 1
+        assert double_face_card_face_2_info['Items'][0]['PK'] == "OracleId#562d71b9-1646-474e-9293-55da6947a758"
+        assert double_face_card_face_2_info['Items'][0]['SK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#2"
+        assert double_face_card_face_2_info['Items'][0]['OracleText'] == "As Agadeem, the Undercrypt enters the battlefield, you may pay 3 life. If you don't, it enters the battlefield tapped.\n{T}: Add {B}."
+        assert double_face_card_face_2_info['Items'][0]['ManaCost'] == ""
+        assert double_face_card_face_2_info['Items'][0]['TypeLine'] == "Land"
+        assert double_face_card_face_2_info['Items'][0]['FaceName'] == "Agadeem, the Undercrypt"
+        assert double_face_card_face_2_info['Items'][0]['FlavorText'] == '\"Here below the hedron fields, souls and secrets lie entombed.\"\n—Vivias, Witch Vessel'
+        assert double_face_card_face_2_info['Items'][0]['ImageUrl'] == "https://cards.scryfall.io/png/back/6/7/67f4c93b-080c-4196-b095-6a120a221988.png?1604195226"
+        assert double_face_card_face_2_info['Items'][0]['Colors'] == []
+        assert double_face_card_face_2_info['Items'][0]['DataType'] == "Face"
+
         os.remove('tests/renew_cards_tests/two_faced_cards.json')
 
 

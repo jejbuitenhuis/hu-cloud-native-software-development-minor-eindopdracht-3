@@ -26,18 +26,32 @@ ttlOffSetSecs = (3 * 60 * 60)
 local_filename = os.getenv("CARD_JSON_LOCATION", "/tmp/default-cards.json")
 
 
-def createCardFace(card, oracle_id, scryfall_id, face_count=1):
-    image_uris = card.get('image_uris', {})  # Check if 'image_uris' exists, provide an empty dictionary as default
+def turnCardIntoFaceItem(card, oracle_id, scryfall_id, face_count=1, ):
+    image_uris = card.get('image_uris', {})
     return {
         "PK": f'OracleId#{oracle_id}',
         "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
-        "OracleText": card.get('oracle_text', ''),  # we set default values in case a field isn't specified
+        "OracleText": card.get('oracle_text', ''),
         "ManaCost": card.get('mana_cost', ''),
         "TypeLine": card.get('type_line', ''),
         "FaceName": card.get('name', ''),
         "FlavorText": card.get('flavor_text', ''),
         "ImageUrl": image_uris.get('png', ''),
-        "Colors": str(card.get('colors', [])),
+        "Colors": card.get('colors', []),
+        "DataType": "Face"
+    }
+
+def turnFaceIntoFaceItem(face, oracle_id, scryfall_id, face_count=1):
+    return {
+        "PK": f'OracleId#{oracle_id}',
+        "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
+        "OracleText": face.get('oracle_text', ''),
+        "ManaCost": face.get('mana_cost', ''),
+        "TypeLine": face.get('type_line', ''),
+        "FaceName": face.get('name', ''),
+        "FlavorText": face.get('flavor_text', ''),
+        "ImageUrl": face.get('image_uris', {}).get('png', ''),
+        "Colors": face.get('colors', []),
         "DataType": "Face"
     }
 
@@ -47,7 +61,6 @@ def getOracleFromCard(card):
         return card['card_faces'][0]['oracle_id']
     else:
         return card['oracle_id']
-
 
 def createCardInfo(card, oracle_id):
     try:
@@ -110,6 +123,7 @@ def lambda_handler(event, context):
     for item in bulk_data_items["data"]:
         if item["type"] == "default_cards":
             default_cards_uri = item["download_uri"]
+            break
 
     with requests.get(default_cards_uri, stream=True) as response:
         if response.status_code == 200:
@@ -120,6 +134,7 @@ def lambda_handler(event, context):
             logger.info(f"Downloaded '{local_filename}' successfully.")
         else:
             logger.info(f"Failed to download. Status code: {response.status_code}")
+            return False
 
     with open(f'{local_filename}', "rb") as file:
         cards = ijson.items(file, 'item')
@@ -135,9 +150,9 @@ def lambda_handler(event, context):
                 face_count = 0
                 for face in card['card_faces']:
                     face_count += 1
-                    card_faces.append(createCardFace(card, oracle_id, card['id'], face_count))
+                    card_faces.append(turnFaceIntoFaceItem(face, oracle_id, card['id'], face_count))
             else:
-                card_faces.append(createCardFace(card, oracle_id, card['id']))
+                card_faces.append(turnCardIntoFaceItem(card, oracle_id, card['id']))
 
             item_list.extend(card_faces)
             item_list = cutTheListAndPersist(item_list, ttl)
