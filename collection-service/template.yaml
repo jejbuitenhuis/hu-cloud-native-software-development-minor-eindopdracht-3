@@ -83,6 +83,25 @@ Resources:
             Path: /ping
             Method: get
 
+  AddCardToCollectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-AddCardToCollectionFunction"
+      CodeUri: functions/add_card/
+      Events:
+        AddCard:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MTGCollectionApi
+            Path: /api/collections
+            Method: post
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCollectionDynamoDBTable
+          STAGE: !Sub "${Stage}"
+      Policies:
+        - AmazonDynamoDBFullAccess
+
 Outputs:
   MTGCollectionApiUrl:
     Description: "API Gateway endpoint URL"

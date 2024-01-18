@@ -31,10 +31,10 @@ def turnCardIntoFaceItem(card, oracle_id, scryfall_id, face_count=1, ):
     return {
         "PK": f'OracleId#{oracle_id}',
         "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
-        "OracleText": card.get('oracle_text', ''),
+        "OracleText": str.lower(card.get('oracle_text', '')),
         "ManaCost": card.get('mana_cost', ''),
         "TypeLine": card.get('type_line', ''),
-        "FaceName": card.get('name', ''),
+        "FaceName": str.lower(card.get('name', '')),
         "FlavorText": card.get('flavor_text', ''),
         "ImageUrl": image_uris.get('png', ''),
         "Colors": card.get('colors', []),
@@ -45,10 +45,10 @@ def turnFaceIntoFaceItem(face, oracle_id, scryfall_id, face_count=1):
     return {
         "PK": f'OracleId#{oracle_id}',
         "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
-        "OracleText": face.get('oracle_text', ''),
+        "OracleText": str.lower(face.get('oracle_text', '')),
         "ManaCost": face.get('mana_cost', ''),
         "TypeLine": face.get('type_line', ''),
-        "FaceName": face.get('name', ''),
+        "FaceName": str.lower(face.get('name', '')),
         "FlavorText": face.get('flavor_text', ''),
         "ImageUrl": face.get('image_uris', {}).get('png', ''),
         "Colors": face.get('colors', []),
@@ -56,27 +56,29 @@ def turnFaceIntoFaceItem(face, oracle_id, scryfall_id, face_count=1):
     }
 
 
-def getOracleFromCard(card):
-    if card.get('layout', '') == 'reversible_card':
-        return card['card_faces'][0]['oracle_id']
-    else:
-        return card['oracle_id']
-
 def createCardInfo(card, oracle_id):
     try:
         return {
             "PK": f'OracleId#{oracle_id}',
             "SK": f'PrintId#{card["id"]}#Card',
-            "OracleName": card['name'],
-            "SetName": card['set_name'],
+            "OracleName": str.lower(card['name']),
+            "SetName": str.lower(card['set_name']),
             "ReleasedAt": card['released_at'],
             "Rarity": card['rarity'],
             "Price": card['prices']['eur'],
+            "OracleId": oracle_id,
+            "PrintId": card['id'],
             "DataType": "Card"
         }
     except Exception as error:
         logger.error(f"An error has occurred while processing card: \n{card}\n "
                      f"Error: \n {error}")
+
+def getOracleFromCard(card):
+    if card.get('layout', '') == 'reversible_card':
+        return card['card_faces'][0]['oracle_id']
+    else:
+        return card['oracle_id']
 
 
 # Can only handle 25 items at a time!

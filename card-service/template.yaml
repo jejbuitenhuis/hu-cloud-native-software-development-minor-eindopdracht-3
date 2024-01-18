@@ -77,20 +77,10 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       TableName: !Sub "${Stage}-mtg-card-db"
 
-  renewEntitiesRule:
-    Type: AWS::Events::Rule
-    Properties:
-      Description: "Rule to trigger RenewEntitiesFunction, to renew the card database"
-      Name: !Sub "${Stage}-renew-entities-rule"
-      ScheduleExpression: "cron(0 4 * * ? *)"
-      Targets:
-        - Arn: !GetAtt RenewEntitiesFunction.Arn
-          Id: !Sub "${Stage}-renew-entities-rule-target"
-
   RenewEntitiesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/renewEntities
+      CodeUri: functions/renewEntities/
       MemorySize: 550
       Timeout: 360
       Environment:
@@ -98,6 +88,24 @@ Resources:
           DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
       Policies:
         - AmazonDynamoDBFullAccess
+
+  GetCardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-GetCardFunction"
+      CodeUri: functions/get_card/
+      Events:
+        GetCard:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCardApi"
+            Path: /api/cards/{oracle_id}/{print_id}
+            Method: get
+      Environment:
+        Variables:
+          DYNAMO_DB_CARD_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
 
   PingFunction:
     Type: AWS::Serverless::Function
@@ -136,7 +144,7 @@ Resources:
     Properties:
       FlexibleTimeWindow:
         Mode: 'OFF'
-      ScheduleExpression: "cron(0 5 * * * *)"
+      ScheduleExpression: "cron(0 5 * * ? *)"
       ScheduleExpressionTimezone: "GMT+1"
       Target:
         Arn: !GetAtt RenewEntitiesFunction.Arn
