@@ -19,6 +19,12 @@ class TestCreateDeck(unittest.TestCase):
     def setUp(self):
         self.monkeypatch = MonkeyPatch()
 
+        self.monkeypatch.setenv("AWS_ACCESS_KEY_ID", "testing")
+        self.monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "testing")
+        self.monkeypatch.setenv("AWS_SECURITY_TOKEN", "testing")
+        self.monkeypatch.setenv("AWS_SESSION_TOKEN", "testing")
+        self.monkeypatch.setenv("AWS_DEFAULT_REGION", "us-east-1")
+
         self.DYNAMO_DB_USER_TABLE_NAME = "table_decks"
 
         self.monkeypatch.setenv("DISABLE_XRAY", "true")
