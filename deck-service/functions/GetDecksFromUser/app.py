@@ -25,15 +25,8 @@ def parse_deck(db_data: dict) -> dict:
     }
 
 def get_user_id(event: dict) -> str:
-    token_header: str = event["headers"]["Authorization"]
-
-    if not token_header.startswith("Bearer "):
-        raise Exception("Invalid authorization header")
-
-    token_header = token_header[len("Bearer "):]
-
+    token_header: str = event["headers"]["Authorization"].replace("Bearer ", "")
     claims = jwt.get_unverified_claims(token_header)
-
     return claims["sub"]
 
 def lambda_handler(event, context):
