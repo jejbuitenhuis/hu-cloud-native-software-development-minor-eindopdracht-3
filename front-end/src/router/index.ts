@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import LoginView from "../views/LoginView.vue";
+import CollectionView from "@/views/CollectionView.vue";
 
 const router = createRouter({
 	history: createWebHashHistory(),
@@ -20,6 +21,11 @@ const router = createRouter({
 			path: "/login",
 			name: "login",
 			component: LoginView,
+		},
+		{
+			path: "/collection",
+			name: "collection",
+			component: CollectionView,
 		},
 		{
 			path: "/:pathMatch(.*)*",
