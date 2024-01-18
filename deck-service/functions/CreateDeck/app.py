@@ -14,8 +14,8 @@ LOGGER = logging.getLogger()
 LOGGER.setLevel("INFO")
 
 DYNAMO_DB = boto3.resource("dynamodb")
-DYNAMO_DB_USER_TABLE_NAME = os.getenv("DYNAMO_DB_USER_TABLE_NAME")
-USER_TABLE = DYNAMO_DB.Table(DYNAMO_DB_USER_TABLE_NAME)
+DYNAMO_DB_DECK_TABLE_NAME = os.getenv("DYNAMO_DB_DECK_TABLE_NAME")
+DECK_TABLE = DYNAMO_DB.Table(DYNAMO_DB_DECK_TABLE_NAME)
 
 def get_user_id(event: dict) -> str:
     token_header: str = event["headers"]["Authorization"]
