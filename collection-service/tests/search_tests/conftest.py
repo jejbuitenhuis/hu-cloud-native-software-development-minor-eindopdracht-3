@@ -3,7 +3,7 @@ import os
 import pytest
 from moto import mock_dynamodb
 
-DYNAMODB_TABLE_NAME = "Collections"
+DYNAMODB_TABLE_NAME = "test-table"
 
 
 @pytest.fixture
@@ -29,8 +29,23 @@ def setup_dynamodb_collection(aws_credentials):
             AttributeDefinitions=[
                 {"AttributeName": "PK", "AttributeType": "S"},
                 {"AttributeName": "SK", "AttributeType": "S"},
+                {"AttributeName": "GSI1SK", "AttributeType": "S"},
             ],
-            BillingMode="PAY_PER_REQUEST",
+            ProvisionedThroughput={"ReadCapacityUnits": 1, "WriteCapacityUnits": 1},
+            GlobalSecondaryIndexes=[
+                {
+                    "IndexName": "GSI-Collection-Cards-In-Deck",
+                    "KeySchema": [
+                        {"AttributeName": "PK", "KeyType": "HASH"},
+                        {"AttributeName": "GSI1SK", "KeyType": "RANGE"},
+                    ],
+                    "Projection": {"ProjectionType": "ALL"},
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 1,
+                        "WriteCapacityUnits": 1,
+                    },
+                }
+            ],
         )
         yield table
 
@@ -41,8 +56,8 @@ def setup_dynamodb_collection_with_items(setup_dynamodb_collection):
 
     table.put_item(
         Item={
-            "PK": "USER#1",
-            "SK": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#1",
+            "PK": "USER#test-user",
+            "SK": "CardInstance#1Face#1",
             "OracleName": "Bessie, the Doctor's Roadster",
             "OracleText": "Haste Whenever Bessie attacks, another target legendary creature can’t be blocked this turn. Crew 2 (Tap any number of creatures you control with total power 2 or more: This Vehicle becomes an artifact creature until end of turn. ",
             "DataType": "Card",
@@ -51,8 +66,8 @@ def setup_dynamodb_collection_with_items(setup_dynamodb_collection):
 
     table.put_item(
         Item={
-            "PK": "USER#1",
-            "SK": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card",
+            "PK": "USER#test-user",
+            "SK": "CardInstance#1#Card",
             "OracleName": "Bessie, the Doctor's Roadster",
             "DataType": "Card",
         },

@@ -1,13 +1,20 @@
 import os
 from unittest.mock import patch
-from moto import mock_dynamodb
 from .jwt_generator import generate_test_jwt
+from .conftest import DYNAMODB_TABLE_NAME
 
 COGINTO_USERNAME = "test@example.com"
 COGINTO_PASSWORD = "NewPassword456!"
 
 
-@patch.dict(os.environ, {"DISABLE_XRAY": "True", "EVENT_BUS_ARN": ""})
+@patch.dict(
+    os.environ,
+    {
+        "DYNAMODB_TABLE": DYNAMODB_TABLE_NAME,
+        "DISABLE_XRAY": "True",
+        "EVENT_BUS_ARN": "",
+    },
+)
 def test_search_works(setup_dynamodb_collection_with_items):
     from functions.Search.app import lambda_handler
 
@@ -43,7 +50,14 @@ def test_search_works(setup_dynamodb_collection_with_items):
     assert result == expected_output
 
 
-@patch.dict(os.environ, {"DISABLE_XRAY": "True", "EVENT_BUS_ARN": ""})
+@patch.dict(
+    os.environ,
+    {
+        "DYNAMODB_TABLE": DYNAMODB_TABLE_NAME,
+        "DISABLE_XRAY": "True",
+        "EVENT_BUS_ARN": "",
+    },
+)
 def test_search_not_found(setup_dynamodb_collection):
     from functions.Search.app import lambda_handler
 

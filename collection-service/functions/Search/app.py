@@ -15,7 +15,7 @@ logger = logging.getLogger()
 logger.setLevel("INFO")
 
 dynamodb = boto3.resource("dynamodb")
-collection_table = dynamodb.Table("Collections")
+collection_table = dynamodb.Table(environ["DYNAMODB_TABLE"])
 
 SEARCH_ATTRIBUTE_NAMES = ["OracleName", "OracleText"]
 
@@ -28,6 +28,7 @@ def lambda_handler(event, context):
 
     # Search query
     search_query = event["queryStringParameters"]["q"]
+    logger.info(f"Attribute query: {search_query}")
     attribute_query = {":search_string": search_query}
     logger.info(f"Attribute query: {attribute_query}")
 
@@ -41,9 +42,10 @@ def lambda_handler(event, context):
         attribute_query=attribute_query,
     )
 
-    items = result["Items"]
+    logger.info(f"All of the items returned: {result}")
 
-    logger.info(f"All of the items returned: {items}")
+    items = result["Items"]
+    # logger.info(f"All of the items returned: {items}")
 
     if items is None:
         return {
@@ -58,14 +60,10 @@ def lambda_handler(event, context):
 
 
 def extract_cognito_username(jwt_token):
-
     decoded_token = jwt.get_unverified_claims(jwt_token)
-
-    # Extract the 'cognito:username' value from the payload
     cognito_username = decoded_token.get("cognito:username")
 
     return cognito_username
-    
 
 
 def create_filter_expression(attribute_names) -> str:
@@ -76,10 +74,10 @@ def create_filter_expression(attribute_names) -> str:
 
 def search_for_querystring(table, key_expression, filter_expression, attribute_query):
     try:
-        table.query(
-            KeyConditionExpression=Key("PK").eq("USER#" + key_expression),
-            FilterExpression=filter_expression,
-            ExpressionAttributeValues=attribute_query,
+        return table.query(
+            KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
+            # FilterExpression=filter_expression,
+            # ExpressionAttributeValues=attribute_query,
         )
     except ClientError as e:
         logger.error(f"ClientError occured while scanning, { e }")

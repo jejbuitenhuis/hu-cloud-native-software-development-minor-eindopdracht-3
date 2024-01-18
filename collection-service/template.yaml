@@ -93,6 +93,11 @@ Resources:
             RestApiId: !Ref "MTGCollectionApi"
             Path: /search
             Method: get
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref MTGCollectionDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
 
 Outputs:
   MTGCollectionApiUrl:
