@@ -2,8 +2,8 @@
 pytest
 coverage
 moto
-python-jose
 
 # Function requirements
+python-jose
 boto3
 aws_xray_sdk

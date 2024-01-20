@@ -61,4 +61,46 @@ def test_search_not_found(setup_dynamodb_collection):
     result = lambda_handler(event, None)
 
     # Assert
-    assert result["statuscode"] == 404
+    assert result["statusCode"] == 404
+
+
+@patch.dict(
+    os.environ,
+    {
+        "DYNAMODB_TABLE": DYNAMODB_TABLE_NAME,
+        "DISABLE_XRAY": "True",
+        "EVENT_BUS_ARN": "",
+    },
+)
+def test_search_no_authorization(setup_dynamodb_collection):
+    from functions.Search.app import lambda_handler
+
+    # Arrange
+    event = {
+        "queryStringParameters": {"q": "Invalid"},
+    }
+
+    # Act
+    result = lambda_handler(event, None)
+    body = json.loads(result["body"])
+
+    # Assert
+    assert result["statusCode"] == 406
+    assert body["message"] == "JWT token not provided"
+
+
+def test_search_no_query(setup_dynamodb_collection):
+    from functions.Search.app import lambda_handler
+
+    # Arrange
+    event = {
+        "headers": {"Authorization": generate_test_jwt()},
+    }
+
+    # Act
+    result = lambda_handler(event, None)
+    body = json.loads(result["body"])
+
+    # Assert
+    assert result["statusCode"] == 406
+    assert body["message"] == "query string parameter not provided"

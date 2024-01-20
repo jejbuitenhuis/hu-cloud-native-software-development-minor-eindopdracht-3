@@ -19,13 +19,45 @@ collection_table = dynamodb.Table(environ["DYNAMODB_TABLE"])
 
 
 def lambda_handler(event, context):
+    # Input
+    authorization_value = event.get("headers", {}).get("Authorization", None)
+    query_string_parameters = event.get("queryStringParameters", {})
+
+    search_value = (
+        query_string_parameters.get("q")
+        if query_string_parameters is not None
+        else None
+    )
+
+    logger.info(f"Auth input: {authorization_value}")
+    logger.info(f"Search input: {search_value}")
+
+    if not authorization_value:
+        return {
+            "headers": {
+                "Content-Type": "application/json",
+            },
+            "statusCode": 406,
+            "body": json.dumps({"message": "JWT token not provided"}),
+        }
+
+    if not search_value:
+        return {
+            "headers": {
+                "Content-Type": "application/json",
+            },
+            "statusCode": 406,
+            "body": json.dumps({"message": "query string parameter not provided"}),
+        }
+
     # Cognito username
-    decoded_token = jwt.get_unverified_claims(event["headers"]["Authorization"])
+    decoded_token = jwt.get_unverified_claims(authorization_value)
     cognito_username = decoded_token.get("cognito:username")
     logger.info(f"Cognito_username: {cognito_username}")
 
     # Search query
-    search_query = event["queryStringParameters"]["q"]
+
+    search_query = search_value
     search_query = search_query.casefold()
     logger.info(f"Search_query: {search_query}")
 
@@ -40,11 +72,12 @@ def lambda_handler(event, context):
     logger.info(f"All of the items returned: {items}")
 
     if not items:
+        logger.info("No items found")
         return {
             "headers": {
                 "Content-Type": "application/json",
             },
-            "statuscode": 404,
+            "statusCode": 404,
             "body": json.dumps({"message": "Not found"}),
         }
 
@@ -52,7 +85,7 @@ def lambda_handler(event, context):
         "headers": {
             "Content-Type": "application/json",
         },
-        "statuscode": 200,
+        "statusCode": 200,
         "body": json.dumps({"Items": items}),
     }
 
@@ -67,7 +100,6 @@ def search_for_querystring(table, key_expression, search_query):
             & Attr("OracleText").contains(search_query)
             # OracleName
             | Attr("OracleName").contains(search_query),
-            ExpressionAttributeValues={":query": search_query},
         )
     except ClientError as e:
         logger.error(f"ClientError occured while scanning, { e }")
