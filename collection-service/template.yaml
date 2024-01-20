@@ -64,11 +64,22 @@ Resources:
           AttributeType: S
         - AttributeName: SK
           AttributeType: S
+        - AttributeName: GSI1SK
+          AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
         - AttributeName: SK
           KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: GSI-Collection-Cards-In-Deck
+          KeySchema:
+            - AttributeName: PK
+              KeyType: HASH
+            - AttributeName: GSI1SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
 
   PingFunction:
@@ -82,6 +93,40 @@ Resources:
             RestApiId: !Ref "MTGCollectionApi"
             Path: /ping
             Method: get
+
+  GetCollection:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/get_collection/
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCollectionApi"
+            Path: /api/collections
+            Method: get
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref MTGCollectionDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+
+  GetCollectionInstance:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/get_instance/
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCollectionApi"
+            Path: /api/collections/{instance_id}
+            Method: get
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref MTGCollectionDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
 
   AddCardToCollectionFunction:
     Type: AWS::Serverless::Function

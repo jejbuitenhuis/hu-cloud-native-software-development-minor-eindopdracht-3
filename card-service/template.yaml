@@ -26,6 +26,12 @@ Parameters:
     Type: String
     Default: development
 
+Conditions:
+  IsNotDevBranch:
+    Fn::Or:
+      - Fn::Equals: [ !Ref Stage, production ]
+      - Fn::Equals: [ !Ref Stage, staging ]
+
 Resources:
   MTGCardApi:
     Type: AWS::Serverless::Api
@@ -142,6 +148,7 @@ Resources:
   CardSchedule:
     Type: AWS::Scheduler::Schedule
     Properties:
+      State: !If [IsNotDevBranch, "ENABLED", "DISABLED"]
       FlexibleTimeWindow:
         Mode: 'OFF'
       ScheduleExpression: "cron(0 5 * * ? *)"
