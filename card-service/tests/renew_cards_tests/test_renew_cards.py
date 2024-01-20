@@ -33,6 +33,7 @@ def setup_table():
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/single_faced_cards.json"})
 @mock_dynamodb
 def test_renew_cards_writes_correct_data_single_face(requests_mock):
+    # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -50,11 +51,12 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
         requests_mock.get("https://api.scryfall.com/bulk-data", json=bulk_data_mock_response)
         requests_mock.get("https://data.scryfall.io/default-cards/default-cards-20240116100428.json", content=mock_file_content)
 
-        # Invoke the lambda handler
+        # Act
         import functions.renewEntities.app
         importlib.reload(functions.renewEntities.app)
         functions.renewEntities.app.lambda_handler({}, {})
 
+        # Assert
         single_face_card_info = table.query(
             KeyConditionExpression=Key('PK').eq('OracleId#44623693-51d6-49ad-8cd7-140505caf02f') & Key('SK').eq(
                 'PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe#Card')
@@ -102,6 +104,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/two_faced_cards.json"})
 @mock_dynamodb
 def test_renew_cards_two_faced(requests_mock):
+    # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -119,11 +122,12 @@ def test_renew_cards_two_faced(requests_mock):
         requests_mock.get("https://api.scryfall.com/bulk-data", json=bulk_data_mock_response)
         requests_mock.get("https://data.scryfall.io/default-cards/default-cards-20240116100428.json", content=mock_file_content)
 
-        # Invoke the lambda handler
+        # Act
         import functions.renewEntities.app
         importlib.reload(functions.renewEntities.app)
         functions.renewEntities.app.lambda_handler({}, {})
 
+        # Assert
         double_face_card_info = table.query(
             KeyConditionExpression=Key('PK').eq('OracleId#562d71b9-1646-474e-9293-55da6947a758') & Key('SK').eq(
                 'PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card')
@@ -187,6 +191,7 @@ def test_renew_cards_two_faced(requests_mock):
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/ten_cards.json"})
 @mock_dynamodb
 def test_renew_cards_ten_cards(requests_mock):
+    # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -204,11 +209,12 @@ def test_renew_cards_ten_cards(requests_mock):
         requests_mock.get("https://api.scryfall.com/bulk-data", json=bulk_data_mock_response)
         requests_mock.get("https://data.scryfall.io/default-cards/default-cards-20240116100428.json", content=mock_file_content)
 
-        # Invoke the lambda handler
+        # Act
         import functions.renewEntities.app
         importlib.reload(functions.renewEntities.app)
         functions.renewEntities.app.lambda_handler({}, {})
 
+        # Assert
         cards = table.scan(
             FilterExpression=Attr("DataType").eq("Card")
         )
@@ -226,6 +232,7 @@ def test_renew_cards_ten_cards(requests_mock):
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/thirty_cards.json"})
 @mock_dynamodb
 def test_renew_cards_thirty_cards(requests_mock):
+    # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -243,11 +250,12 @@ def test_renew_cards_thirty_cards(requests_mock):
         requests_mock.get("https://api.scryfall.com/bulk-data", json=bulk_data_mock_response)
         requests_mock.get("https://data.scryfall.io/default-cards/default-cards-20240116100428.json", content=mock_file_content)
 
-        # Invoke the lambda handler
+        # Act
         import functions.renewEntities.app
         importlib.reload(functions.renewEntities.app)
         functions.renewEntities.app.lambda_handler({}, {})
 
+        # Assert
         cards = table.scan(
             FilterExpression=Attr("DataType").eq("Card")
         )
@@ -264,6 +272,7 @@ def test_renew_cards_thirty_cards(requests_mock):
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/correct_ttl.json"})
 @mock_dynamodb
 def test_renew_cards_has_correct_ttl(requests_mock):
+    # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -281,11 +290,12 @@ def test_renew_cards_has_correct_ttl(requests_mock):
         requests_mock.get("https://api.scryfall.com/bulk-data", json=bulk_data_mock_response)
         requests_mock.get("https://data.scryfall.io/default-cards/default-cards-20240116100428.json", content=mock_file_content)
 
-        # Invoke the lambda handler
+
         import functions.renewEntities.app
         importlib.reload(functions.renewEntities.app)
         functions.renewEntities.app.lambda_handler({}, {})
 
+        # Assert
         single_face_card = table.query(
             KeyConditionExpression=Key('PK').eq('OracleId#44623693-51d6-49ad-8cd7-140505caf02f')
         )

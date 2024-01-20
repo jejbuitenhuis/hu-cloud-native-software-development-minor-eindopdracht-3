@@ -1,15 +1,14 @@
 import importlib
 import json
 import time
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import os
-import pytest
 import boto3
-import requests
-import requests_mock
-from boto3.dynamodb.conditions import Key, Attr
 from jose import jwt
 from moto import mock_dynamodb
+from botocore.stub import Stubber
+from boto3.dynamodb.conditions import Key
+import pytest
 
 import logging
 
@@ -29,13 +28,11 @@ def generate_jwt_token(user_id: str = "test-user", secret_key: str = "secret", a
     }
 
     all_claims = {**default_claims, **claims}
-
     token = jwt.encode(all_claims, secret_key, algorithm=algorithm)
-
     return token
 
 
-def setup_cards():
+def setup_get_cards_response():
     return [
         {
             "PK": f'OracleId#562d71b9-1646-474e-9293-55da6947a758',
@@ -79,6 +76,44 @@ def setup_cards():
         }
     ]
 
+
+def setup_saved_cards_response():
+    return [
+        {
+            "PK": "UserId#1",
+            "SK": "CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2#Card",
+            "PrintId": "67f4c93b-080c-4196-b095-6a120a221988",
+            "CardInstanceId": "6c538e3f-068d-44af-9117-ef3f653831d2",
+            "Condition": "MINT",
+            "DataType": "Card"
+        },
+        {
+            "PK": "UserId#1",
+            "SK": "CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2#Face#1",
+            "PrintId": "67f4c93b-080c-4196-b095-6a120a221988",
+            "CardInstanceId": "6c538e3f-068d-44af-9117-ef3f653831d2",
+            "Condition": "MINT",
+            "DataType": "Face"
+        },
+        {
+            "PK": "UserId#1",
+            "SK": "CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2#Face#2",
+            "PrintId": "67f4c93b-080c-4196-b095-6a120a221988",
+            "CardInstanceId": "6c538e3f-068d-44af-9117-ef3f653831d2",
+            "Condition": "MINT",
+            "DataType": "Face"
+        }
+    ]
+
+
+def get_mocked_ssm_parameter():
+    ssm_client = boto3.client('ssm')
+    stubber = Stubber(ssm_client)
+    expected_response = {'Parameter': {'Value': 'https://mockapi.example.com'}}
+    stubber.add_response('get_parameter', expected_response, {'Name': 'test-stage/MTGCardApi/url'})
+    stubber.activate()
+
+
 def setup_table():
     dynamodb = boto3.resource('dynamodb', 'us-east-1')
     table = dynamodb.create_table(
@@ -92,55 +127,96 @@ def setup_table():
 
     return table
 
+
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
-                         "DYNAMO_DB_CARD_TABLE_NAME": "test-collection-table"})
+                         "DYNAMO_DB_CARD_TABLE_NAME": "test-collection-table",
+                         "STAGE": "test-stage"})
 @mock_dynamodb
-def test_lambda_handler_successful(requests_mock):
-
+@patch('functions.add_card.app.uuid.uuid4')
+@patch('functions.add_card.app.boto3.client')
+def test_lambda_handler_successful(mock_boto3_client, mock_uuid, requests_mock):
     # Arrange
-    table = setup_table()
-    items = setup_cards()
-    get_card_response = {
-        "statusCode": 200,
-        "body": items
-    }
+    mocked_url = "https://mockapi.example.com"
+    mock_ssm = mock_boto3_client.return_value
+    mock_ssm.get_parameter.return_value = {'Parameter': {'Value': f'{mocked_url}'}}
 
+    mocked_uuid = "6c538e3f-068d-44af-9117-ef3f653831d2"
+    mock_uuid.return_value = mocked_uuid
+
+    table = setup_table()
+    items = setup_get_cards_response()
+    get_card_response = {
+        "status_code": 200,
+        "body": json.dumps(items)
+    }
     jwt_token = generate_jwt_token()
 
     event = {
         "headers": {
-            "Authorization": "Bearer {jwt_token}"
+            "Authorization": f"Bearer {jwt_token}"
         },
-        "body": {
+        "body": json.dumps({
             "oracle_id": "562d71b9-1646-474e-9293-55da6947a758",
             "print_id": "67f4c93b-080c-4196-b095-6a120a221988",
             "condition": "MINT"
-        }
+        })
     }
 
-    requests_mock.get("https://api.scryfall.com/bulk-data", json=get_card_response)
+    requests_mock.get(
+        f"{mocked_url}/api/cards/562d71b9-1646-474e-9293-55da6947a758/67f4c93b-080c-4196-b095-6a120a221988",
+        json=get_card_response)
 
-
-    import functions.get_card.app
-    importlib.reload(functions.get_card.app)
+    import functions.add_card.app
+    importlib.reload(functions.add_card.app)
 
     # Act
-    result = functions.get_card.app.lambda_handler(event, {})
+    result = functions.add_card.app.lambda_handler(event, {})
 
     # Assert
-    assert result['statusCode'] == 200
-    response_body = json.loads(result['body'])
-    returned_items = [item for item in response_body['Items']]
-    assert returned_items == items
+    card = table.query(
+        KeyConditionExpression=Key('PK').eq('UserId#test-user') & Key('SK').eq(
+            'CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2#Card')
+    )
+    face_1 = table.query(
+        KeyConditionExpression=Key('PK').eq('UserId#test-user') & Key('SK').eq(
+            'CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2#Face#1')
+    )
+    face_2 = table.query(
+        KeyConditionExpression=Key('PK').eq('UserId#test-user') & Key('SK').eq(
+            'CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2#Face#2')
+    )
+
+    logger.info(f'card: {face_1}')
+
+    assert result['status_code'] == 201
+    assert card['Items'][0]['PrintId'] == '67f4c93b-080c-4196-b095-6a120a221988'
+    assert card['Items'][0]['Condition'] == 'MINT'
+    assert card['Items'][0]['DataType'] == 'Card'
+    assert face_1['Items'][0]['PrintId'] == '67f4c93b-080c-4196-b095-6a120a221988'
+    assert face_1['Items'][0]['Condition'] == 'MINT'
+    assert face_1['Items'][0]['DataType'] == 'Face'
+    assert face_2['Items'][0]['PrintId'] == '67f4c93b-080c-4196-b095-6a120a221988'
+    assert face_2['Items'][0]['Condition'] == 'MINT'
+    assert face_2['Items'][0]['DataType'] == 'Face'
+
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
-                         "DYNAMO_DB_CARD_TABLE_NAME": "test-collection-table"})
+                         "DYNAMO_DB_CARD_TABLE_NAME": "test-collection-table",
+                         "STAGE": "test-stage"})
 @mock_dynamodb
-def test_lambda_handler_card_not_found():
-
+@patch('functions.add_card.app.uuid.uuid4')
+@patch('functions.add_card.app.boto3.client')
+def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid, requests_mock):
     # Arrange
+    mocked_url = "https://mockapi.example.com"
+    mock_ssm = mock_boto3_client.return_value
+    mock_ssm.get_parameter.return_value = {'Parameter': {'Value': f'{mocked_url}'}}
+
+    mocked_uuid = "6c538e3f-068d-44af-9117-ef3f653831d2"
+    mock_uuid.return_value = mocked_uuid
+
     table = setup_table()
 
     event = {

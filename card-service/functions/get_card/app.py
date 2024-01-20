@@ -34,7 +34,7 @@ def lambda_handler(event, context):
 
         if not response["Items"]:
             return {
-                "statusCode": 404,
+                "status_code": 404,
                 "body": json.dumps({
                     "error": "Card not found."
                 })
@@ -43,14 +43,14 @@ def lambda_handler(event, context):
     except ClientError as e:
         LOGGER.error(f"Error while fetching card: {e}")
         return {
-            "statusCode": 500,
-            "body": json.dumps(e.response)
+            "status_code": 500,
+            "body": "Server error while fetching card."
         }
 
 
     LOGGER.info(f'items to be returned: {response["Items"]}')
 
     return {
-        "statusCode": 200,
+        "status_code": 200,
         "body": json.dumps(response)
     }

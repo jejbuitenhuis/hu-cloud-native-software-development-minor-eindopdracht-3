@@ -129,3 +129,5 @@ def test_lambda_handler_card_not_found():
     response_body = json.loads(result['body'])
     assert response_body['error'] == 'Card does not exist.'
 
+
+# TODO: test de 500 response
