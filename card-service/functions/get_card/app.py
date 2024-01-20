@@ -36,7 +36,7 @@ def lambda_handler(event, context):
             return {
                 "statusCode": 404,
                 "body": json.dumps({
-                    "error": "Card does not exist."
+                    "error": "Card not found."
                 })
             }
 

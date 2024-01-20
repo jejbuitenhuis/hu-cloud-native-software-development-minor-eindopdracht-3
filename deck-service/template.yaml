@@ -72,18 +72,6 @@ Resources:
           KeyType: RANGE
       BillingMode: PAY_PER_REQUEST
 
-  PingFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: functions/Ping/
-      Events:
-        HelloWorld:
-          Type: Api
-          Properties:
-            RestApiId: !Ref "MTGDeckApi"
-            Path: /ping
-            Method: get
-
   CreateDeckFunction:
     Type: AWS::Serverless::Function
     Properties:

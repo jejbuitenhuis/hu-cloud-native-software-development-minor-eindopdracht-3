@@ -22,6 +22,47 @@
           "type": "aws_proxy"
         }
       }
+    },
+    "/cards/{oracle_id}/{print_id}": {
+      "get": {
+        "summary": "Get MTG Card by Oracle ID and Print ID",
+        "parameters": [
+          {
+            "name": "oracle_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Oracle ID of the card"
+          },
+          {
+            "name": "print_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Print ID of the card"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Card data goes here"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Card not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
     }
   }
 }
