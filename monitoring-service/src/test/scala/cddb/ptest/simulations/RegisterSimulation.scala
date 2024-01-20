@@ -13,7 +13,7 @@ class RegisterSimulation extends Simulation {
 
   val levelDuration = System.getProperty("levelDuration", "3").toInt seconds
   val rampDuration = System.getProperty("rampDuration", "2").toInt seconds
-  val userIncrease = System.getProperty("userIncrease", "1").toDouble
+  val userIncrease = System.getProperty("userIncrease", "3").toDouble
   val levels = System.getProperty("levels", "3").toInt
   val startingRate = System.getProperty("startingRate", "0").toDouble
 

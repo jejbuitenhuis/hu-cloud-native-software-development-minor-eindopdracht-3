@@ -11,7 +11,7 @@ object Scenarios {
 
   private val credentialsFeeder = Iterator.continually({
     val randomString = Random.alphanumeric.take(8).mkString
-      Map("password" -> randomString, "email" -> (s"$randomString@performance-test.com"))
+      Map("password" -> randomString, "email" -> (s"p-test@$randomString.com"))
   })
 
   val registerScenario = scenario("Register user")
