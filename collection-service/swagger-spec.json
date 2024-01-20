@@ -5,15 +5,32 @@
     "version": "1.0"
   },
   "paths": {
-    "/search": {
+    "api/search": {
       "get": {
-        "parameters" : [],
+        "parameters" : [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses" : {
           "200": {
-            "description": "OK"
+            "description": "Succefull response"
+          
           },
           "404": {
             "description": "Not Found"
+          },
+          "406": {
+            "description": "JWT token not provided"
           }
         },
         "x-amazon-apigateway-integration" : {
