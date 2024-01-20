@@ -28,8 +28,22 @@ class TestCreateDeck(unittest.TestCase):
 
         return token
 
+    def insert_test_incident(self, deck_id: str, deck_name: str, user_id: str = None):
+        if user_id is None:
+            user_id = self.user_id
+
+        self.dynamodb_table.put_item(Item={
+            "PK": f"USER#{user_id}",
+            "SK": f"DECK#{deck_id}",
+
+            "data_type": "DECK",
+            "user_id": user_id,
+            "deck_id": deck_id,
+            "deck_name": deck_name,
+        })
+
     def get_sut(self):
-        from functions.CreateDeck import app
+        from functions.GetDecksFromUser import app
 
         return app
 
@@ -84,43 +98,12 @@ class TestCreateDeck(unittest.TestCase):
 
         self.sut = self.get_sut()
 
-    def test_deck_is_created(self):
-        expected_deck_name = "Test deck"
+    def test_all_created_decks_are_returned_correctly(self):
+        deck_id = "deck-id"
+        deck_name = "deck-name"
 
-        mock_event = {
-            "body": json.dumps({
-                "name": expected_deck_name,
-            }),
-            "headers": {
-                "Authorization": f"Bearer {self.jwt_token}",
-            },
-        }
-        mock_context = {}
+        self.insert_test_incident(deck_id, deck_name)
 
-        result = self.sut.lambda_handler(mock_event, mock_context)
-
-        assert result["statusCode"] == 201
-        assert "body" in result
-
-        body = json.loads(result["body"])
-
-        assert "id" in body
-        assert body["id"] != None
-        assert body["name"] == expected_deck_name
-
-        db_items = self.dynamodb_table.query(
-            KeyConditionExpression=Key("PK").eq(f"USER#{self.user_id}") & Key("SK").begins_with("DECK#"),
-        )["Items"]
-
-        assert len(db_items) == 1
-        assert db_items[0]["PK"] == f"USER#{self.user_id}"
-        assert db_items[0]["SK"] == f"DECK#{body['id']}"
-        assert db_items[0]["data_type"] == "DECK"
-        assert db_items[0]["user_id"] == self.user_id
-        assert db_items[0]["deck_id"] == body["id"]
-        assert db_items[0]["deck_name"] == expected_deck_name
-
-    def test_invalid_request_is_returned_when_no_body_is_specified(self):
         mock_event = {
             "headers": {
                 "Authorization": f"Bearer {self.jwt_token}",
@@ -130,17 +113,24 @@ class TestCreateDeck(unittest.TestCase):
 
         result = self.sut.lambda_handler(mock_event, mock_context)
 
-        assert result["statusCode"] == 400
+        assert result["statusCode"] == 200
         assert "body" in result
+        assert result["body"] is not None
 
-        body = json.loads(result["body"])
+        body = json.loads( result["body"] )
 
-        assert "message" in body
-        assert body["message"] == "Missing 'name'"
+        assert len(body) == 1
+        assert body[0]["id"] == deck_id
+        assert body[0]["name"] == deck_name
 
-    def test_invalid_request_is_returned_when_no_name_is_specified(self):
+    def test_no_decks_are_returned_if_the_user_does_not_have_decks(self):
+        deck_id = "deck-id"
+        deck_name = "deck-name"
+        other_user_id = "other-user"
+
+        self.insert_test_incident(deck_id, deck_name, user_id=other_user_id)
+
         mock_event = {
-            "body": json.dumps({}),
             "headers": {
                 "Authorization": f"Bearer {self.jwt_token}",
             },
@@ -149,10 +139,10 @@ class TestCreateDeck(unittest.TestCase):
 
         result = self.sut.lambda_handler(mock_event, mock_context)
 
-        assert result["statusCode"] == 400
+        assert result["statusCode"] == 200
         assert "body" in result
+        assert result["body"] is not None
 
-        body = json.loads(result["body"])
+        body = json.loads( result["body"] )
 
-        assert "message" in body
-        assert body["message"] == "Missing 'name'"
+        assert len(body) == 0
