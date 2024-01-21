@@ -59,6 +59,7 @@ jobs:
         if: ${{ inputs.service-name }} == 'monitoring-service' && ${{ inputs.environment }} == 'dev-env-maikel'
         run: |
           sudo apt-get install maven
+          mvn clean install -U          
           mvn gatling:test -DStage=${{ inputs.environment }} -Dsimulation=RegisterSimulation
 
       - name: Upload test results
