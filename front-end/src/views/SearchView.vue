@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import {ref, inject} from 'vue';
-import type {Ref} from "vue";
+import {ref} from 'vue';
 import SearchCard from '../components/SearchCard.vue';
 
-const scryfallAPI = inject<Ref<string>>('ScryfallAPI');
 const searchQuery = ref('');
 const cards = ref([]);
 const errorText = ref("");
@@ -47,10 +45,7 @@ async function findCards() {
   cards.value = [];
   errorText.value = "";
 
-  let apiUrl: string = scryfallAPI!.value + "/cards/search?";
-  const query = "q=" + searchQuery.value;
-  apiUrl = apiUrl + query;
-
+  const apiUrl: string = `https://api.scryfall.com/cards/search?q=${searchQuery.value}`;
   const response = await requestCards(apiUrl);
   cards.value = response.data;
 }

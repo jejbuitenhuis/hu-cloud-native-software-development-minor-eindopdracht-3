@@ -15,10 +15,4 @@ let app = createApp(App)
 			
 app.use(createPinia());
 app.use(router);
-
-// Global variables
-const scryfallAPI = ref("https://api.scryfall.com");	
-app.provide('ScryfallAPI', scryfallAPI)
-
-				
 app.mount("#app");

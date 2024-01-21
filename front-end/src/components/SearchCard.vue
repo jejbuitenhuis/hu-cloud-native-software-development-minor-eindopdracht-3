@@ -5,9 +5,7 @@ const cardName = ref("");
 const cardOracle = ref("");
 const cardImageLink = ref("");
 
-const {cardObject} = defineProps({
-  cardObject: Object
-})
+const {cardObject} = defineProps<{cardObject: any}>()
 
 cardName.value = cardObject.name
 cardOracle.value = cardObject.oracle_id;
@@ -20,7 +18,7 @@ if (cardObject.hasOwnProperty('image_uris')) {
 
 <template>
   <article class="cardItem">
-    <RouterLink :to="`/cards/${cardOracle}`">
+    <RouterLink :to="`/oracles/${cardOracle}`">
       <span>{{ cardName }}</span>
       <div>
         <img class="image" :src="cardImageLink" :alt="cardName">
