@@ -61,16 +61,12 @@ jobs:
           sudo apt-get install maven
           mvn gatling:test -DStage=${{ inputs.environment }} -Dsimulation=RegisterSimulation
 
-          - name: Upload test results
-          if: ${{ inputs.service-name == 'monitoring-service' && inputs.environment == 'dev-env-maikel' }}
-          run: |
-            pwd
-            date
-            ls -la target/gatling
-          uses: actions/upload-artifact@v2
-          with:
-            name: gatling-results
-            path: target/gatling/**
+      - name: Upload test results
+        if: ${{ inputs.service-name == 'monitoring-service' && inputs.environment == 'dev-env-maikel' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: gatling-results
+          path: ./${{inputs.service-name}}/target/gatling/**
 
       # TODO change Run performance tests to only run on staging when merging to master
       # - name: Run performance tests
