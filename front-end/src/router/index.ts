@@ -38,6 +38,16 @@ const router = createRouter({
 			name: "collection",
 			component: () => import(/* webpackChunkName: "login" */ "../views/CollectionView.vue"),
 		},
+        {
+			path: "/search",
+			name: "search",
+			component: () => import(/* webpackChunkName: "login" */ "../views/SearchView.vue"),
+		},
+		{
+			path: "/cards/:cardName",
+			name: "cards",
+			component: () => import(/* webpackChunkName: "login" */ "../views/CardDetailView.vue"),
+		},
 		{
 			path: "/:pathMatch(.*)*",
 			name: "not-found",
