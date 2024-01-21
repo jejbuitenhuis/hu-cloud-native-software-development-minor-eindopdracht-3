@@ -54,3 +54,11 @@ jobs:
           --parameter-overrides Stage=${{ inputs.environment }} 
           --stack-name '${{inputs.service-name}}-${{inputs.environment}}' 
           --s3-prefix '${{inputs.service-name}}-${{inputs.environment}}'
+
+      - name: Run performance tests
+        if: ${{ inputs.service-name }} == 'monitoring-service' && ${{ inputs.environment }} != 'production'
+        run: mvn gatling:test -DStage=${{ inputs.environment }} -Dsimulation=RegisterSimulation
+
+      # - name: Run performance tests
+      #   if: ${{ inputs.service-name }} == 'monitoring-service' && ${{ inputs.environment }} == 'staging'
+      #   run: mvn gatling:test -DStage=staging -Dsimulation=RegisterSimulation
