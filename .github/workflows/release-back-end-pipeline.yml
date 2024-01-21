@@ -63,12 +63,9 @@ jobs:
 
       - name: Upload test results
         if: ${{ inputs.service-name == 'monitoring-service' && inputs.environment == 'dev-env-maikel' }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: gatling-results
           path: ./${{inputs.service-name}}/target/gatling/**
 
       # TODO change Run performance tests to only run on staging when merging to master
-      # - name: Run performance tests
-      #   if: ${{ inputs.service-name }} == 'monitoring-service' && ${{ inputs.environment }} == 'staging'
-      #   run: mvn gatling:test -DStage=staging -Dsimulation=RegisterSimulation
