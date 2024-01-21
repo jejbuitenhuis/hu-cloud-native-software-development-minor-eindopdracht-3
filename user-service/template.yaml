@@ -57,18 +57,6 @@ Resources:
       Type: String
       Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
 
-  PingFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: functions/Ping/
-      Events:
-        HelloWorld:
-          Type: Api
-          Properties:
-            RestApiId: !Ref "MTGUserApi"
-            Path: /ping
-            Method: get
-
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -89,6 +77,13 @@ Resources:
         EmailSendingAccount: DEVELOPER
         SourceArn: arn:aws:ses:us-east-1:861259332787:identity/dragons.cloud-native-minor.it
         From: !If [IsProductionStage, "verify@dragons.cloud-native-minor.it", !Sub "verify-${Stage}@dragons.cloud-native-minor.it"]
+
+  UserPoolIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/Cognito/userPoolId
+      Type: String
+      Value: !Ref UserPool
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
