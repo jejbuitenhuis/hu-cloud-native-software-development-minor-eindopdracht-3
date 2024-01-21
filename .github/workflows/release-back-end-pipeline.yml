@@ -56,14 +56,13 @@ jobs:
           --s3-prefix '${{inputs.service-name}}-${{inputs.environment}}'
 
       - name: Run performance tests on ${{ inputs.environment }}
-        if: ${{ inputs.service-name }} == 'monitoring-service' && ${{ inputs.environment }} == 'dev-env-maikel'
+        if: ${{ inputs.service-name == 'monitoring-service' && inputs.environment == 'dev-env-maikel' }}
         run: |
           sudo apt-get install maven
-          mvn clean install -U          
           mvn gatling:test -DStage=${{ inputs.environment }} -Dsimulation=RegisterSimulation
 
       - name: Upload test results
-        if: ${{ inputs.service-name }} == 'monitoring-service' && ${{ inputs.environment }} == 'dev-env-maikel'
+        if: ${{ inputs.service-name == 'monitoring-service' && inputs.environment == 'dev-env-maikel' }}        uses: actions/upload-artifact@v2
         uses: actions/upload-artifact@v2
         with:
           name: gatling-results
