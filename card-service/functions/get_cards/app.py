@@ -15,6 +15,14 @@ table = dynamodb.Table(environ['DYNAMODB_TABLE_NAME'])
 
 
 def lambda_handler(event, context):
+    if "queryStringParameters" not in event or "oracle_id" not in event["queryStringParameters"]:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({
+                "message": "Missing oracle_id path parameter"
+            })
+        }
+
     oracleId = event["queryStringParameters"]["oracle_id"]
     response = table.query(
         KeyConditionExpression=Key('PK').eq(f"OracleId#{oracleId}"),
