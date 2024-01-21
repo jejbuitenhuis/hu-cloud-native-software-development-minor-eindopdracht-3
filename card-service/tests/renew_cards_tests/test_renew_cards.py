@@ -10,6 +10,15 @@ import requests_mock
 from boto3.dynamodb.conditions import Key, Attr
 from moto import mock_dynamodb
 
+@pytest.fixture(scope="function")
+def aws_credentials():
+    """Mocked AWS Credentials for moto."""
+    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
+    os.environ["AWS_SECURITY_TOKEN"] = "testing"
+    os.environ["AWS_SESSION_TOKEN"] = "testing"
+    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+
 
 def setup_table():
     dynamodb = boto3.resource('dynamodb', 'us-east-1')
@@ -32,7 +41,7 @@ def setup_table():
                          "CARDS_UPDATE_FREQUENCY" : "7",
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/single_faced_cards.json"})
 @mock_dynamodb
-def test_renew_cards_writes_correct_data_single_face(requests_mock):
+def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credentials):
     # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()
@@ -103,7 +112,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
                          "CARDS_UPDATE_FREQUENCY" : "7",
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/two_faced_cards.json"})
 @mock_dynamodb
-def test_renew_cards_two_faced(requests_mock):
+def test_renew_cards_two_faced(requests_mock, aws_credentials):
     # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()
@@ -190,7 +199,7 @@ def test_renew_cards_two_faced(requests_mock):
                          "CARDS_UPDATE_FREQUENCY" : "7",
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/ten_cards.json"})
 @mock_dynamodb
-def test_renew_cards_ten_cards(requests_mock):
+def test_renew_cards_ten_cards(requests_mock, aws_credentials):
     # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()
@@ -231,7 +240,7 @@ def test_renew_cards_ten_cards(requests_mock):
                          "CARDS_UPDATE_FREQUENCY" : "7",
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/thirty_cards.json"})
 @mock_dynamodb
-def test_renew_cards_thirty_cards(requests_mock):
+def test_renew_cards_thirty_cards(requests_mock, aws_credentials):
     # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()
@@ -271,7 +280,7 @@ def test_renew_cards_thirty_cards(requests_mock):
                          "CARDS_UPDATE_FREQUENCY" : "7",
                          "CARD_JSON_LOCATION": "tests/renew_cards_tests/correct_ttl.json"})
 @mock_dynamodb
-def test_renew_cards_has_correct_ttl(requests_mock):
+def test_renew_cards_has_correct_ttl(requests_mock, aws_credentials):
     # Arrange
     with patch('boto3.client') as mock_client:
         table = setup_table()

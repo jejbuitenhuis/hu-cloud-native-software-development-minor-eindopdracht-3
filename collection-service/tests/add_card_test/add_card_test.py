@@ -15,6 +15,15 @@ import logging
 logger = logging.getLogger()
 logger.setLevel("INFO")
 
+@pytest.fixture(scope="function")
+def aws_credentials():
+    """Mocked AWS Credentials for moto."""
+    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
+    os.environ["AWS_SECURITY_TOKEN"] = "testing"
+    os.environ["AWS_SESSION_TOKEN"] = "testing"
+    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
+
 
 def generate_jwt_token(user_id: str = "test-user", secret_key: str = "secret", algorithm: str = "HS256",
                        claims: dict = {}) -> str:
@@ -106,14 +115,6 @@ def setup_saved_cards_response():
     ]
 
 
-def get_mocked_ssm_parameter():
-    ssm_client = boto3.client('ssm')
-    stubber = Stubber(ssm_client)
-    expected_response = {'Parameter': {'Value': 'https://mockapi.example.com'}}
-    stubber.add_response('get_parameter', expected_response, {'Name': 'test-stage/MTGCardApi/url'})
-    stubber.activate()
-
-
 def setup_table():
     dynamodb = boto3.resource('dynamodb', 'us-east-1')
     table = dynamodb.create_table(
@@ -135,7 +136,7 @@ def setup_table():
 @mock_dynamodb
 @patch('functions.add_card.app.uuid.uuid4')
 @patch('functions.add_card.app.boto3.client')
-def test_lambda_handler_successful(mock_boto3_client, mock_uuid, requests_mock):
+def test_lambda_handler_successful(mock_boto3_client, mock_uuid, requests_mock, aws_credentials):
     # Arrange
     mocked_url = "https://mockapi.example.com"
     mock_ssm = mock_boto3_client.return_value
@@ -208,7 +209,7 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, requests_mock):
 @mock_dynamodb
 @patch('functions.add_card.app.uuid.uuid4')
 @patch('functions.add_card.app.boto3.client')
-def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid, requests_mock):
+def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid,requests_mock, aws_credentials):
     # Arrange
     mocked_url = "https://mockapi.example.com"
     mock_ssm = mock_boto3_client.return_value
@@ -217,21 +218,38 @@ def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid, requests_mo
     mocked_uuid = "6c538e3f-068d-44af-9117-ef3f653831d2"
     mock_uuid.return_value = mocked_uuid
 
-    table = setup_table()
-
-    event = {
-        "oracle_id": "wrong_id",
-        "print_id": "wrong_id"
+    get_card_response = {
+        "status_code": 404,
+        "body": json.dumps({
+            "error": "Card not found."
+        })
     }
 
-    import functions.get_card.app
-    importlib.reload(functions.get_card.app)
+    jwt_token = generate_jwt_token()
+
+    event = {
+        "headers": {
+            "Authorization": f"Bearer {jwt_token}"
+        },
+        "body": json.dumps({
+            "oracle_id": "wrong-id",
+            "print_id": "wrong-id",
+            "condition": "MINT"
+        })
+    }
+
+    requests_mock.get(
+    f"{mocked_url}/api/cards/wrong-id/wrong-id",
+    json=get_card_response)
+
+    import functions.add_card.app
+    importlib.reload(functions.add_card.app)
 
     # Act
-    result = functions.get_card.app.lambda_handler(event, {})
+    result = functions.add_card.app.lambda_handler(event, {})
+    response_body = json.loads(result['body'])
 
     # Assert
-    assert result['statusCode'] == 404
-    response_body = json.loads(result['body'])
-    assert response_body['error'] == 'Card does not exist.'
+    assert result['status_code'] == 404
+    assert response_body['error'] == 'Card not found.'
 
