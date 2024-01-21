@@ -33,20 +33,46 @@ def fetch_api_url():
 def parse_card_item(item, user_id, condition):
     card_instance_id = str(uuid.uuid4())
     parts = item["SK"].split("#")
+    face_type = parts[-1]
     item_type = '#'.join(parts[2:])
 
-    card_instance = {
+    if (item['DataType'] == 'Card'):
+        return {
+        "PK": f'UserId#{user_id}',
+        "SK": f'CardInstanceId#{card_instance_id}#{item_type}',
+        "PrintId": item["PrintId"],
+        "CardInstanceId": card_instance_id,
+        "Condition": condition,
+        "DeckId": "",
+        "OracleName": item['OracleName'],
+        "SetName": item['SetName'],
+        "ReleasedAt": item['ReleasedAt'],
+        "Rarity": item['Rarity'],
+        "Price": item['Price'],
+        "OracleId": item['OracleId'],
+        "PrintId": item['PrintId'],
+        "DataType": "Card",
+        "GSI1SK": ""
+    }
+    else:
+        return {
         "PK": f'UserId#{user_id}',
         "SK": f'CardInstanceId#{card_instance_id}#{item_type}',
         "PrintId": item.get("PrintId", ""),
         "CardInstanceId": card_instance_id,
         "Condition": condition,
-        "DataType": item.get("DataType", "")
+        "DeckId": "",
+        "OracleText": item['OracleText'],
+        "ManaCost": item['ManaCost'],
+        "TypeLine": item['TypeLine'],
+        "FaceName": item['FaceName'],
+        "FlavorText": item['FlavorText'],
+        "ImageUrl": item['ImageUrl'],
+        "Colors": item['Colors'],
+        "FaceType": face_type,
+        "DataType": "Face",
+        "GSI1SK": "",
     }
-
-    LOGGER.error(f"Card instance: {card_instance}")
-
-    return card_instance
 
 
 def save_card_to_db(items, user_id, condition):

@@ -2,7 +2,7 @@
 pytest
 coverage
 moto
-python-jose
+jose
 
 # Function requirements
 boto3

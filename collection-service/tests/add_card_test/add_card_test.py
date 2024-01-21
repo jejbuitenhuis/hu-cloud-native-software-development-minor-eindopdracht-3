@@ -194,12 +194,16 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, requests_mock, 
     assert card['Items'][0]['PrintId'] == '67f4c93b-080c-4196-b095-6a120a221988'
     assert card['Items'][0]['Condition'] == 'MINT'
     assert card['Items'][0]['DataType'] == 'Card'
+
     assert face_1['Items'][0]['PrintId'] == '67f4c93b-080c-4196-b095-6a120a221988'
     assert face_1['Items'][0]['Condition'] == 'MINT'
     assert face_1['Items'][0]['DataType'] == 'Face'
+    assert face_1['Items'][0]['FaceType'] == "1"
+
     assert face_2['Items'][0]['PrintId'] == '67f4c93b-080c-4196-b095-6a120a221988'
     assert face_2['Items'][0]['Condition'] == 'MINT'
     assert face_2['Items'][0]['DataType'] == 'Face'
+    assert face_2['Items'][0]['FaceType'] == "2"
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
