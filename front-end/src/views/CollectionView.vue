@@ -1,28 +1,10 @@
 <script setup lang="ts">
 import "@shoelace-style/shoelace/dist/components/card/card";
 import {ref} from "vue";
+import type {CombinedPrint, PrintCard, PrintFace, PrintPart} from "@/models/cardModels";
 
-type CardInstanceCard = {
-  DataType: "Card",
-  CardInstanceId: string,
-  PrintId: string,
-  DeckId: string | undefined,
-}
-type CardInstanceFace = {
-  DataType: "Face",
-  FaceType: "Front" | "Back",
-  CardInstanceId: string,
-  PrintId: string,
-  DeckId: string | undefined,
-  ImageLink: string,
-}
-type CardInstance = CardInstanceCard | CardInstanceFace;
-type CombinedCardInstance = CardInstanceCard & {
-  FrontFace: CardInstanceFace,
-  BackFace: CardInstanceFace | undefined,
-}
 type Collection = {
-  [key: string]: CombinedCardInstance[],
+  [key: string]: CombinedPrint[],
 }
 
 const collection = ref<Collection>({});
@@ -36,26 +18,22 @@ async function getCollection() {
     console.error(`Failed collections fetch. Status: ${response.status}`)
     return;
   }
-  const data = await response.json() as CardInstance[];
+  const data = await response.json() as PrintPart[];
   const newCollection: Collection = {};
-  const instanceCards = data.filter(v => v.DataType == "Card") as CardInstanceCard[];
-  const instanceFaces = data.filter(v => v.DataType == "Face") as CardInstanceFace[];
+  const instanceCards = data.filter(v => v.DataType == "Card") as PrintCard[];
+  const instanceFaces = data.filter(v => v.DataType == "Face") as PrintFace[];
 
   for (const instanceCard of instanceCards) {
-    const frontFace = instanceFaces.find(v => v.FaceType === "Front" && v.CardInstanceId === instanceCard.CardInstanceId) as CardInstanceFace;
-    const backFace = instanceFaces.find(v => v.FaceType === "Back" && v.CardInstanceId === instanceCard.CardInstanceId);
-
-    const newInstance: CombinedCardInstance = {
+    const newInstance: CombinedPrint = {
       ...instanceCard,
-      FrontFace: frontFace,
-      BackFace: backFace,
+      Faces: instanceFaces.filter(v => v.GSI1PK === instanceCard.GSI1SK)
     }
 
-    if (instanceCard.PrintId in newCollection) {
-      newCollection[instanceCard.PrintId].push(newInstance)
+    if (instanceCard.PK in newCollection) {
+      newCollection[instanceCard.PK].push(newInstance)
       continue;
     }
-    newCollection[instanceCard.PrintId] = [newInstance]
+    newCollection[instanceCard.PK] = [newInstance]
   }
   collection.value = newCollection;
   collectionLoading.value = false;
@@ -74,9 +52,8 @@ getCollection();
     </p>
 
     <section class="cards-container">
-      <!--TODO: Replace with card component-->
       <sl-card v-for="(card, _) in collection" class="card">
-        <img slot="image" :src="card[0]['FrontFace']['ImageLink']" alt="MTG - Card face">
+        <img slot="image" :src="card[0].Faces[0].ImageUrl" alt="MTG - Card face">
         <div>Instances: {{card.length}}</div>
       </sl-card>
     </section>
