@@ -1,13 +1,11 @@
 import os
 import time
-import traceback
 from os import environ
 from aws_xray_sdk.core import patch_all
 import boto3
 import logging
 import requests
 import ijson
-import json
 
 if 'DISABLE_XRAY' not in environ:
     patch_all()
@@ -31,6 +29,8 @@ def turnCardIntoFaceItem(card, oracle_id, scryfall_id, face_count=1, ):
     return {
         "PK": f'OracleId#{oracle_id}',
         "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
+        "GSI1PK": f'PrintId#{scryfall_id}',
+        "GSI1SK": f'Face#{face_count}',
         "OracleText": card.get('oracle_text', ''),
         "ManaCost": card.get('mana_cost', ''),
         "TypeLine": card.get('type_line', ''),
@@ -45,6 +45,8 @@ def turnFaceIntoFaceItem(face, oracle_id, scryfall_id, face_count=1):
     return {
         "PK": f'OracleId#{oracle_id}',
         "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
+        "GSI1PK": f'PrintId#{scryfall_id}',
+        "GSI1SK": f'Face#{face_count}',
         "OracleText": face.get('oracle_text', ''),
         "ManaCost": face.get('mana_cost', ''),
         "TypeLine": face.get('type_line', ''),
@@ -67,6 +69,8 @@ def createCardInfo(card, oracle_id):
         return {
             "PK": f'OracleId#{oracle_id}',
             "SK": f'PrintId#{card["id"]}#Card',
+            "GSI1PK": f'PrintId#{card["id"]}',
+            "GSI1SK": f'Card',
             "OracleName": card['name'],
             "SetName": card['set_name'],
             "ReleasedAt": card['released_at'],

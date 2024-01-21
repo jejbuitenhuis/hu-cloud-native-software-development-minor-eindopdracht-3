@@ -3,10 +3,7 @@ import json
 import time
 from unittest.mock import patch, MagicMock
 import os
-import pytest
 import boto3
-import requests
-import requests_mock
 from boto3.dynamodb.conditions import Key, Attr
 from moto import mock_dynamodb
 
@@ -30,10 +27,10 @@ def setup_table():
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
-                         "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/single_faced_cards.json"})
+                         "CARDS_UPDATE_FREQUENCY": "7",
+                         "CARD_JSON_LOCATION": "tests/integration/single_faced_cards.json"})
 @mock_dynamodb
-def test_renew_cards_writes_correct_data_single_face(requests_mock):
+def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credentials):
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -44,7 +41,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open(r'tests/renew_cards_tests/json_test_files/10_cards.json', 'r', encoding='utf-8') as file:
+        with open(r'tests/integration/json_test_files/10_cards.json', 'r', encoding='utf-8') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -90,7 +87,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
         assert single_face_card_face_info['Items'][0]['Colors'] == ["R"]
         assert single_face_card_face_info['Items'][0]['DataType'] == "Face"
 
-        os.remove('tests/renew_cards_tests/single_faced_cards.json')
+        os.remove('tests/integration/single_faced_cards.json')
 
 
 
@@ -98,9 +95,9 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock):
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/two_faced_cards.json"})
+                         "CARD_JSON_LOCATION": "tests/integration/two_faced_cards.json"})
 @mock_dynamodb
-def test_renew_cards_two_faced(requests_mock):
+def test_renew_cards_two_faced(requests_mock, aws_credentials):
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -111,7 +108,7 @@ def test_renew_cards_two_faced(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('tests/renew_cards_tests/json_test_files/double_faced_card_list.json', 'r', encoding='utf-8') as file:
+        with open('tests/integration/json_test_files/double_faced_card_list.json', 'r', encoding='utf-8') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -143,6 +140,8 @@ def test_renew_cards_two_faced(requests_mock):
         assert len(double_face_card_info['Items']) == 1
         assert double_face_card_info['Items'][0]['PK'] == "OracleId#562d71b9-1646-474e-9293-55da6947a758"
         assert double_face_card_info['Items'][0]['SK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card"
+        assert double_face_card_info['Items'][0]['GSI1PK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988"
+        assert double_face_card_info['Items'][0]['GSI1SK'] == "Card"
         assert double_face_card_info['Items'][0]['OracleName'] == "Agadeem's Awakening // Agadeem, the Undercrypt"
         assert double_face_card_info['Items'][0]['SetName'] == "Zendikar Rising"
         assert double_face_card_info['Items'][0]['ReleasedAt'] == "2020-09-25"
@@ -153,6 +152,8 @@ def test_renew_cards_two_faced(requests_mock):
         assert len(double_face_card_face_1_info['Items']) == 1
         assert double_face_card_face_1_info['Items'][0]['PK'] == "OracleId#562d71b9-1646-474e-9293-55da6947a758"
         assert double_face_card_face_1_info['Items'][0]['SK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#1"
+        assert double_face_card_face_1_info['Items'][0]['GSI1PK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988"
+        assert double_face_card_face_1_info['Items'][0]['GSI1SK'] == "Face#1"
         assert double_face_card_face_1_info['Items'][0]['OracleText'] == "Return from your graveyard to the battlefield any number of target creature cards that each have a different mana value X or less."
         assert double_face_card_face_1_info['Items'][0]['ManaCost'] == "{X}{B}{B}{B}"
         assert double_face_card_face_1_info['Items'][0]['TypeLine'] == "Sorcery"
@@ -165,6 +166,8 @@ def test_renew_cards_two_faced(requests_mock):
         assert len(double_face_card_face_2_info['Items']) == 1
         assert double_face_card_face_2_info['Items'][0]['PK'] == "OracleId#562d71b9-1646-474e-9293-55da6947a758"
         assert double_face_card_face_2_info['Items'][0]['SK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Face#2"
+        assert double_face_card_face_2_info['Items'][0]['GSI1PK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988"
+        assert double_face_card_face_2_info['Items'][0]['GSI1SK'] == "Face#2"
         assert double_face_card_face_2_info['Items'][0]['OracleText'] == "As Agadeem, the Undercrypt enters the battlefield, you may pay 3 life. If you don't, it enters the battlefield tapped.\n{T}: Add {B}."
         assert double_face_card_face_2_info['Items'][0]['ManaCost'] == ""
         assert double_face_card_face_2_info['Items'][0]['TypeLine'] == "Land"
@@ -174,16 +177,16 @@ def test_renew_cards_two_faced(requests_mock):
         assert double_face_card_face_2_info['Items'][0]['Colors'] == []
         assert double_face_card_face_2_info['Items'][0]['DataType'] == "Face"
 
-        os.remove('tests/renew_cards_tests/two_faced_cards.json')
+        os.remove('tests/integration/two_faced_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/ten_cards.json"})
+                         "CARD_JSON_LOCATION": "tests/integration/ten_cards.json"})
 @mock_dynamodb
-def test_renew_cards_ten_cards(requests_mock):
+def test_renew_cards_ten_cards(requests_mock, aws_credentials):
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -194,7 +197,7 @@ def test_renew_cards_ten_cards(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('tests/renew_cards_tests/json_test_files/10_cards.json', 'r') as file:
+        with open('tests/integration/json_test_files/10_cards.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -213,16 +216,16 @@ def test_renew_cards_ten_cards(requests_mock):
         assert requests_mock.called
         assert requests_mock.call_count == 2
         assert len(cards['Items']) == 10
-        os.remove('tests/renew_cards_tests/ten_cards.json')
+        os.remove('tests/integration/ten_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/thirty_cards.json"})
+                         "CARD_JSON_LOCATION": "tests/integration/thirty_cards.json"})
 @mock_dynamodb
-def test_renew_cards_thirty_cards(requests_mock):
+def test_renew_cards_thirty_cards(requests_mock, aws_credentials):
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -233,7 +236,7 @@ def test_renew_cards_thirty_cards(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('tests/renew_cards_tests/json_test_files/30_cards.json', 'r') as file:
+        with open('tests/integration/json_test_files/30_cards.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -251,16 +254,16 @@ def test_renew_cards_thirty_cards(requests_mock):
         assert len(cards['Items']) == 30
         assert requests_mock.called
         assert requests_mock.call_count == 2
-        os.remove('tests/renew_cards_tests/thirty_cards.json')
+        os.remove('tests/integration/thirty_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/correct_ttl.json"})
+                         "CARD_JSON_LOCATION": "tests/integration/correct_ttl.json"})
 @mock_dynamodb
-def test_renew_cards_has_correct_ttl(requests_mock):
+def test_renew_cards_has_correct_ttl(requests_mock, aws_credentials):
     with patch('boto3.client') as mock_client:
         table = setup_table()
         mock_event_bridge = MagicMock()
@@ -271,7 +274,7 @@ def test_renew_cards_has_correct_ttl(requests_mock):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('tests/renew_cards_tests/json_test_files/single_face_card_list.json', 'r') as file:
+        with open('tests/integration/json_test_files/single_face_card_list.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -296,4 +299,4 @@ def test_renew_cards_has_correct_ttl(requests_mock):
             print(item['RemoveAt'])
             assert item['RemoveAt'] > int(time.time()) + CARDS_UPDATE_FREQUENCY
             assert item['RemoveAt'] <= int(time.time()) + 2 * CARDS_UPDATE_FREQUENCY
-        os.remove('tests/renew_cards_tests/correct_ttl.json')
+        os.remove('tests/integration/correct_ttl.json')
