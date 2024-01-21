@@ -72,6 +72,10 @@ Resources:
           AttributeType: S
         - AttributeName: SK
           AttributeType: S
+        - AttributeName: GSI1PK
+          AttributeType: S
+        - AttributeName: GSI1SK
+          AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
@@ -80,6 +84,15 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: RemoveAt
         Enabled: true
+      GlobalSecondaryIndexes:
+        - IndexName: Card-Id-GSI
+          KeySchema:
+            - AttributeName: GSI1PK
+              KeyType: HASH
+            - AttributeName: GSI1SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
       TableName: !Sub "${Stage}-mtg-card-db"
 
@@ -95,16 +108,38 @@ Resources:
       Policies:
         - AmazonDynamoDBFullAccess
 
-  PingFunction:
+  GetCardsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/Ping/
+      CodeUri: functions/get_cards/
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
       Events:
-        HelloWorld:
+        ApiRequest:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCardApi"
-            Path: /ping
+            Path: /api/cards
+            Method: get
+
+  GetCardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/get_card/
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+      Events:
+        ApiRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCardApi"
+            Path: /api/cards/{card_id}
             Method: get
 
   SchedulerRole:

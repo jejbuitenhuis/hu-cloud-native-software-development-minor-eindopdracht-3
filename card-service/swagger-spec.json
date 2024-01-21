@@ -5,9 +5,16 @@
     "version": "1.0"
   },
   "paths": {
-    "/ping": {
+    "/api/cards": {
       "get": {
-        "parameters": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "oracle_id",
+            "type": "string",
+            "required": false
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -16,7 +23,32 @@
         "x-amazon-apigateway-integration": {
           "httpMethod": "POST",
           "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PingFunction.Arn}/invocations"
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCardsFunction.Arn}/invocations"
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/api/cards/{card_id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_id",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCardFunction.Arn}/invocations"
           },
           "passthroughBehavior": "when_no_match",
           "type": "aws_proxy"
