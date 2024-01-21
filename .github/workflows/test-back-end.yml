@@ -15,7 +15,7 @@ on:
         required: false
     secrets:
       SONAR_QUBE_TOKEN:
-        required: true
+        required: false
 
 jobs:
   test-backend:
