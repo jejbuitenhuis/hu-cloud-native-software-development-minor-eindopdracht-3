@@ -87,7 +87,7 @@ Resources:
     Properties:
       CodeUri: functions/get_collection/
       Events:
-        HelloWorld:
+        GetCollection:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCollectionApi"
@@ -104,7 +104,7 @@ Resources:
     Properties:
       CodeUri: functions/get_instance/
       Events:
-        HelloWorld:
+        GetCollectionInstance:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCollectionApi"
