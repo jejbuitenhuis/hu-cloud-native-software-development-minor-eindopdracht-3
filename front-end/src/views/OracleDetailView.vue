@@ -2,37 +2,7 @@
 import {useRoute} from "vue-router";
 import {ref} from "vue";
 import DecoratedText from "@/components/DecoratedText.vue";
-
-type PrintCard = {
-  PK: string,
-  SK: string,
-  GSI1PK: string,
-  GSI1SK: string,
-  DataType: "Card",
-  OracleName: string,
-  Price: number | null,
-  Rarity: "common" | "uncommon" | "rare" | "mythic",
-  ReleasedAt: string,
-  SetName: string,
-}
-type PrintFace = {
-  PK: string,
-  SK: string,
-  GSI1PK: string,
-  GSI1SK: string,
-  DataType: "Face",
-  Colors: string,
-  FaceName: string,
-  FlavorText: string,
-  ImageUrl: string,
-  ManaCost: string,
-  OracleText: string,
-  TypeLine: string,
-}
-type PrintPart = PrintCard | PrintFace;
-type CombinedPrint = PrintCard & {
-  Faces: PrintFace[]
-}
+import type {CombinedPrint, PrintCard, PrintFace, PrintPart} from "@/models/cardModels";
 
 const route = useRoute();
 const allPrints = ref<CombinedPrint[] | null>()
