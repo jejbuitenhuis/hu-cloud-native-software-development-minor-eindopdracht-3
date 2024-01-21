@@ -28,8 +28,9 @@ async function getOracle() {
       Faces: faces.filter(v => v.GSI1PK == card.GSI1PK)
     })
   }
+  combinedPrints.sort((a, b) => new Date(b.ReleasedAt).getTime() - new Date(a.ReleasedAt).getTime())
   allPrints.value = combinedPrints;
-  oracle.value = combinedPrints[combinedPrints.length - 1];
+  oracle.value = combinedPrints[0];
   loading.value = false;
 }
 getOracle();
@@ -39,7 +40,7 @@ getOracle();
   <p v-if="loading" class="centered-content">Loading</p>
   <div v-if="!loading && oracle != null" class="oracle-wrapper">
     <div class="oracle-image">
-      <img :src="oracle.Faces[0].ImageUrl" :alt="oracle.Faces[0].FaceName">
+      <img v-for="face in oracle.Faces" :src="face.ImageUrl" :alt="face.FaceName">
     </div>
 
     <div>
@@ -69,7 +70,7 @@ getOracle();
           <tbody>
           <tr v-for="print in allPrints">
             <td>{{ print.SetName }}</td>
-            <td>{{ new Date(print.ReleasedAt).toLocaleDateString() }}</td>
+            <td>{{ new Date(print.ReleasedAt).toLocaleDateString("nl-nl") }}</td>
             <td>{{ print.Rarity }}</td>
             <td>{{ print.Price == null ? "-" : `€${print.Price}` }}</td>
             <td><router-link :to="`/cards/${print.GSI1PK.replace('PrintId#', '')}`">View</router-link></td>
@@ -100,7 +101,7 @@ p {
 }
 
 .oracle-image img {
-  max-width: 30rem;
+  max-width: 25rem;
 }
 
 .face-info {
