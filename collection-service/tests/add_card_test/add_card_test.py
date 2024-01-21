@@ -149,7 +149,7 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, requests_mock, 
     items = setup_get_cards_response()
     get_card_response = {
         "status_code": 200,
-        "body": json.dumps(items)
+        "body": json.dumps({"items": items})
     }
     jwt_token = generate_jwt_token()
 

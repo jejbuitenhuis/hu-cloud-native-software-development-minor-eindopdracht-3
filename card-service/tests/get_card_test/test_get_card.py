@@ -99,7 +99,7 @@ def test_lambda_handler_successful():
     result = functions.get_card.app.lambda_handler(event, {})
 
     # Assert
-    assert result['statusCode'] == 200
+    assert result['status_code'] == 200
     response_body = json.loads(result['body'])
     returned_items = [item for item in response_body['Items']]
     assert returned_items == items
@@ -125,9 +125,6 @@ def test_lambda_handler_card_not_found():
     result = functions.get_card.app.lambda_handler(event, {})
 
     # Assert
-    assert result['statusCode'] == 404
+    assert result['status_code'] == 404
     response_body = json.loads(result['body'])
-    assert response_body['error'] == 'Card does not exist.'
-
-
-# TODO: test de 500 response
+    assert response_body['message'] == 'Card does not exist.'

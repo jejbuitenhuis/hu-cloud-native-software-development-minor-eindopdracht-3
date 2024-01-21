@@ -120,7 +120,7 @@ def lambda_handler(event, context):
             LOGGER.error(f"Error while fetching card from api: {api_response_code}")
             return {
                 "status_code": api_response['status_code'],
-                "body": json.dumps(api_response_body)
+                "body": json.dumps({"message": api_response_body})
             }
 
         saved_cards = save_card_to_db(api_response_body, user_id, condition)
@@ -130,12 +130,12 @@ def lambda_handler(event, context):
             LOGGER.info(f"{card}\n")
         return {
             "status_code": 201,
-            "body": json.dumps(saved_cards)
+            "body": json.dumps({"items": saved_cards})
         }
     except ClientError as e:
         LOGGER.error(f"Error while saving the card: {e}")
         return {
             "status_code": 500,
-            "body": json.dumps(e.response)
+            "body": json.dumps({"message": e.response})
         }
 
