@@ -6,14 +6,14 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
-import cddb.ptest.config.UrlConfig.userApiUrl
+import cddb.ptest.config.ApiUrlConfig.userApiUrl
 import cddb.ptest.scenarios.Scenarios._
 
-class RegisterSimulation extends Simulation {
+class AllSimulations extends Simulation {
 
   val levelDuration = System.getProperty("levelDuration", "3").toInt seconds
   val rampDuration = System.getProperty("rampDuration", "2").toInt seconds
-  val userIncrease = System.getProperty("userIncrease", "3").toDouble
+  val userIncrease = System.getProperty("userIncrease", "0").toDouble
   val levels = System.getProperty("levels", "3").toInt
   val startingRate = System.getProperty("startingRate", "0").toDouble
 
@@ -26,7 +26,13 @@ class RegisterSimulation extends Simulation {
                .separatedByRampsLasting(rampDuration)
                .startingFrom(startingRate)
 
+  val adminConfirmationScenario = scenario("Admin confirm user")
+    .exec(UserRequest.adminConfirm)
+
   setUp(
     registerScenario.inject(users)
+      .andThen(adminConfirmationScenario.inject(users))
+      .andThen(loginScenario.inject(users)),
+    existingUserScenario.inject(users)
   ).protocols(httpProtocol)
 }
