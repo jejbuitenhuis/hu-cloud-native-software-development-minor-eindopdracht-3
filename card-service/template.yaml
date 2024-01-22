@@ -86,7 +86,7 @@ Resources:
   RenewEntitiesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/renewEntities
+      CodeUri: functions/renew_entities/
       MemorySize: 550
       Timeout: 360
       Environment:
@@ -95,17 +95,23 @@ Resources:
       Policies:
         - AmazonDynamoDBFullAccess
 
-  PingFunction:
+  GetCardFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/Ping/
+      FunctionName: !Sub "${Stage}-GetCardFunction"
+      CodeUri: functions/get_card/
       Events:
-        HelloWorld:
+        GetCard:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCardApi"
-            Path: /ping
+            Path: /api/cards/{oracle_id}/{print_id}
             Method: get
+      Environment:
+        Variables:
+          DYNAMO_DB_CARD_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
 
   SchedulerRole:
     Type: AWS::IAM::Role

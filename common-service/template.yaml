@@ -28,7 +28,7 @@ Resources:
   EventBusPolicy:
     Type: AWS::Events::EventBusPolicy
     Properties:
-      EventBusName: 
+      EventBusName:
         Ref: "MTGEventBus"
       StatementId: !Sub "${Stage}AllowToPutEvents"
       Statement:
