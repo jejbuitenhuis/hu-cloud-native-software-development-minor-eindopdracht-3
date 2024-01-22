@@ -15,10 +15,12 @@ table = dynamodb.Table(environ['DYNAMODB_TABLE_NAME'])
 
 
 def lambda_handler(event, context):
+    card_oracle_id = event["oracle_id"]
+    card_print_id = event["print_id"]
     response = table.query(
-        IndexName="Card-Id-GSI",
-        KeyConditionExpression=Key('GSI1PK').eq(f"PrintId#{event['pathParameters']['card_id']}"),
-    )
+        KeyConditionExpression=
+            Key('PK').eq(f"OracleId#{card_oracle_id}") &
+            Key('SK').begins_with(f"PrintId#{card_print_id}"))
     items = response['Items']
 
     if len(items) == 0:

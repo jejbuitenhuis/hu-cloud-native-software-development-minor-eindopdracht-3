@@ -72,10 +72,6 @@ Resources:
           AttributeType: S
         - AttributeName: SK
           AttributeType: S
-        - AttributeName: GSI1PK
-          AttributeType: S
-        - AttributeName: GSI1SK
-          AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
@@ -84,22 +80,13 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: RemoveAt
         Enabled: true
-      GlobalSecondaryIndexes:
-        - IndexName: Card-Id-GSI
-          KeySchema:
-            - AttributeName: GSI1PK
-              KeyType: HASH
-            - AttributeName: GSI1SK
-              KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
       TableName: !Sub "${Stage}-mtg-card-db"
 
   RenewEntitiesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/renewEntities
+      CodeUri: functions/renewEntities/
       MemorySize: 550
       Timeout: 360
       Environment:
@@ -111,6 +98,7 @@ Resources:
   GetCardsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${Stage}-GetCardsFunction"
       CodeUri: functions/get_cards/
       Environment:
         Variables:
@@ -122,12 +110,13 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCardApi"
-            Path: /api/cards
+            Path: /api/cards/{oracle_id}
             Method: get
 
   GetCardFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${Stage}-GetCardFunction"
       CodeUri: functions/get_card/
       Environment:
         Variables:
@@ -139,7 +128,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCardApi"
-            Path: /api/cards/{card_id}
+            Path: /api/cards/{oracle_id}/{card_id}
             Method: get
 
   SchedulerRole:
