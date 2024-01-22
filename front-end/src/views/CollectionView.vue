@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import "@shoelace-style/shoelace/dist/components/card/card";
 import {ref} from "vue";
-import type {CombinedPrint, PrintCard, PrintFace, PrintPart} from "@/models/cardModels";
+import type {PrintCard} from "@/models/cardModels";
 
 type Collection = {
-  [key: string]: CombinedPrint[],
+  [key: string]: PrintCard[],
 }
 
 const collection = ref<Collection>({});
@@ -18,23 +18,18 @@ async function getCollection() {
     console.error(`Failed collections fetch. Status: ${response.status}`)
     return;
   }
-  const data = await response.json() as PrintPart[];
+  const parsedData = await response.json() as any;
+  const data = await parsedData["Items"] as PrintCard[];
   const newCollection: Collection = {};
-  const instanceCards = data.filter(v => v.DataType == "Card") as PrintCard[];
-  const instanceFaces = data.filter(v => v.DataType == "Face") as PrintFace[];
 
-  for (const instanceCard of instanceCards) {
-    const newInstance: CombinedPrint = {
-      ...instanceCard,
-      Faces: instanceFaces.filter(v => v.OracleId === instanceCard.PrintId)
-    }
-
-    if (instanceCard.PK in newCollection) {
-      newCollection[instanceCard.PK].push(newInstance)
+  for (const instanceCard of data) {
+    if (instanceCard.OracleId in newCollection) {
+      newCollection[instanceCard.OracleId].push(instanceCard)
       continue;
     }
-    newCollection[instanceCard.PK] = [newInstance]
+    newCollection[instanceCard.OracleId] = [instanceCard]
   }
+
   collection.value = newCollection;
   collectionLoading.value = false;
 }
@@ -53,7 +48,7 @@ getCollection();
 
     <section class="cards-container">
       <sl-card v-for="(card, _) in collection" class="card">
-        <img slot="image" :src="card[0].Faces[0].ImageUrl" alt="MTG - Card face">
+        <img slot="image" :src="card[0].CardFaces[0].ImageUrl" alt="MTG - Card face">
         <div>Instances: {{card.length}}</div>
       </sl-card>
     </section>
