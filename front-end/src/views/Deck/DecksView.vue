@@ -21,12 +21,19 @@ function createDeck(): void {
 
 async function getDecks() {
   const token = localStorage.getItem("jwtToken");
+
   if (!token) return;
-  const response = await fetch("/api/decks", {headers: {Authorization: token}});
+
+  const response = await fetch("/api/decks", { headers: {
+    Authorization: `Bearer ${token}`,
+  } });
+
   if (!response.ok) {
     console.error(`Failed collections fetch. Status: ${response.status}`)
+
     return;
   }
+
   decks.value = await response.json() as Deck[];
   loading.value = false;
 }

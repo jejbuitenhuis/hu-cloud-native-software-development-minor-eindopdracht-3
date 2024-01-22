@@ -7,6 +7,9 @@
   "paths": {
     "/ping": {
       "get": {
+        "security": [
+          { "CognitoAuth": [] }
+        ],
         "parameters" : [],
         "responses" : {
           "200": {
@@ -15,7 +18,9 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PingFunction.Arn}/invocations"},
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PingFunction.Arn}/invocations"
+          },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }
@@ -34,7 +39,9 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RegisterUserFunction.Arn}/invocations"},
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RegisterUserFunction.Arn}/invocations"
+          },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }
@@ -53,7 +60,9 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LoginUserFunction.Arn}/invocations"},
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LoginUserFunction.Arn}/invocations"
+          },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }

@@ -7,6 +7,9 @@
   "paths": {
     "/ping": {
       "get": {
+        "security": [
+          { "cognito": [] }
+        ],
         "parameters": [],
         "responses": {
           "200": {

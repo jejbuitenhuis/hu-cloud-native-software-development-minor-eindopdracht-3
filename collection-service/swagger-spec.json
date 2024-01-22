@@ -7,6 +7,9 @@
   "paths": {
     "/ping": {
       "get": {
+        "security": [
+          { "cognito": [] }
+        ],
         "parameters" : [],
         "responses" : {
           "200": {
@@ -15,7 +18,9 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PingFunction.Arn}/invocations"},
+          "uri": {
+            "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PingFunction.Arn}/invocations"
+          },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }
@@ -23,14 +28,10 @@
     },
     "/api/collections": {
       "get": {
-        "parameters" : [
-          {
-            "name" : "Authorization",
-            "in" : "header",
-            "required" : true,
-            "type" : "string"
-          }
+        "security": [
+          { "cognito": [] }
         ],
+        "parameters" : [],
         "responses" : {
           "200": {
             "description": "OK"
@@ -38,7 +39,9 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCollection.Arn}/invocations"},
+          "uri": {
+            "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCollection.Arn}/invocations"
+          },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }
@@ -46,16 +49,13 @@
     },
     "/api/collections/{instance_id}": {
       "get": {
+        "security": [
+          { "cognito": [] }
+        ],
         "parameters" : [
           {
             "name" : "instance_id",
             "in" : "path",
-            "required" : true,
-            "type" : "string"
-          },
-          {
-            "name" : "Authorization",
-            "in" : "header",
             "required" : true,
             "type" : "string"
           }
@@ -70,7 +70,9 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCollectionInstance.Arn}/invocations"},
+          "uri": {
+            "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCollectionInstance.Arn}/invocations"
+          },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }
