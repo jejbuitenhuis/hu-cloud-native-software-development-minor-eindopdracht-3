@@ -99,7 +99,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credenti
         assert cardfaces[0]['ImageUrl'] == "https://cards.scryfall.io/png/front/0/0/0000579f-7b35-4ed3-b44c-db2a538066fe.png?1562894979"
         assert cardfaces[0]['Colors'] == ["R"]
 
-        os.remove('renew_cards_tests/single_faced_cards.json')
+        os.remove('tests/renew_cards_tests/single_faced_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
@@ -176,7 +176,7 @@ def test_renew_cards_two_faced(requests_mock, aws_credentials):
         assert cardfaces[1]['LowercaseFaceName'] == "agadeem, the undercrypt"
         assert cardfaces[1]['LowercaseOracleText'] == "as agadeem, the undercrypt enters the battlefield, you may pay 3 life. if you don't, it enters the battlefield tapped.\n{t}: add {b}."
 
-        os.remove('renew_cards_tests/two_faced_cards.json')
+        os.remove('tests/renew_cards_tests/two_faced_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
@@ -216,7 +216,7 @@ def test_renew_cards_ten_cards(requests_mock, aws_credentials):
         assert requests_mock.called
         assert requests_mock.call_count == 2
         assert len(cards['Items']) == 10
-        os.remove('renew_cards_tests/ten_cards.json')
+        os.remove('tests/renew_cards_tests/ten_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
@@ -254,7 +254,7 @@ def test_renew_cards_thirty_cards(requests_mock, aws_credentials):
         assert len(cards['Items']) == 30
         assert requests_mock.called
         assert requests_mock.call_count == 2
-        os.remove('renew_cards_tests/thirty_cards.json')
+        os.remove('tests/renew_cards_tests/thirty_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
@@ -302,4 +302,4 @@ def test_renew_cards_has_correct_ttl(requests_mock, aws_credentials):
             print(item['RemoveAt'])
             assert item['RemoveAt'] > int(time.time()) + CARDS_UPDATE_FREQUENCY
             assert item['RemoveAt'] <= int(time.time()) + 2 * CARDS_UPDATE_FREQUENCY
-        os.remove('renew_cards_tests/correct_ttl.json')
+        os.remove('tests/renew_cards_tests/correct_ttl.json')
