@@ -8,10 +8,16 @@ import io.gatling.http.Predef._
 object UserRequest {
   private val contentTypeHeader = Map("Content-Type" -> "application/json;charset=UTF-8")
 
-  val register = http("register user")
-    .post("/api/users")
-    .headers(contentTypeHeader)
-    .body(StringBody("""{ "password": "${password}", "email": "${email}" }""")).asJson
+  def createUserRequest(requestName: String) = {
+    http(requestName)
+      .post("/api/users")
+      .headers(contentTypeHeader)
+      .body(StringBody("""{ "password": "${password}", "email": "${email}" }""")).asJson
+  }
+
+  val register = createUserRequest("register user")
+  
+  val existingRegister = createUserRequest("existing register user")
 
   val login = http("login user")
     .post("/api/users/login")

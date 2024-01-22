@@ -1,6 +1,6 @@
 package cddb.ptest.config
 
-import cddb.ptest.config.SSMParameterStore.retrieveParameterValue
+import cddb.ptest.utils.SSMParameterStore.retrieveParameterValue
 
 object ApiUrlConfig {
   val stage: String = System.getProperty("Stage", "development")
