@@ -2,6 +2,8 @@
 pytest
 coverage
 moto
+python-jose
+requests_mock
 
 # Function requirements
 python-jose

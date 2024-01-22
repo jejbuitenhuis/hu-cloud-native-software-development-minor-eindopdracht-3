@@ -48,7 +48,6 @@ def test_lambda_handler_successful():
 
         # Assert
         assert result['statusCode'] == 201
-        response_body = json.loads(result['body'])
         response_user = client.admin_get_user(
                 UserPoolId=user_pool_id,
                 Username='maikel.reijneke@gmail.com'
