@@ -26,7 +26,7 @@ def lambda_handler(event, context):
 
         if len(items) == 0:
             return {
-                "status_code": 404,
+                "statusCode": 404,
                 "body": json.dumps({
                     "Message": "Card not found."
                 })
@@ -35,20 +35,16 @@ def lambda_handler(event, context):
     except ClientError as e:
         LOGGER.error(f"Error while fetching card: {e}")
         return {
-            "status_code": 500,
+            "statusCode": 500,
             "body": json.dumps({"Message": "Server error while fetching card."})
         }
 
-    LOGGER.info(f'items to be returned: {response["Items"]}')
+    LOGGER.info(f'items to be returned: {items}')
 
     for item in items:
         item.pop('RemoveAt', None)
 
     return {
-        "status_code": 200,
-        "body": json.dumps({"Items": response['Items']}),
-        "headers": {
-            "content-type": "application/json"
-        },
-        "isBase64Encoded": False
+        "statusCode": 200,
+        "body": json.dumps({"Items": items})
     }
