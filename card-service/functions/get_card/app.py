@@ -41,12 +41,12 @@ def lambda_handler(event, context):
             "body": json.dumps({"Message": "Server error while fetching card."})
         }
 
-    LOGGER.info(f'items to be returned: {response["Item"]}')
+    item = response["Item"]
+    item.pop('RemoveAt', None)
 
-    for item in response['Items']:
-        item.pop('RemoveAt', None)
+    LOGGER.info(f'items to be returned: {item}')
 
     return {
         "statusCode": 200,
-        "body": json.dumps(response['Item'])
+        "body": json.dumps(item)
     }

@@ -21,9 +21,8 @@ def test_get_card_by_id(setup_dynamodb):
 
     # Assert the response
     assert response['statusCode'] == 200
-    body = json.loads(response['body'])["Items"]
-    assert len(body) == 1
-    assert len(body[0]['CardFaces']) == 2
+    body = json.loads(response['body'])
+    assert len(body['CardFaces']) == 2
 
 
 @patch.dict(os.environ, {"DYNAMODB_TABLE_NAME": DYNAMODB_TABLE_NAME, "DISABLE_XRAY": "True"})
