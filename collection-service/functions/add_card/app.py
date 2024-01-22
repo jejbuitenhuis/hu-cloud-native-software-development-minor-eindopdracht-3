@@ -114,15 +114,17 @@ def lambda_handler(event, context):
         api_url = fetch_api_url()
         api_response = requests.get(f'{api_url}/api/cards/{oracle_id}/{print_id}').json()
         api_response_code = api_response["status_code"]
-        api_response_body = json.loads(api_response["body"])
 
         if api_response_code != 200:
-            LOGGER.error(f"Error while fetching card from api: {api_response_code}")
+            LOGGER.error(api_response)
+            api_response_body = json.loads(api_response["body"])['Message']
+            LOGGER.error(f"Error while fetching card from api: {api_response_code}\n {api_response_body}")
             return {
                 "status_code": api_response['status_code'],
-                "body": json.dumps({"message": api_response_body})
+                "body": json.dumps({"Message": api_response_body})
             }
 
+        api_response_body = json.loads(api_response["body"])['Items']
         saved_cards = save_card_to_db(api_response_body, user_id, condition)
 
         LOGGER.info(f"Successfully added the following cards to the collection:")
@@ -136,6 +138,6 @@ def lambda_handler(event, context):
         LOGGER.error(f"Error while saving the card: {e}")
         return {
             "status_code": 500,
-            "body": json.dumps({"message": e.response})
+            "body": json.dumps({"Message": e.response})
         }
 

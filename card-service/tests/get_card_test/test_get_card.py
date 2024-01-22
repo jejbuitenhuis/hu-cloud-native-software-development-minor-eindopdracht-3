@@ -101,6 +101,7 @@ def test_lambda_handler_successful():
     # Assert
     assert result['status_code'] == 200
     response_body = json.loads(result['body'])
+    logger.info(response_body)
     returned_items = [item for item in response_body['Items']]
     assert returned_items == items
 
@@ -111,7 +112,7 @@ def test_lambda_handler_successful():
 def test_lambda_handler_card_not_found():
 
     # Arrange
-    table = setup_table()
+    setup_table()
 
     event = {
         "oracle_id": "wrong_id",
@@ -127,4 +128,4 @@ def test_lambda_handler_card_not_found():
     # Assert
     assert result['status_code'] == 404
     response_body = json.loads(result['body'])
-    assert response_body['message'] == 'Card does not exist.'
+    assert response_body['Message'] == 'Card not found.'

@@ -36,7 +36,7 @@ def lambda_handler(event, context):
             return {
                 "status_code": 404,
                 "body": json.dumps({
-                    "message": "Card not found."
+                    "Message": "Card not found."
                 })
             }
 
@@ -44,13 +44,12 @@ def lambda_handler(event, context):
         LOGGER.error(f"Error while fetching card: {e}")
         return {
             "status_code": 500,
-            "body": json.dumps({"message": "Server error while fetching card."})
+            "body": json.dumps({"Message": "Server error while fetching card."})
         }
-
 
     LOGGER.info(f'items to be returned: {response["Items"]}')
 
     return {
         "status_code": 200,
-        "body": json.dumps({"message": response})
+        "body": json.dumps({"Items": response['Items']})
     }

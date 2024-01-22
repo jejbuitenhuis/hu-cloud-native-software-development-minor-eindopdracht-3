@@ -149,7 +149,7 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, requests_mock, 
     items = setup_get_cards_response()
     get_card_response = {
         "status_code": 200,
-        "body": json.dumps({"items": items})
+        "body": json.dumps({"Items": items})
     }
     jwt_token = generate_jwt_token()
 
@@ -225,7 +225,7 @@ def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid,requests_moc
     get_card_response = {
         "status_code": 404,
         "body": json.dumps({
-            "error": "Card not found."
+            "Message": "Card not found."
         })
     }
 
@@ -255,5 +255,5 @@ def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid,requests_moc
 
     # Assert
     assert result['status_code'] == 404
-    assert response_body['error'] == 'Card not found.'
+    assert response_body['Message'] == 'Card not found.'
 
