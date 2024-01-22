@@ -49,6 +49,9 @@ getCard();
           <p>{{ face.TypeLine }}</p>
           <DecoratedText :text="face.FlavorText"/>
         </div>
+        <div>
+          <sl-button class="add-to-collection-button">Add Card to Collection</sl-button>
+        </div>
       </div>
     </div>
   </div>
@@ -74,6 +77,10 @@ p {
 
 .card-image img {
   max-width: 25rem;
+}
+
+.add-to-collection-button {
+  margin-top: 1rem;
 }
 
 .face-info {

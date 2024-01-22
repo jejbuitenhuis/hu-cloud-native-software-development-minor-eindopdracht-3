@@ -128,16 +128,4 @@ class CardNotFoundError extends Error {
   padding-top: 1rem;
   width: 80%;
 }
-
-.cardItem {
-  max-width: 25%;
-  padding: 0.4rem;
-}
-
-.image {
-  height: auto;
-  width: 100%;
-  display: block;
-  border-radius: 1rem;
-}
 </style>

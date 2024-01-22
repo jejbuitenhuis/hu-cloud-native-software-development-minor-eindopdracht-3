@@ -56,6 +56,9 @@ getOracle();
           <p>{{ face.TypeLine }}</p>
           <DecoratedText :text="face.FlavorText"/>
         </div>
+        <div>
+          <sl-button class="add-to-deck-button">Add Card to Deck</sl-button>
+        </div>
       </div>
 
       <div class="prints-info">
@@ -120,6 +123,10 @@ p {
   background-color: #333;
   border-radius: 0.5rem;
   padding: 1rem;
+  margin-top: 1rem;
+}
+
+.add-to-deck-button {
   margin-top: 1rem;
 }
 
