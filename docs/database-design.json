@@ -3,7 +3,7 @@
   "ModelMetadata": {
     "Author": "Team Dragons",
     "DateCreated": "Dec 21, 2023, 09:22 AM",
-    "DateLastModified": "Jan 18, 2024, 10:33 AM",
+    "DateLastModified": "Jan 20, 2024, 11:03 PM",
     "Description": "DB designs for the MTG deck/collection management system",
     "AWSService": "Amazon DynamoDB",
     "Version": "3.0"
@@ -1192,6 +1192,10 @@
         {
           "AttributeName": "GSI1SK",
           "AttributeType": "S"
+        },
+        {
+          "AttributeName": "GSI2SK",
+          "AttributeType": "S"
         }
       ],
       "TableFacets": [
@@ -1207,13 +1211,13 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "CardInstanceId#1#Card"
+                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#CardInstanceId#b8a528c9-fba7-4604-94da-814801d93b8d#Card"
               },
               "DeckId": {
                 "S": "1"
               },
               "CardInstanceId": {
-                "S": "1"
+                "S": "b8a528c9-fba7-4604-94da-814801d93b8d"
               },
               "PrintId": {
                 "S": "67f4c93b-080c-4196-b095-6a120a221988"
@@ -1222,7 +1226,10 @@
                 "S": "Card"
               },
               "GSI1SK": {
-                "S": "DeckId#1"
+                "S": "DeckId#1#CardInstanceId#b8a528c9-fba7-4604-94da-814801d93b8d"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#b8a528c9-fba7-4604-94da-814801d93b8d#Card"
               }
             },
             {
@@ -1230,13 +1237,13 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "CardInstanceId#1#Face#1"
+                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#CardInstanceId#b8a528c9-fba7-4604-94da-814801d93b8d#Face#1"
               },
               "DeckId": {
                 "S": "1"
               },
               "CardInstanceId": {
-                "S": "1"
+                "S": "b8a528c9-fba7-4604-94da-814801d93b8d"
               },
               "PrintId": {
                 "S": "67f4c93b-080c-4196-b095-6a120a221988"
@@ -1245,7 +1252,10 @@
                 "S": "Face"
               },
               "GSI1SK": {
-                "S": "CardInstanceId#1#Face#2"
+                "S": "DeckId#1#CardInstanceId#b8a528c9-fba7-4604-94da-814801d93b8d"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#b8a528c9-fba7-4604-94da-814801d93b8d#Face#1"
               }
             },
             {
@@ -1253,13 +1263,13 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "CardInstanceId#1#Face#2"
+                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#CardInstanceId#b8a528c9-fba7-4604-94da-814801d93b8d#Face#2"
               },
               "DeckId": {
                 "S": "1"
               },
               "CardInstanceId": {
-                "S": "1"
+                "S": "b8a528c9-fba7-4604-94da-814801d93b8d"
               },
               "PrintId": {
                 "S": "67f4c93b-080c-4196-b095-6a120a221988"
@@ -1268,7 +1278,10 @@
                 "S": "Face"
               },
               "GSI1SK": {
-                "S": "DeckId#1"
+                "S": "DeckId#1#CardInstanceId#b8a528c9-fba7-4604-94da-814801d93b8d"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#b8a528c9-fba7-4604-94da-814801d93b8d#Face#2"
               }
             },
             {
@@ -1276,13 +1289,168 @@
                 "S": "USER#1"
               },
               "SK": {
-                "S": "CardInstanceId#2#Card"
+                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#CardInstanceId#f230725a-b5a8-49ea-bd0a-b5ab74fa2311#Card"
               },
               "CardInstanceId": {
-                "S": "2"
+                "S": "f230725a-b5a8-49ea-bd0a-b5ab74fa2311"
               },
               "PrintId": {
                 "S": "67f4c93b-080c-4196-b095-6a120a221988"
+              },
+              "DataType": {
+                "S": "Card"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#f230725a-b5a8-49ea-bd0a-b5ab74fa2311#Card"
+              }
+            },
+            {
+              "PK": {
+                "S": "USER#1"
+              },
+              "SK": {
+                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#CardInstanceId#f230725a-b5a8-49ea-bd0a-b5ab74fa2311#Face#1"
+              },
+              "CardInstanceId": {
+                "S": "f230725a-b5a8-49ea-bd0a-b5ab74fa2311"
+              },
+              "PrintId": {
+                "S": "67f4c93b-080c-4196-b095-6a120a221988"
+              },
+              "DataType": {
+                "S": "Face"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#f230725a-b5a8-49ea-bd0a-b5ab74fa2311#Face#1"
+              }
+            },
+            {
+              "PK": {
+                "S": "USER#1"
+              },
+              "SK": {
+                "S": "PrintId#67f4c93b-080c-4196-b095-6a120a221988#CardInstanceId#f230725a-b5a8-49ea-bd0a-b5ab74fa2311#Face#2"
+              },
+              "CardInstanceId": {
+                "S": "f230725a-b5a8-49ea-bd0a-b5ab74fa2311"
+              },
+              "PrintId": {
+                "S": "67f4c93b-080c-4196-b095-6a120a221988"
+              },
+              "DataType": {
+                "S": "Face"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#f230725a-b5a8-49ea-bd0a-b5ab74fa2311#Face#2"
+              }
+            },
+            {
+              "PK": {
+                "S": "USER#1"
+              },
+              "SK": {
+                "S": " PrintId#69B5c93b-080c-4196-b095-6a120a221988#CardInstanceId#df9b9852-128b-4e58-873f-0a3bfb9fa420#Card"
+              },
+              "CardInstanceId": {
+                "S": "df9b9852-128b-4e58-873f-0a3bfb9fa420"
+              },
+              "PrintId": {
+                "S": "69B5c93b-080c-4196-b095-6a120a221988"
+              },
+              "DataType": {
+                "S": "Card"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#df9b9852-128b-4e58-873f-0a3bfb9fa420#Card"
+              }
+            },
+            {
+              "PK": {
+                "S": "USER#1"
+              },
+              "SK": {
+                "S": " PrintId#69B5c93b-080c-4196-b095-6a120a221988#CardInstanceId#df9b9852-128b-4e58-873f-0a3bfb9fa420#Face#1"
+              },
+              "CardInstanceId": {
+                "S": "df9b9852-128b-4e58-873f-0a3bfb9fa420"
+              },
+              "PrintId": {
+                "S": "69B5c93b-080c-4196-b095-6a120a221988"
+              },
+              "DataType": {
+                "S": "Face"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#df9b9852-128b-4e58-873f-0a3bfb9fa420#Face#1"
+              }
+            },
+            {
+              "PK": {
+                "S": "USER#1"
+              },
+              "SK": {
+                "S": " PrintId#69B5c93b-080c-4196-b095-6a120a221988#CardInstanceId#a3fd3e55-bcad-4bfd-973d-e4223e3a60da#Card"
+              },
+              "DeckId": {
+                "S": "1"
+              },
+              "CardInstanceId": {
+                "S": "a3fd3e55-bcad-4bfd-973d-e4223e3a60da"
+              },
+              "PrintId": {
+                "S": "69B5c93b-080c-4196-b095-6a120a221988"
+              },
+              "DataType": {
+                "S": "Card"
+              },
+              "GSI1SK": {
+                "S": "DeckId#1#CardInstanceId#a3fd3e55-bcad-4bfd-973d-e4223e3a60da#Card"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#a3fd3e55-bcad-4bfd-973d-e4223e3a60da#Card"
+              }
+            },
+            {
+              "PK": {
+                "S": "USER#1"
+              },
+              "SK": {
+                "S": " PrintId#69B5c93b-080c-4196-b095-6a120a221988#CardInstanceId#a3fd3e55-bcad-4bfd-973d-e4223e3a60da#Face#1"
+              },
+              "DeckId": {
+                "S": "1"
+              },
+              "CardInstanceId": {
+                "S": "a3fd3e55-bcad-4bfd-973d-e4223e3a60da"
+              },
+              "PrintId": {
+                "S": "69B5c93b-080c-4196-b095-6a120a221988"
+              },
+              "DataType": {
+                "S": "Face"
+              },
+              "GSI1SK": {
+                "S": "DeckId#1#CardInstanceId#a3fd3e55-bcad-4bfd-973d-e4223e3a60da#Face#1"
+              },
+              "GSI2SK": {
+                "S": "CardInstanceId#a3fd3e55-bcad-4bfd-973d-e4223e3a60da#Face#1"
+              }
+            },
+            {
+              "PK": {
+                "S": "USER#2"
+              },
+              "SK": {
+                "S": " PrintId#69B5c93b-080c-4196-b095-6a120a221988#CardInstanceId#c978fe89-b0a5-426d-a61a-fac1fdc2405b#Card"
+              },
+              "DeckId": {
+                "S": "1"
+              },
+              "CardInstanceId": {
+                "S": "1"
+              },
+              "PrintId": {
+                "S": "69B5c93b-080c-4196-b095-6a120a221988"
               },
               "DataType": {
                 "S": "Card"
@@ -1290,33 +1458,19 @@
             },
             {
               "PK": {
-                "S": "USER#1"
+                "S": "USER#2"
               },
               "SK": {
-                "S": "CardInstanceId#2#Face#1"
+                "S": "PrintId#69B5c93b-080c-4196-b095-6a120a221988#CardInstanceId#c978fe89-b0a5-426d-a61a-fac1fdc2405b#Face#1"
+              },
+              "DeckId": {
+                "S": "1"
               },
               "CardInstanceId": {
-                "S": "2"
+                "S": "1"
               },
               "PrintId": {
-                "S": "67f4c93b-080c-4196-b095-6a120a221988"
-              },
-              "DataType": {
-                "S": "Face"
-              }
-            },
-            {
-              "PK": {
-                "S": "USER#1"
-              },
-              "SK": {
-                "S": "CardInstanceId#2#Face#2"
-              },
-              "CardInstanceId": {
-                "S": "2"
-              },
-              "PrintId": {
-                "S": "67f4c93b-080c-4196-b095-6a120a221988"
+                "S": "69B5c93b-080c-4196-b095-6a120a221988"
               },
               "DataType": {
                 "S": "Face"
@@ -1328,7 +1482,8 @@
             "CardInstanceId",
             "PrintId",
             "DataType",
-            "GSI1SK"
+            "GSI1SK",
+            "GSI2SK"
           ],
           "DataAccess": {
             "MySql": {}
@@ -1337,7 +1492,7 @@
       ],
       "GlobalSecondaryIndexes": [
         {
-          "IndexName": "GSI",
+          "IndexName": "DeckIdGSI",
           "KeyAttributes": {
             "PartitionKey": {
               "AttributeName": "PK",
@@ -1345,6 +1500,22 @@
             },
             "SortKey": {
               "AttributeName": "GSI1SK",
+              "AttributeType": "S"
+            }
+          },
+          "Projection": {
+            "ProjectionType": "ALL"
+          }
+        },
+        {
+          "IndexName": "CardInstanceGSI",
+          "KeyAttributes": {
+            "PartitionKey": {
+              "AttributeName": "PK",
+              "AttributeType": "S"
+            },
+            "SortKey": {
+              "AttributeName": "GSI2SK",
               "AttributeType": "S"
             }
           },
