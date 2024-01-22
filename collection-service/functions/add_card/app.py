@@ -34,8 +34,6 @@ def fetch_api_url():
 
 def parse_card_item(item, user_id, condition):
     card_instance_id = str(uuid.uuid4())
-    parts = item["SK"].split("#")
-    item_type = '#'.join(parts[2:])
     face_items = []
 
     for face in item['CardFaces']:
@@ -53,7 +51,7 @@ def parse_card_item(item, user_id, condition):
 
     return {
         "PK": f'UserId#{user_id}',
-        "SK": f'CardInstanceId#{card_instance_id}#{item_type}',
+        "SK": f'CardInstanceId#{card_instance_id}',
         "PrintId": item["PrintId"],
         "OracleId": item['OracleId'],
         "CardInstanceId": card_instance_id,
@@ -106,29 +104,29 @@ def lambda_handler(event, context):
     try:
         api_url = fetch_api_url()
         api_response = requests.get(f'{api_url}/api/cards/{oracle_id}/{print_id}').json()
-        api_response_code = api_response["status_code"]
+        api_response_code = api_response["statusCode"]
 
         if api_response_code != 200:
             api_response_body = json.loads(api_response["body"])['Message']
             LOGGER.error(f"Error while fetching card from api: {api_response_code}\n {api_response_body}")
             return {
-                "status_code": api_response['status_code'],
+                "statusCode": api_response['statusCode'],
                 "body": json.dumps({"Message": api_response_body})
             }
 
-        api_response_body = json.loads(api_response["body"])['Items']
+        api_response_body = json.loads(api_response["body"])
         saved_cards = save_card_to_db(api_response_body, user_id, condition)
 
         LOGGER.info(f"Successfully added the following cards to the collection:")
         for card in saved_cards:
             LOGGER.info(f"{card}\n")
         return {
-            "status_code": 201,
+            "statusCode": 201,
             "body": json.dumps({"items": saved_cards})
         }
     except ClientError as e:
         LOGGER.error(f"Error while saving the card: {e}")
         return {
-            "status_code": 500,
+            "statusCode": 500,
             "body": json.dumps({"Message": e.response})
         }

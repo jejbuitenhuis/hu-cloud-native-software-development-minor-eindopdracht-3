@@ -1,13 +1,11 @@
 import os
 import time
-import traceback
 from os import environ
 from aws_xray_sdk.core import patch_all
 import boto3
 import logging
 import requests
 import ijson
-import json
 
 if 'DISABLE_XRAY' not in environ:
     patch_all()
@@ -59,7 +57,7 @@ def createCardInfo(card, oracle_id):
     try:
         return {
             "PK": f'OracleId#{oracle_id}',
-            "SK": f'PrintId#{card["id"]}#Card',
+            "SK": f'PrintId#{card["id"]}',
             "OracleName": card['name'],
             "SetName": card['set_name'],
             "ReleasedAt": card['released_at'],

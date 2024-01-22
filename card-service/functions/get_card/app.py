@@ -1,10 +1,6 @@
 import json
-
 import os
-
 from boto3.dynamodb.conditions import Key
-from jose import jwt
-
 import boto3
 from botocore.exceptions import ClientError
 from aws_xray_sdk.core import patch_all
@@ -28,11 +24,12 @@ def lambda_handler(event, context):
     card_print_id = event["print_id"]
 
     try:
-        response = CARD_TABLE.query(
-                KeyConditionExpression=Key('PK').eq(f"OracleId#{card_oracle_id}")
-                & Key('SK').begins_with(f"PrintId#{card_print_id}"))
+        response = CARD_TABLE.get_item(Key={
+            'PK': f'OracleId#{card_oracle_id}',
+            'SK': f'PrintId#{card_print_id}'
+        })
 
-        if not response["Items"]:
+        if "Item" not in response:
             return {
                 "status_code": 404,
                 "body": json.dumps({
@@ -47,9 +44,9 @@ def lambda_handler(event, context):
             "body": json.dumps({"Message": "Server error while fetching card."})
         }
 
-    LOGGER.info(f'items to be returned: {response["Items"]}')
+    LOGGER.info(f'items to be returned: {response["Item"]}')
 
     return {
         "status_code": 200,
-        "body": json.dumps({"Items": response['Items']})
+        "body": json.dumps(response['Item'])
     }

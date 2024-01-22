@@ -70,7 +70,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credenti
         # Assert
         single_face_card_info = table.query(
             KeyConditionExpression=Key('PK').eq('OracleId#44623693-51d6-49ad-8cd7-140505caf02f') & Key('SK').eq(
-                'PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe#Card')
+                'PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe')
         )
 
         card = single_face_card_info['Items'][0]
@@ -80,7 +80,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credenti
         assert requests_mock.call_count == 2
         assert len(single_face_card_info['Items']) == 1
         assert card['PK'] == "OracleId#44623693-51d6-49ad-8cd7-140505caf02f"
-        assert card['SK'] == "PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe#Card"
+        assert card['SK'] == "PrintId#0000579f-7b35-4ed3-b44c-db2a538066fe"
         assert card['OracleName'] == "Fury Sliver"
         assert card['SetName'] == "Time Spiral"
         assert card['ReleasedAt'] == "2006-10-06"
@@ -135,7 +135,7 @@ def test_renew_cards_two_faced(requests_mock, aws_credentials):
         # Assert
         double_face_card_info = table.query(
             KeyConditionExpression=Key('PK').eq('OracleId#562d71b9-1646-474e-9293-55da6947a758') & Key('SK').eq(
-                'PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card')
+                'PrintId#67f4c93b-080c-4196-b095-6a120a221988')
         )
 
 
@@ -144,7 +144,7 @@ def test_renew_cards_two_faced(requests_mock, aws_credentials):
 
         assert len(double_face_card_info['Items']) == 1
         assert double_face_card_info['Items'][0]['PK'] == "OracleId#562d71b9-1646-474e-9293-55da6947a758"
-        assert double_face_card_info['Items'][0]['SK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card"
+        assert double_face_card_info['Items'][0]['SK'] == "PrintId#67f4c93b-080c-4196-b095-6a120a221988"
         assert double_face_card_info['Items'][0]['OracleName'] == "Agadeem's Awakening // Agadeem, the Undercrypt"
         assert double_face_card_info['Items'][0]['SetName'] == "Zendikar Rising"
         assert double_face_card_info['Items'][0]['ReleasedAt'] == "2020-09-25"
