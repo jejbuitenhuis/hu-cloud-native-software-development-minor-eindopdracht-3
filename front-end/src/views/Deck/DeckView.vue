@@ -19,9 +19,7 @@ async function getDeck() {
 
   if (!token) return;
 
-  const response = await fetch(`/api/decks/${route.params["deck_id"]}`, { headers: {
-    Authorization: `Bearer ${token}`,
-  } });
+  const response = await fetch(`/api/decks/${route.params["deck_id"]}`, { headers: { Authorization: token } });
 
   if (!response.ok) {
     console.error(`Failed collections fetch. Status: ${response.status}`)

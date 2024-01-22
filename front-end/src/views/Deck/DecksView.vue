@@ -24,9 +24,7 @@ async function getDecks() {
 
   if (!token) return;
 
-  const response = await fetch("/api/decks", { headers: {
-    Authorization: `Bearer ${token}`,
-  } });
+  const response = await fetch("/api/decks", { headers: { Authorization: token } });
 
   if (!response.ok) {
     console.error(`Failed collections fetch. Status: ${response.status}`)
