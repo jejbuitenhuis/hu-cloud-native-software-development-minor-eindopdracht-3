@@ -37,7 +37,7 @@ def lambda_handler(event, context):
             "headers": {
                 "Content-Type": "application/json",
             },
-            "statusCode": 406,
+            "statusCode": 401,
             "body": json.dumps({"message": "JWT token not provided"}),
         }
 

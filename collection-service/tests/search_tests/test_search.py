@@ -85,7 +85,7 @@ def test_search_no_authorization(setup_dynamodb_collection):
     body = json.loads(result["body"])
 
     # Assert
-    assert result["statusCode"] == 406
+    assert result["statusCode"] == 401
     assert body["message"] == "JWT token not provided"
 
 

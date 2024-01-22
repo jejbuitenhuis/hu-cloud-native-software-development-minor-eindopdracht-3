@@ -18,7 +18,7 @@ stack_name = "collection-service-development"
 s3_prefix = "collection-service-development"
 region = "us-east-1"
 parameter_overrides = [
-    "Stage=dev-env-ruben"
+    "Stage=development"
 ]
 
 [default.package.parameters]
