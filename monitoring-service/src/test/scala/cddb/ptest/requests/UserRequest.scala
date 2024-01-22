@@ -18,6 +18,4 @@ object UserRequest {
     .headers(contentTypeHeader)
     .body(StringBody("""{ "password": "${password}", "email": "${email}" }""")).asJson
 
-  val adminConfirm
-
 }

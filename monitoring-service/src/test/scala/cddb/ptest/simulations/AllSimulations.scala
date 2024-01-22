@@ -11,10 +11,10 @@ import cddb.ptest.scenarios.Scenarios._
 
 class AllSimulations extends Simulation {
 
-  val levelDuration = System.getProperty("levelDuration", "3").toInt seconds
+  val levelDuration = System.getProperty("levelDuration", "2").toInt seconds
   val rampDuration = System.getProperty("rampDuration", "2").toInt seconds
-  val userIncrease = System.getProperty("userIncrease", "0").toDouble
-  val levels = System.getProperty("levels", "3").toInt
+  val userIncrease = System.getProperty("userIncrease", "1").toDouble
+  val levels = System.getProperty("levels", "2").toInt
   val startingRate = System.getProperty("startingRate", "0").toDouble
 
 
@@ -26,13 +26,8 @@ class AllSimulations extends Simulation {
                .separatedByRampsLasting(rampDuration)
                .startingFrom(startingRate)
 
-  val adminConfirmationScenario = scenario("Admin confirm user")
-    .exec(UserRequest.adminConfirm)
-
   setUp(
-    registerScenario.inject(users)
-      .andThen(adminConfirmationScenario.inject(users))
-      .andThen(loginScenario.inject(users)),
+    registerAndLoginScenario.inject(users),
     existingUserScenario.inject(users)
   ).protocols(httpProtocol)
 }

@@ -2,10 +2,13 @@ package cddb.ptest.scenarios
 
 import scala.concurrent.duration._
 import scala.util.Random
+import java.io.PrintWriter
+
+import cddb.ptest.requests.UserRequest
+import cddb.ptest.config.ConfirmUser
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import cddb.ptest.requests.UserRequest
 
 object Scenarios {
 
@@ -20,25 +23,15 @@ object Scenarios {
   ))
 
 
-  val registerScenario = scenario("Register user")
+  val registerAndLoginScenario = scenario("Combined Registration, confirmation and Login")
     .feed(credentialsFeeder)
-    .exec(UserRequest.register.check(status.is(201))
-      .exec(session => {
-        val email = session("email").as[String]
-        val password = session("password").as[String]
-        session.set("registeredEmail", email).set("registeredPassword", password)
-      })
-    )
-
-  val loginScenario = scenario("Login with registered user")
-    .exec(
-      exec(session => {
-        val email = session("registeredEmail").as[String]
-        val password = session("registeredPassword").as[String]
-        session
-      })
-    )
-    .exec(UserRequest.login)
+    .exec(UserRequest.register.check(status.is(201)))
+    .exec(session => {
+      val email = session("email").as[String]
+      ConfirmUser.adminConfirmUser(email)
+      session
+    })
+    .exec(UserRequest.login.check(status.is(200)))
 
   val existingUserScenario = scenario("Register existing user")
     .feed(existingUserFeeder)
@@ -52,6 +45,4 @@ object Scenarios {
       })
     )
     .exec(UserRequest.register.check(status.is(409)))
-
-  
 }

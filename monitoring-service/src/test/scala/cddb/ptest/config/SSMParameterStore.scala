@@ -1,3 +1,5 @@
+package cddb.ptest.config
+
 import software.amazon.awssdk.services.ssm.SsmClient
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest
 
