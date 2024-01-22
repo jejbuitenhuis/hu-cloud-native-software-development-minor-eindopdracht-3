@@ -7,6 +7,9 @@
   "paths": {
     "/cards/{oracle_id}/{print_id}": {
       "get": {
+        "security": [
+          { "cognito": [] }
+        ],
         "summary": "Get MTG Card by Oracle ID and Print ID",
         "parameters": [
           {

@@ -7,6 +7,9 @@
   "paths": {
     "/ping": {
       "get": {
+        "security": [
+          { "cognito": [] }
+        ],
         "parameters" : [],
         "responses" : {
           "200": {
@@ -15,7 +18,9 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PingFunction.Arn}/invocations"},
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PingFunction.Arn}/invocations"
+          },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }
@@ -23,6 +28,9 @@
     },
     "/api/users": {
       "post": {
+        "security": [
+          { "NONE": [] }
+        ],
         "parameters" : [],
         "responses" : {
           "201": {
@@ -34,7 +42,9 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RegisterUserFunction.Arn}/invocations"},
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RegisterUserFunction.Arn}/invocations"
+          },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }
@@ -42,6 +52,9 @@
     },
     "/api/users/login": {
       "post": {
+        "security": [
+          { "NONE": [] }
+        ],
         "parameters" : [],
         "responses" : {
           "200": {
@@ -53,7 +66,9 @@
         },
         "x-amazon-apigateway-integration" : {
           "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LoginUserFunction.Arn}/invocations"},
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LoginUserFunction.Arn}/invocations"
+          },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }
