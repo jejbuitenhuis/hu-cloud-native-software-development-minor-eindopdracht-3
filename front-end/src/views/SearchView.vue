@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import SearchCard from '../components/SearchCard.vue';
+import {useRoute, useRouter} from "vue-router";
 
-const searchQuery = ref('');
+const router = useRouter();
+const route = useRoute();
+
+const searchQuery = ref(route.query.q);
 const cards = ref([]);
 const errorText = ref("");
 
@@ -45,10 +49,12 @@ async function findCards() {
   cards.value = [];
   errorText.value = "";
 
+  await router.replace({query: {q: searchQuery.value}});
   const apiUrl: string = `https://api.scryfall.com/cards/search?q=${searchQuery.value}`;
   const response = await requestCards(apiUrl);
   cards.value = response.data;
 }
+if (searchQuery.value !== "") findCards();
 
 async function requestCards(scryfallAPI: string): Promise<any> {
   try {
