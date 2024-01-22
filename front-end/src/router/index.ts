@@ -44,12 +44,12 @@ const router = createRouter({
 			component: () => import(/* webpackChunkName: "search" */ "../views/SearchView.vue"),
 		},
 		{
-			path: "/oracles/:oracle_id",
+			path: "/cards/:oracle_id",
 			name: "oracles",
 			component: () => import(/* webpackChunkName: "oracles" */ "../views/OracleDetailView.vue"),
 		},
 		{
-			path: "/cards/:card_id",
+			path: "/cards/:oracle_id/:card_id",
 			name: "cards",
 			component: () => import(/* webpackChunkName: "cards" */ "../views/CardDetailView.vue"),
 		},

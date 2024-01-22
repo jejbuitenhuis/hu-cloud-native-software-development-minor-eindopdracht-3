@@ -12,12 +12,13 @@ const loading = ref(true)
 async function getOracle() {
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
-  const response = await fetch(`/api/cards?oracle_id=${route.params["oracle_id"]}`, {headers: {Authorization: token}});
+  const response = await fetch(`/api/cards/${route.params["oracle_id"]}`, {headers: {Authorization: token}});
   if (!response.ok) {
     console.error(`Failed oracle fetch. Status: ${response.status}`)
     return;
   }
-  const data = await response.json() as PrintPart[];
+  const parsedData = await response.json() as any;
+  const data = await parsedData["Items"] as PrintPart[];
   const combinedPrints: CombinedPrint[] = [];
   const cards = data.filter(v => v.DataType == "Card") as PrintCard[];
   const faces = data.filter(v => v.DataType == "Face") as PrintFace[];
@@ -25,7 +26,7 @@ async function getOracle() {
   for (const card of cards) {
     combinedPrints.push({
       ...card,
-      Faces: faces.filter(v => v.GSI1PK == card.GSI1PK)
+      Faces: faces.filter(v => v.PrintId == card.PrintId)
     })
   }
   combinedPrints.sort((a, b) => new Date(b.ReleasedAt).getTime() - new Date(a.ReleasedAt).getTime())
@@ -73,7 +74,7 @@ getOracle();
             <td>{{ new Date(print.ReleasedAt).toLocaleDateString("nl-nl") }}</td>
             <td>{{ print.Rarity }}</td>
             <td>{{ print.Price == null ? "-" : `€${print.Price}` }}</td>
-            <td><router-link :to="`/cards/${print.GSI1PK.replace('PrintId#', '')}`">View</router-link></td>
+            <td><router-link :to="`/cards/${print.OracleId}/${print.PrintId}`">View</router-link></td>
           </tr>
           </tbody>
         </table>

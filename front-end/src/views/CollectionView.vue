@@ -26,7 +26,7 @@ async function getCollection() {
   for (const instanceCard of instanceCards) {
     const newInstance: CombinedPrint = {
       ...instanceCard,
-      Faces: instanceFaces.filter(v => v.GSI1PK === instanceCard.GSI1SK)
+      Faces: instanceFaces.filter(v => v.OracleId === instanceCard.PrintId)
     }
 
     if (instanceCard.PK in newCollection) {

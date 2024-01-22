@@ -1,8 +1,8 @@
 export type PrintCard = {
   PK: string,
   SK: string,
-  GSI1PK: string,
-  GSI1SK: string,
+  OracleId: string,
+  PrintId: string,
   DataType: "Card",
   OracleName: string,
   Price: number | null,
@@ -13,8 +13,8 @@ export type PrintCard = {
 export type PrintFace = {
   PK: string,
   SK: string,
-  GSI1PK: string,
-  GSI1SK: string,
+  OracleId: string,
+  PrintId: string,
   DataType: "Face",
   Colors: string,
   FaceName: string,

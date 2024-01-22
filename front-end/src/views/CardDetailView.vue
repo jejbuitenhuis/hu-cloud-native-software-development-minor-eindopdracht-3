@@ -11,21 +11,20 @@ const card = ref<CombinedPrint | null>(null);
 async function getCard() {
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
-  const response = await fetch(`/api/cards/${route.params["card_id"]}`, {headers: {Authorization: token}});
+  const response = await fetch(`/api/cards/${route.params["oracle_id"]}/${route.params["card_id"]}`, {headers: {Authorization: token}});
   if (!response.ok) {
     console.error(`Failed card fetch. Status: ${response.status}`)
     return;
   }
-  const data = await response.json() as PrintPart[];
+  const parsedData = await response.json() as any;
+  const data = await parsedData["Items"] as PrintPart[];
   const rawCard = data.find(v => v.DataType == "Card") as PrintCard;
   const faces = data.filter(v => v.DataType == "Face") as PrintFace[];
 
-  const newCard: CombinedPrint = {
+  card.value = {
     ...rawCard,
     Faces: faces,
   };
-
-  card.value = newCard;
   loading.value = false;
 }
 getCard();

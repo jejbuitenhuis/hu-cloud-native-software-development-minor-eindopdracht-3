@@ -18,7 +18,7 @@ if (cardObject.hasOwnProperty('image_uris')) {
 
 <template>
   <article class="cardItem">
-    <RouterLink :to="`/oracles/${cardOracle}`">
+    <RouterLink :to="`/cards/${cardOracle}`">
       <span>{{ cardName }}</span>
       <div>
         <img class="image" :src="cardImageLink" :alt="cardName">
