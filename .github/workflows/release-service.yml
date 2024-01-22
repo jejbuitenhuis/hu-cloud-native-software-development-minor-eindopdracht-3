@@ -21,23 +21,17 @@ jobs:
       SONAR_TOKEN_COLLECTION: ${{ secrets.SONAR_TOKEN_COLLECTION }}
       SONAR_TOKEN_FRONT_END: ${{ secrets.SONAR_TOKEN_FRONT_END }}
 
-  test-and-deploy-production:
+  deploy-production:
     needs: test-and-deploy-staging
-    uses: ./.github/workflows/test-and-deploy-environment.yml
+    uses: ./.github/workflows/build-dev-environment.yml
     with:
       environment: production
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      SONAR_TOKEN_CARD: ${{ secrets.SONAR_TOKEN_CARD }}
-      SONAR_TOKEN_USER: ${{ secrets.SONAR_TOKEN_USER }}
-      SONAR_TOKEN_DECK: ${{ secrets.SONAR_TOKEN_DECK }}
-      SONAR_TOKEN_WISHLIST: ${{ secrets.SONAR_TOKEN_WISHLIST }}
-      SONAR_TOKEN_COLLECTION: ${{ secrets.SONAR_TOKEN_COLLECTION }}
-      SONAR_TOKEN_FRONT_END: ${{ secrets.SONAR_TOKEN_FRONT_END }}
 
   tag-and-release:
-    needs: test-and-deploy-production
+    needs: deploy-production
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
