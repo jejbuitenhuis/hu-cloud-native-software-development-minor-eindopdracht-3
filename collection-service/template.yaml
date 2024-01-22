@@ -134,6 +134,7 @@ Resources:
           STAGE: !Sub "${Stage}"
       Policies:
         - AmazonDynamoDBFullAccess
+        - AmazonSSMReadOnlyAccess
 
 Outputs:
   MTGCollectionApiUrl:
