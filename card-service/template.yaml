@@ -128,7 +128,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCardApi"
-            Path: /api/cards/{oracle_id}/{card_id}
+            Path: /api/cards/{oracle_id}/{print_id}
             Method: get
 
   SchedulerRole:

@@ -29,6 +29,8 @@ def turnCardIntoFaceItem(card, oracle_id, scryfall_id, face_count=1, ):
     return {
         "PK": f'OracleId#{oracle_id}',
         "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
+        "OracleId": oracle_id,
+        "PrintId": scryfall_id,
         "OracleText": str.lower(card.get('oracle_text', '')),
         "ManaCost": card.get('mana_cost', ''),
         "TypeLine": card.get('type_line', ''),
@@ -43,6 +45,8 @@ def turnFaceIntoFaceItem(face, oracle_id, scryfall_id, face_count=1):
     return {
         "PK": f'OracleId#{oracle_id}',
         "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
+        "OracleId": oracle_id,
+        "PrintId": scryfall_id,
         "OracleText": str.lower(face.get('oracle_text', '')),
         "ManaCost": face.get('mana_cost', ''),
         "TypeLine": face.get('type_line', ''),
