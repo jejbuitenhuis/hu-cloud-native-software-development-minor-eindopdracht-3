@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: The environment name for the stack
+        description: The environment name for the stack. Only lower-case and no spaces!
         required: true
         type: string
   workflow_call:
@@ -22,7 +22,6 @@ jobs:
   deploy-common-service:
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
-      path: ./common-service
       service-name: common-service
       environment: ${{ inputs.environment }}
     secrets:
@@ -33,7 +32,6 @@ jobs:
     needs: deploy-common-service
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
-      path: ./card-service
       service-name: card-service
       environment: ${{ inputs.environment }}
     secrets:
@@ -44,7 +42,6 @@ jobs:
     needs: deploy-common-service
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
-      path: ./collection-service
       service-name: collection-service
       environment: ${{ inputs.environment }}
     secrets:
@@ -55,7 +52,6 @@ jobs:
     needs: deploy-common-service
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
-      path: ./deck-service
       service-name: deck-service
       environment: ${{ inputs.environment }}
     secrets:
@@ -66,7 +62,6 @@ jobs:
     needs: deploy-common-service
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
-      path: ./user-service
       service-name: user-service
       environment: ${{ inputs.environment }}
     secrets:
@@ -77,7 +72,6 @@ jobs:
     needs: deploy-common-service
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
-      path: ./wishlist-service
       service-name: wishlist-service
       environment: ${{ inputs.environment }}
     secrets:
