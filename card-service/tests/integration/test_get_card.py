@@ -49,7 +49,7 @@ def setup_items():
     return [
         {
             "PK": f'OracleId#562d71b9-1646-474e-9293-55da6947a758',
-            "SK": f'PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card',
+            "SK": f'PrintId#67f4c93b-080c-4196-b095-6a120a221988',
             "OracleId": "562d71b9-1646-474e-9293-55da6947a758",
             "PrintId": "67f4c93b-080c-4196-b095-6a120a221988",
             "OracleName": "Agadeem's Awakening // Agadeem, the Undercrypt",

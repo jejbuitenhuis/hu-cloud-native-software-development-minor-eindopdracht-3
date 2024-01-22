@@ -57,7 +57,7 @@ def createCardInfo(card, oracle_id):
     try:
         return {
             "PK": f'OracleId#{oracle_id}',
-            "SK": f'PrintId#{card["id"]}#Card',
+            "SK": f'PrintId#{card["id"]}',
             "OracleName": card['name'],
             "SetName": card['set_name'],
             "ReleasedAt": card['released_at'],

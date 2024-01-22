@@ -45,7 +45,7 @@ def setup_get_card_response():
 
     return {
             "PK": f'OracleId#562d71b9-1646-474e-9293-55da6947a758',
-            "SK": f'PrintId#67f4c93b-080c-4196-b095-6a120a221988#Card',
+            "SK": f'PrintId#67f4c93b-080c-4196-b095-6a120a221988',
             "OracleId": "562d71b9-1646-474e-9293-55da6947a758",
             "PrintId": "67f4c93b-080c-4196-b095-6a120a221988",
             "OracleName": "Agadeem's Awakening // Agadeem, the Undercrypt",
@@ -94,7 +94,7 @@ def setup_saved_cards_response():
     return [
         {
             "PK": "UserId#1",
-            "SK": "CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2#Card",
+            "SK": "CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2",
             "PrintId": "67f4c93b-080c-4196-b095-6a120a221988",
             "CardInstanceId": "6c538e3f-068d-44af-9117-ef3f653831d2",
             "Condition": "MINT",
@@ -165,10 +165,9 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, aws_credentials
     mock_uuid.return_value = mocked_uuid
 
     table = setup_table()
-    items = setup_get_card_response()
     get_card_response = {
-        "status_code": 200,
-        "body": json.dumps({"Items": items})
+        "statusCode": 200,
+        "body": json.dumps(setup_get_card_response())
     }
     jwt_token = generate_jwt_token()
 
@@ -196,10 +195,10 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, aws_credentials
     # Assert
     card = table.query(
         KeyConditionExpression=Key('PK').eq('UserId#test-user') & Key('SK').eq(
-            'CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2#Card')
+            'CardInstanceId#6c538e3f-068d-44af-9117-ef3f653831d2')
     )
 
-    assert result['status_code'] == 201
+    assert result['statusCode'] == 201
     assert card['Items'][0]['PrintId'] == '67f4c93b-080c-4196-b095-6a120a221988'
     assert card['Items'][0]['Condition'] == 'MINT'
 
@@ -242,7 +241,7 @@ def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid, aws_credent
     mock_uuid.return_value = mocked_uuid
 
     get_card_response = {
-        "status_code": 404,
+        "statusCode": 404,
         "body": json.dumps({
             "Message": "Card not found."
         })
@@ -273,6 +272,6 @@ def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid, aws_credent
     response_body = json.loads(result['body'])
 
     # Assert
-    assert result['status_code'] == 404
+    assert result['statusCode'] == 404
     assert response_body['Message'] == 'Card not found.'
 
