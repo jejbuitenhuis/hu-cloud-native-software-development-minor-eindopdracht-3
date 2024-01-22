@@ -21,7 +21,7 @@ def test_get_collection(setup_dynamodb):
 
     # Assert the response
     assert response['statusCode'] == 200
-    body = json.loads(response['body'])
+    body = json.loads(response['body'])["Items"]
     assert len(body) == 3
 
 
