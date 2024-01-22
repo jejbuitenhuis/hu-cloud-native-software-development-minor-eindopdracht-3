@@ -41,7 +41,7 @@ def setup_table():
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "renew_cards_tests/single_faced_cards.json"})
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/single_faced_cards.json"})
 @mock_dynamodb
 def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credentials):
     # Arrange
@@ -55,7 +55,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credenti
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open(r'renew_cards_tests/json_test_files/10_cards.json', 'r', encoding='utf-8') as file:
+        with open(r'tests/renew_cards_tests/json_test_files/10_cards.json', 'r', encoding='utf-8') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -106,7 +106,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credenti
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "renew_cards_tests/two_faced_cards.json"})
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/two_faced_cards.json"})
 @mock_dynamodb
 def test_renew_cards_two_faced(requests_mock, aws_credentials):
     # Arrange
@@ -120,7 +120,7 @@ def test_renew_cards_two_faced(requests_mock, aws_credentials):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('renew_cards_tests/json_test_files/double_faced_card_list.json', 'r', encoding='utf-8') as file:
+        with open('tests/renew_cards_tests/json_test_files/double_faced_card_list.json', 'r', encoding='utf-8') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -183,7 +183,7 @@ def test_renew_cards_two_faced(requests_mock, aws_credentials):
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "renew_cards_tests/ten_cards.json"})
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/ten_cards.json"})
 @mock_dynamodb
 def test_renew_cards_ten_cards(requests_mock, aws_credentials):
     # Arrange
@@ -198,7 +198,7 @@ def test_renew_cards_ten_cards(requests_mock, aws_credentials):
             ]
         }
         print(f"PWD: {os.getcwd()}")
-        with open('renew_cards_tests/json_test_files/10_cards.json', 'r') as file:
+        with open('tests/renew_cards_tests/json_test_files/10_cards.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -223,7 +223,7 @@ def test_renew_cards_ten_cards(requests_mock, aws_credentials):
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "renew_cards_tests/thirty_cards.json"})
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/thirty_cards.json"})
 @mock_dynamodb
 def test_renew_cards_thirty_cards(requests_mock, aws_credentials):
     # Arrange
@@ -237,7 +237,7 @@ def test_renew_cards_thirty_cards(requests_mock, aws_credentials):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('renew_cards_tests/json_test_files/30_cards.json', 'r') as file:
+        with open('tests/renew_cards_tests/json_test_files/30_cards.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -261,7 +261,7 @@ def test_renew_cards_thirty_cards(requests_mock, aws_credentials):
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "renew_cards_tests/correct_ttl.json"})
+                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/correct_ttl.json"})
 @mock_dynamodb
 def test_renew_cards_has_correct_ttl(requests_mock, aws_credentials):
     # Arrange
@@ -275,7 +275,7 @@ def test_renew_cards_has_correct_ttl(requests_mock, aws_credentials):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('renew_cards_tests/json_test_files/single_face_card_list.json', 'r') as file:
+        with open('tests/renew_cards_tests/json_test_files/single_face_card_list.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
