@@ -26,33 +26,32 @@ ttlOffSetSecs = (3 * 60 * 60)
 local_filename = os.getenv("CARD_JSON_LOCATION", "/tmp/default-cards.json")
 
 
-def turnCardIntoFaceItem(card, oracle_id, scryfall_id, face_count=1, ):
+def turnCardIntoFaceItem(card):
     image_uris = card.get('image_uris', {})
     return {
-        "PK": f'OracleId#{oracle_id}',
-        "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
-        "OracleText": str.lower(card.get('oracle_text', '')),
+        "OracleText": card.get('oracle_text', ''),
         "ManaCost": card.get('mana_cost', ''),
         "TypeLine": card.get('type_line', ''),
-        "FaceName": str.lower(card.get('name', '')),
+        "FaceName": card.get('name', ''),
         "FlavorText": card.get('flavor_text', ''),
         "ImageUrl": image_uris.get('png', ''),
         "Colors": card.get('colors', []),
-        "DataType": "Face"
+        "LowercaseFaceName": str.lower(card.get('name', '')),
+        "LowercaseOracleText": str.lower(card.get('oracle_text', ''))
     }
 
-def turnFaceIntoFaceItem(face, oracle_id, scryfall_id, face_count=1):
+
+def turnFaceIntoFaceItem(face):
     return {
-        "PK": f'OracleId#{oracle_id}',
-        "SK": f'PrintId#{scryfall_id}#Face#{face_count}',
-        "OracleText": str.lower(face.get('oracle_text', '')),
+        "OracleText": face.get('oracle_text', ''),
         "ManaCost": face.get('mana_cost', ''),
         "TypeLine": face.get('type_line', ''),
-        "FaceName": str.lower(face.get('name', '')),
+        "FaceName": face.get('name', ''),
         "FlavorText": face.get('flavor_text', ''),
         "ImageUrl": face.get('image_uris', {}).get('png', ''),
         "Colors": face.get('colors', []),
-        "DataType": "Face"
+        "LowercaseFaceName": str.lower(face.get('name', '')),
+        "LowercaseOracleText": str.lower(face.get('oracle_text', ''))
     }
 
 
@@ -61,14 +60,14 @@ def createCardInfo(card, oracle_id):
         return {
             "PK": f'OracleId#{oracle_id}',
             "SK": f'PrintId#{card["id"]}#Card',
-            "OracleName": str.lower(card['name']),
-            "SetName": str.lower(card['set_name']),
+            "OracleName": card['name'],
+            "SetName": card['set_name'],
             "ReleasedAt": card['released_at'],
             "Rarity": card['rarity'],
             "Price": card['prices']['eur'],
             "OracleId": oracle_id,
             "PrintId": card['id'],
-            "DataType": "Card"
+            "LowerCaseOracleName" : str.lower(card.get('name', ''))
         }
     except Exception as error:
         logger.error(f"An error has occurred while processing card: \n{card}\n "
@@ -79,6 +78,14 @@ def getOracleFromCard(card):
         return card['card_faces'][0]['oracle_id']
     else:
         return card['oracle_id']
+
+def getCombinedLowerCaseOracleText(faces):
+    loweredText = "";
+    for face in faces:
+        loweredText += str.lower(face.get('OracleText', ''))
+        loweredText += " "
+    return loweredText
+
 
 
 # Can only handle 25 items at a time!
@@ -146,21 +153,24 @@ def lambda_handler(event, context):
             oracle_id = getOracleFromCard(card)
             card_info = createCardInfo(card, oracle_id)
             card_faces = []
-            item_list.append(card_info)
 
             if card.get("card_faces") != None:
                 face_count = 0
                 for face in card['card_faces']:
                     face_count += 1
-                    card_faces.append(turnFaceIntoFaceItem(face, oracle_id, card['id'], face_count))
+                    card_faces.append(turnFaceIntoFaceItem(face))
             else:
-                card_faces.append(turnCardIntoFaceItem(card, oracle_id, card['id']))
+                card_faces.append(turnCardIntoFaceItem(card))
 
-            item_list.extend(card_faces)
+            card_info['CardFaces'] = card_faces
+            card_info['CombinedLowercaseOracleText'] = getCombinedLowerCaseOracleText(card_faces)
+            item_list.append(card_info)
             item_list = cutTheListAndPersist(item_list, ttl)
 
         item_list = cutTheListAndPersist(item_list, ttl)
 
-        writeBatchToDb(item_list, table, ttl)
+        if len(item_list) != 0:
+            writeBatchToDb(item_list, table, ttl)
+
         logger.info("Finished!")
     return True
