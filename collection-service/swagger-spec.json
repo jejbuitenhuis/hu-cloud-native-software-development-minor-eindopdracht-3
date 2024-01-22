@@ -7,6 +7,9 @@
   "paths": {
     "/api/collections": {
       "get": {
+        "security": [
+          { "cognito": [] }
+        ],
         "parameters": [
           {
             "name": "Authorization",
@@ -139,6 +142,9 @@
     },
     "/api/collections/{instance_id}": {
       "get": {
+        "security": [
+          { "cognito": [] }
+        ],
         "parameters": [
           {
             "name": "instance_id",

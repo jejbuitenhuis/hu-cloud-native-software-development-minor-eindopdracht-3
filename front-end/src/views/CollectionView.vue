@@ -13,7 +13,7 @@ const collectionLoading = ref<boolean>(true);
 async function getCollection() {
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
-  const response = await fetch("/api/collections", {headers: {Authorization: token}});
+  const response = await fetch("/api/collections", { headers: { Authorization: token } });
   if (!response.ok) {
     console.error(`Failed collections fetch. Status: ${response.status}`)
     return;
