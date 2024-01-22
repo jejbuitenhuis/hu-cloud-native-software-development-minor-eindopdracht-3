@@ -8,6 +8,7 @@ from jose import jwt
 from moto import mock_dynamodb
 from botocore.stub import Stubber
 from boto3.dynamodb.conditions import Key
+import requests_mock
 import pytest
 
 import logging
@@ -136,7 +137,7 @@ def setup_table():
 @mock_dynamodb
 @patch('functions.add_card.app.uuid.uuid4')
 @patch('functions.add_card.app.boto3.client')
-def test_lambda_handler_successful(mock_boto3_client, mock_uuid, requests_mock, aws_credentials):
+def test_lambda_handler_successful(mock_boto3_client, mock_uuid, aws_credentials, requests_mock):
     # Arrange
     mocked_url = "https://mockapi.example.com"
     mock_ssm = mock_boto3_client.return_value
@@ -213,7 +214,7 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, requests_mock, 
 @mock_dynamodb
 @patch('functions.add_card.app.uuid.uuid4')
 @patch('functions.add_card.app.boto3.client')
-def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid,requests_mock, aws_credentials):
+def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid, aws_credentials, requests_mock):
     # Arrange
     mocked_url = "https://mockapi.example.com"
     mock_ssm = mock_boto3_client.return_value
