@@ -2,11 +2,11 @@
 import {useRoute} from "vue-router";
 import {ref} from "vue";
 import DecoratedText from "@/components/DecoratedText.vue";
-import type {CombinedPrint, PrintCard, PrintFace, PrintPart} from "@/models/cardModels";
+import type {PrintCard} from "@/models/cardModels";
 
 const route = useRoute();
 const loading = ref(true)
-const card = ref<CombinedPrint | null>(null);
+const card = ref<PrintCard | null>(null);
 
 async function getCard() {
   const token = localStorage.getItem("jwtToken");
@@ -17,14 +17,7 @@ async function getCard() {
     return;
   }
   const parsedData = await response.json() as any;
-  const data = await parsedData["Items"] as PrintPart[];
-  const rawCard = data.find(v => v.DataType == "Card") as PrintCard;
-  const faces = data.filter(v => v.DataType == "Face") as PrintFace[];
-
-  card.value = {
-    ...rawCard,
-    Faces: faces,
-  };
+  card.value = parsedData['Items'][0] as PrintCard;
   loading.value = false;
 }
 getCard();
@@ -34,14 +27,14 @@ getCard();
   <p v-if="loading" class="centered-content">Loading</p>
   <div v-if="!loading && card != null" class="card-wrapper">
     <div class="card-image">
-      <img v-for="face in card.Faces" :src="face.ImageUrl" :alt="face.FaceName">
+      <img v-for="face in card.CardFaces" :src="face.ImageUrl" :alt="face.FaceName">
     </div>
 
     <div>
       <div class="card-info">
         <h2>{{ card.OracleName }}</h2>
-        <DecoratedText :text="card.Faces[0].OracleText"/>
-        <div v-for="face in card.Faces" class="face-info">
+        <DecoratedText :text="card.CardFaces[0].OracleText"/>
+        <div v-for="face in card.CardFaces" class="face-info">
           <div>
             <p>{{ face.FaceName }}</p>
             <DecoratedText :text="face.ManaCost"/>

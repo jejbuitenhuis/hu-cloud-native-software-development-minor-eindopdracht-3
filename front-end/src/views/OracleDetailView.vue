@@ -2,11 +2,11 @@
 import {useRoute} from "vue-router";
 import {ref} from "vue";
 import DecoratedText from "@/components/DecoratedText.vue";
-import type {CombinedPrint, PrintCard, PrintFace, PrintPart} from "@/models/cardModels";
+import type {PrintCard} from "@/models/cardModels";
 
 const route = useRoute();
-const allPrints = ref<CombinedPrint[] | null>()
-const oracle = ref<CombinedPrint | null>()
+const allPrints = ref<PrintCard[] | null>()
+const oracle = ref<PrintCard | null>()
 const loading = ref(true)
 
 async function getOracle() {
@@ -18,20 +18,12 @@ async function getOracle() {
     return;
   }
   const parsedData = await response.json() as any;
-  const data = await parsedData["Items"] as PrintPart[];
-  const combinedPrints: CombinedPrint[] = [];
-  const cards = data.filter(v => v.DataType == "Card") as PrintCard[];
-  const faces = data.filter(v => v.DataType == "Face") as PrintFace[];
+  const data = await parsedData["Items"] as PrintCard[];
+  // Sort the prints on release date
+  data.sort((a, b) => new Date(b.ReleasedAt).getTime() - new Date(a.ReleasedAt).getTime())
 
-  for (const card of cards) {
-    combinedPrints.push({
-      ...card,
-      Faces: faces.filter(v => v.PrintId == card.PrintId)
-    })
-  }
-  combinedPrints.sort((a, b) => new Date(b.ReleasedAt).getTime() - new Date(a.ReleasedAt).getTime())
-  allPrints.value = combinedPrints;
-  oracle.value = combinedPrints[0];
+  allPrints.value = data;
+  oracle.value = data[0];
   loading.value = false;
 }
 getOracle();
@@ -41,14 +33,14 @@ getOracle();
   <p v-if="loading" class="centered-content">Loading</p>
   <div v-if="!loading && oracle != null" class="oracle-wrapper">
     <div class="oracle-image">
-      <img v-for="face in oracle.Faces" :src="face.ImageUrl" :alt="face.FaceName">
+      <img v-for="face in oracle.CardFaces" :src="face.ImageUrl" :alt="face.FaceName">
     </div>
 
     <div>
       <div class="oracle-info">
         <h2>{{ oracle.OracleName }}</h2>
-        <DecoratedText :text="oracle.Faces[0].OracleText"/>
-        <div v-for="face in oracle.Faces" class="face-info">
+        <DecoratedText :text="oracle.CardFaces[0].OracleText"/>
+        <div v-for="face in oracle.CardFaces" class="face-info">
           <div>
             <p>{{ face.FaceName }}</p>
             <DecoratedText :text="face.ManaCost"/>
