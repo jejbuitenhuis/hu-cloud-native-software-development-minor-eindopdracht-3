@@ -16,8 +16,7 @@ async function getCard() {
     console.error(`Failed card fetch. Status: ${response.status}`)
     return;
   }
-  const parsedData = await response.json() as any;
-  card.value = parsedData['Items'][0] as PrintCard;
+  card.value = await response.json() as PrintCard;
   loading.value = false;
 }
 getCard();
