@@ -103,7 +103,7 @@ def test_lambda_handler_successful():
     result = functions.get_card.app.lambda_handler(event, {})
 
     # Assert
-    assert result['status_code'] == 200
+    assert result['statusCode'] == 200
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
@@ -127,6 +127,6 @@ def test_lambda_handler_card_not_found():
     result = functions.get_card.app.lambda_handler(event, {})
 
     # Assert
-    assert result['status_code'] == 404
+    assert result['statusCode'] == 404
     response_body = json.loads(result['body'])
     assert response_body['Message'] == 'Card not found.'
