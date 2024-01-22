@@ -35,15 +35,13 @@ async function createDeck(): Promise<ReturnType<typeof router.push>> {
   }
 
   const token = getToken();
-
   if (!token) {
     return router.push(`/login/?redirect_url=${encodeURIComponent(router.currentRoute.value.path)}`);
   }
-
   const response = await fetch("/api/decks/", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: token,
     },
     body: JSON.stringify({
       name: deckName.value,
