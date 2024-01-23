@@ -10,6 +10,7 @@ import cddb.ptest.requests.CardRequest
 
 import cddb.ptest.utils.ConfirmUser
 
+import io.gatling.core.feeder.Feeder
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
@@ -25,13 +26,17 @@ object Scenarios {
     "email" -> "existing@mail.com"
   ))
 
+  private val cardFeeder = jsonFile("src/test/resources/bodies/cards.json").shuffle
+
+  private val addCardsScenario = repeat(5) {
+    feed(cardFeeder)
+      .exec(CollectionRequest.addCardToCollection.check(status.is(201)))
+      .pause(50 millis)
+  }
+
   private val deckNameFeeder = Iterator.continually(Map(
     "deckname" -> Random.alphanumeric.take(8).mkString
   ))
-
-  // Add Cards to DB on initial setup
-  val addCardsScenario = scenario("Add Cards to DB on initial setup")
-    .exec(addCardsFromJsonToTable())
 
   // Registration, Confirmation, Login, Collection, Deck and Cards Scenario
   val registerLoginCollectionDeckAndCardsScenario = scenario("Registration, Confirmation, Login, Collection, Deck and Cards Scenario")
@@ -44,26 +49,24 @@ object Scenarios {
       ConfirmUser.adminConfirmUser(email)
       session
     })
+    .pause(50 millis)
 
-    // Login user and extrqact token
-    .exec(UserRequest.login.check(status.is(200))
-      .check(jsonPath("$.token").saveAs("authToken"))
-      .exec(session => {
-        val authToken = session("authToken").as[String]
-        session.set("authToken", authToken)
+    // Login user and extract token
+    .exec(
+      exec(session => {
+        UserRequest.login.check(status.is(200))
+        println("Login token: " + session("authToken").as[String])
+        session
       })
     )
+    .pause(50 millis)
 
     // Add to and get collection
-    .during(5) {
-      exec(CollectionRequest.addCardToCollection)
-        .pause(5 millis)
-    }
-    .exec(CollectionRequest.getCollectionFromUser)
+    .exec(addCardsScenario)
 
     // Create deck, add cards and get all deckcards
     .feed(deckNameFeeder)
-    .exec(DeckRequest.createDeck(deckNameFeeder).check(status.is(201)))
+    .exec(DeckRequest.createDeck.check(status.is(201)))
     .during(5) {
       exec(DeckRequest.addCardToDeck.check(status.is(201)))
         .pause(5 millis)

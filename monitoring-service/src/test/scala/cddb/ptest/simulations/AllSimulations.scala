@@ -9,6 +9,7 @@ import io.gatling.jdbc.Predef._
 import cddb.ptest.config.ApiUrlConfig.userApiUrl
 import cddb.ptest.scenarios.Scenarios._
 
+
 class AllSimulations extends Simulation {
 
   val levelDuration = System.getProperty("levelDuration", "3").toInt seconds
@@ -28,9 +29,7 @@ class AllSimulations extends Simulation {
                .startingFrom(startingRate)
 
   setUp(
-    addCardsScenario,
-    nothingFor(pauseDuration seconds),
-    registerAndLoginScenario.inject(users),
+    registerLoginCollectionDeckAndCardsScenario.inject(users),
     existingUserScenario.inject(users)
   ).protocols(httpProtocol)
 }

@@ -19,9 +19,12 @@ object UserRequest {
   
   val existingRegister = createUserRequest("Existing Register User")
 
-  val login = http("login user")
+  val login = http("Rogin user")
     .post("/api/users/login")
     .headers(contentTypeHeader)
     .body(StringBody("""{ "password": "${password}", "email": "${email}" }""")).asJson
-
+    .check(
+      status.is(200),
+      jsonPath("#.token").saveAs("authToken")
+    )
 }
