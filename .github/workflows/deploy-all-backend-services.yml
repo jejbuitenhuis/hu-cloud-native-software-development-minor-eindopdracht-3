@@ -28,36 +28,6 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  deploy-card-service:
-    needs: deploy-common-service
-    uses: ./.github/workflows/release-back-end-pipeline.yml
-    with:
-      service-name: card-service
-      environment: ${{ inputs.environment }}
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-  deploy-collection-service:
-    needs: deploy-common-service
-    uses: ./.github/workflows/release-back-end-pipeline.yml
-    with:
-      service-name: collection-service
-      environment: ${{ inputs.environment }}
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-  deploy-deck-service:
-    needs: deploy-common-service
-    uses: ./.github/workflows/release-back-end-pipeline.yml
-    with:
-      service-name: deck-service
-      environment: ${{ inputs.environment }}
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
   deploy-user-service:
     needs: deploy-common-service
     uses: ./.github/workflows/release-back-end-pipeline.yml
@@ -68,8 +38,38 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+  deploy-card-service:
+    needs: deploy-user-service
+    uses: ./.github/workflows/release-back-end-pipeline.yml
+    with:
+      service-name: card-service
+      environment: ${{ inputs.environment }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy-collection-service:
+    needs: deploy-user-service
+    uses: ./.github/workflows/release-back-end-pipeline.yml
+    with:
+      service-name: collection-service
+      environment: ${{ inputs.environment }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deploy-deck-service:
+    needs: deploy-user-service
+    uses: ./.github/workflows/release-back-end-pipeline.yml
+    with:
+      service-name: deck-service
+      environment: ${{ inputs.environment }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
   deploy-wishlist-service:
-    needs: deploy-common-service
+    needs: deploy-user-service
     uses: ./.github/workflows/release-back-end-pipeline.yml
     with:
       service-name: wishlist-service
