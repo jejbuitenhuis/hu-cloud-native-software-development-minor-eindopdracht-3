@@ -94,6 +94,7 @@ Resources:
   RenewEntitiesFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "card-service-${Stage}-RenewEntitiesFunction"
       CodeUri: functions/renew_entities/
       MemorySize: 550
       Timeout: 360
@@ -106,7 +107,7 @@ Resources:
   GetCardsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${Stage}-GetCardsFunction"
+      FunctionName: !Sub "card-service-${Stage}-GetCardsFunction"
       CodeUri: functions/get_cards/
       Environment:
         Variables:
@@ -124,7 +125,7 @@ Resources:
   SearchCardsFuncion:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${Stage}-SearchCardsFuncion"
+      FunctionName: !Sub "card-service-${Stage}-SearchCardsFuncion"
       CodeUri: functions/Search/
       Environment:
         Variables:
@@ -142,7 +143,7 @@ Resources:
   GetCardFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${Stage}-GetCardFunction"
+      FunctionName: !Sub "card-service-${Stage}-GetCardFunction"
       CodeUri: functions/get_card/
       Environment:
         Variables:

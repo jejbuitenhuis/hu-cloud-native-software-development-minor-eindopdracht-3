@@ -93,6 +93,7 @@ Resources:
   SearchFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "collection-service-${Stage}-SearchFunction"
       CodeUri: functions/Search
       Events:
         HelloWorld:
@@ -110,6 +111,7 @@ Resources:
   GetCollection:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "collection-service-${Stage}-GetCollection"
       CodeUri: functions/get_collection/
       Events:
         GetCollection:
@@ -127,6 +129,7 @@ Resources:
   GetCollectionInstance:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "collection-service-${Stage}-GetCollectionInstance"
       CodeUri: functions/get_instance/
       Events:
         GetCollectionInstance:
@@ -144,7 +147,7 @@ Resources:
   AddCardToCollectionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${Stage}-AddCardToCollectionFunction"
+      FunctionName: !Sub "collection-service-${Stage}-AddCardToCollectionFunction"
       CodeUri: functions/add_card/
       Events:
         AddCard:
