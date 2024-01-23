@@ -10,6 +10,7 @@ const cardId = route.params["card_id"];
 const wantsToAddThisCard = ref<boolean>(false);
 const loading = ref(true)
 const card = ref<PrintCard | null>(null);
+const collectionCardConditionValue = ref<string>("near_mint");
 
 async function getCard() {
   const token = localStorage.getItem("jwtToken");
@@ -29,6 +30,7 @@ async function flipWantsToAddThisCard() {
 }
 
 async function addCardToCollection() {
+  if (collectionCardConditionValue.value == "") return;
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
   const response = await fetch(`/api/collections`,
@@ -40,7 +42,7 @@ async function addCardToCollection() {
       body: JSON.stringify({
         "oracle_id": oracleId,
         "print_id": cardId,
-        "condition": "mint"
+        "condition": collectionCardConditionValue.value
       }),
       method: "post"
     });
@@ -75,7 +77,7 @@ async function addCardToCollection() {
             <sl-button @click="flipWantsToAddThisCard">Add Card to Collection</sl-button>
           </div>
           <div v-if="wantsToAddThisCard" class="add-to-collection-button-wrapper">
-            <sl-select label="Card condition" value="near_mint">
+            <sl-select label="Card condition" value="near_mint" @sl-change="collectionCardConditionValue = $event.target.value">
               <sl-option value="mint">Mint</sl-option>
               <sl-option value="near_mint">Near Mint</sl-option>
               <sl-option value="slightly_played">Slightly Played</sl-option>
