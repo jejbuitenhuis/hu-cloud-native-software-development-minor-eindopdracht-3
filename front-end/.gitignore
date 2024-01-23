@@ -23,3 +23,4 @@ yarn-error.log*
 .scannerwork/**
 coverage/**
 
+/cypress/downloads/

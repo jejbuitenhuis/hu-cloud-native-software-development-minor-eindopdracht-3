@@ -48,6 +48,16 @@ Resources:
                   }
                 },
                 {
+                "type": "text",
+                "x": 0,
+                "y": 18,
+                "width": 24,
+                "height": 1,
+                "properties": {
+                  "markdown": "## Import Scryfall data\n"
+                  }
+                },
+                {
                   "height": 5,
                   "width": 9,
                   "y": 2,
@@ -209,8 +219,28 @@ Resources:
                       }
                     }
                   }
+                },
+                {
+                    "type": "metric",
+                    "x": 0,
+                    "y": 19,
+                    "width": 6,
+                    "height": 6,
+                    "properties": {
+                        "metrics": [
+                            [ "AWS/Lambda", "Invocations", "FunctionName", "card-service-production-RenewEntitiesFunction-2CXI1JVuYg6z", { "region": "us-east-1", "yAxis": "left" } ]
+                        ],
+                        "view": "timeSeries",
+                        "stacked": false,
+                        "region": "us-east-1",
+                        "period": 300,
+                        "stat": "Sum",
+                        "start": "-PT3H",
+                        "title": "Import Scryfall data invocations"
+                    }
                 }
               ]
             }'
         - CloudFrontDistributionId: !ImportValue
             'Fn::Sub': "front-end-${Stage}-CloudFrontId"
+

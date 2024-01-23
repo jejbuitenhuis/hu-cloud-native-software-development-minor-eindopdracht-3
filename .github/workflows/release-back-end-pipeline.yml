@@ -1,11 +1,18 @@
 name: Deploy a back-end service
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
-      path:
+      environment:
+        description: The environment name for the stack. Only lower-case and no spaces!
         required: true
         type: string
+      service-name:
+        description: The service name. Example user-service
+        required: true
+        type: string
+  workflow_call:
+    inputs:
       environment:
         required: true
         type: string
@@ -23,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ inputs.path }}
+        working-directory: ./${{ inputs.service-name }}
 
     steps:
       - uses: actions/checkout@v4

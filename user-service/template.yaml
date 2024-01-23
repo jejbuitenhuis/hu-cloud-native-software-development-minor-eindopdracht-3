@@ -23,6 +23,9 @@ Parameters:
     Type: String
     Default: development
 
+Conditions:
+  IsProductionStage: !Equals [!Ref Stage, production]
+
 Resources:
   MTGUserApi:
     Type: AWS::Serverless::Api
@@ -35,6 +38,14 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: ./swagger-spec.json
+      Auth:
+        Authorizers:
+          CognitoAuth:
+            UserPoolArn:
+              Fn::ImportValue: !Sub user-service-${Stage}-cognito-user-pool
+            Identity:
+              Header: Authorization
+        DefaultAuthorizer: CognitoAuth
       MethodSettings:
         - ResourcePath: '/*'
           HttpMethod: '*'
@@ -46,6 +57,13 @@ Resources:
 
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
+
+  MTGUserApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGUserApi/url
+      Type: String
+      Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
 
   PingFunction:
     Type: AWS::Serverless::Function
@@ -75,6 +93,10 @@ Resources:
       Schema:
         - Name: email
           AttributeDataType: String
+      EmailConfiguration:
+        EmailSendingAccount: DEVELOPER
+        SourceArn: arn:aws:ses:us-east-1:861259332787:identity/dragons.cloud-native-minor.it
+        From: !If [IsProductionStage, "verify@dragons.cloud-native-minor.it", !Sub "verify-${Stage}@dragons.cloud-native-minor.it"]
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
@@ -95,6 +117,7 @@ Resources:
   RegisterUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${Stage}-RegisterUserFunction"
       CodeUri: functions/register_user/
       Events:
         RegisterUser:
@@ -109,11 +132,25 @@ Resources:
           USER_POOL_ID: !Ref UserPool
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AmazonCognitoPowerUser
+        - !Ref RegisterUserFunctionPolicy
+
+  RegisterUserFunctionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${Stage}-RegisterUserFunctionPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - cognito-idp:SignUp
+              - cognito-idp:AdminGetUser
+            Resource: "*"
 
   LoginUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${Stage}-LoginUserFunction"
       CodeUri: functions/login_user/
       Events:
         LoginUser:
@@ -127,24 +164,47 @@ Resources:
           USER_POOL_CLIENT_ID: !Ref UserPoolClient
       Policies:
         - AWSLambdaBasicExecutionRole
-        - AmazonCognitoPowerUser
+        - !Ref LoginFunctionPolicy
+
+  LoginFunctionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${Stage}-LoginFunctionPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - cognito-idp:InitiateAuth
+            Resource: "*"
 
 Outputs:
   UserPoolClientId:
     Description: UserPool Client Id
     Value: !Ref UserPoolClient
+
   UserPoolId:
     Description: UserPool Id
     Value: !Ref UserPool
+
+  UserPoolArn:
+    Description: UserPool Arn
+    Value: !GetAtt UserPool.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-cognito-user-pool
+
   RegisterUserFunction:
     Description: Function
     Value: !GetAtt RegisterUserFunction.Arn
+
   LoginUserFunction:
     Description: Function
     Value: !GetAtt LoginUserFunction.Arn
+
   MTGUserApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
   MTGUserApi:
     Description: "Api gateway"
     Value: !Ref MTGUserApi

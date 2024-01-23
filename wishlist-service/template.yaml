@@ -35,6 +35,14 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: ./swagger-spec.json
+      Auth:
+        Authorizers:
+          CognitoAuth:
+            UserPoolArn:
+              Fn::ImportValue: !Sub user-service-${Stage}-cognito-user-pool
+            Identity:
+              Header: Authorization
+        DefaultAuthorizer: CognitoAuth
       MethodSettings:
         - ResourcePath: '/*'
           HttpMethod: '*'
@@ -46,6 +54,13 @@ Resources:
 
   AccessLogGroup:
     Type: AWS::Logs::LogGroup
+
+  MTGWishlistApiUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/MTGWishlistApi/url
+      Type: String
+      Value: !Sub "https://${MTGWishlistApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
 
   MTGWishlistDynamoDBTable:
     Type: AWS::DynamoDB::Table

@@ -35,7 +35,7 @@ Resources:
         Effect: "Allow"
         Principal: "*"
         Action: "events:PutEvents"
-        Resource: !GetAtt "MTGEventBus.Arn"
+        Resource: !GetAtt MTGEventBus.Arn
 
 Outputs:
   MTGEventBus:

@@ -3,8 +3,8 @@ import "@shoelace-style/shoelace/dist/components/input/input";
 import '@shoelace-style/shoelace/dist/components/card/card';
 import type SlInput from "@shoelace-style/shoelace/dist/components/input/input";
 
-import {ref, type Ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import { ref, type Ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const email = ref('');
 const password = ref('');
@@ -24,15 +24,18 @@ function login() {
       .then((response) => {
         if (response.ok) {
           response.json()
-              .then((body) => {
-                storeSessionToken(body.token);
-              })
-          router.push("/home");
-        }
-        if (response.status === 403) {
+            .then((body) => {
+              storeSessionToken(body.token);
+
+              const returnUrl = !!router.currentRoute.value.query.redirect_url
+                ? router.currentRoute.value.query.redirect_url as string
+                : "/collection";
+
+              router.push(returnUrl);
+            });
+        } else if (response.status === 403) {
           showErrorMessage('Invalid credentials!')
-        }
-        if (response.status === 400) {
+        } else if (response.status === 400) {
           showErrorMessage('Please verify your account with the confirmation email!')
         } else {
           showErrorMessage('Something went wrong!');
@@ -41,11 +44,11 @@ function login() {
 }
 
 function storeSessionToken(token: string) {
-  localStorage.setItem("jwtToken", token);
+  localStorage.setItem("jwtToken", `Bearer ${token}`);
 }
 
 function showErrorMessage(error: string) {
-  console.log(error);
+  console.error(error);
   errorMessage.value = error;
 }
 
@@ -60,10 +63,6 @@ function isFormValid(): boolean {
   }
 
   return true;
-}
-
-function handleInput() {
-  console.log("handle input");
 }
 
 async function sendData(email: string, password: string) {
@@ -88,11 +87,11 @@ async function sendData(email: string, password: string) {
       <h1>Login</h1>
       <form id="login-form" @submit.prevent.submit="login">
         <sl-input label="Email" id="email" type="email" placeholder="Email" required v-model="email"
-                  ref="emailInput"></sl-input>
+                  ref="emailInput" data-test-id="email"></sl-input>
         <sl-input label="Password" id="password" password-toggle placeholder="Password" type="password" required
-                  v-model="password" @sl-input="handleInput" ref="passwordInput"></sl-input>
+                  v-model="password" ref="passwordInput" data-test-id="password"></sl-input>
         <p class="error" id="error-message" v-if="errorMessage">{{ errorMessage }}</p>
-        <sl-button id="login" class="button" variant="primary" type="submit">Login</sl-button>
+        <sl-button id="login" class="button" variant="primary" type="submit" data-test-id="submit">Login</sl-button>
       </form>
     </sl-card>
   </div>
@@ -116,6 +115,6 @@ async function sendData(email: string, password: string) {
 }
 
 .error {
-  color: var(--sl-color-red-200)
+  color: var(--sl-color-red-200);
 }
 </style>

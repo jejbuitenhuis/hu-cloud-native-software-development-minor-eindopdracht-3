@@ -7,8 +7,8 @@ export default defineConfig({
 	server: {
 		port: 8080,
 		proxy: {
-			'/api': {
-				target : "https://dyuhohayf454t.cloudfront.net",
+			"/api": {
+				target : "https://d3m6kngt9xtwhs.cloudfront.net",
 				changeOrigin: true
 			}
 		}

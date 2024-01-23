@@ -1,7 +1,4 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
-import RegisterView from "../views/RegisterView.vue";
-import LoginView from "../views/LoginView.vue";
 
 const router = createRouter({
 	history: createWebHashHistory(),
@@ -9,22 +6,57 @@ const router = createRouter({
 		{
 			path: "/",
 			name: "home",
-			component: HomeView,
+			component: () => import(/* webpackChunkName: "home" */ "../views/HomeView.vue"),
 		},
 		{
 			path: "/register",
 			name: "register",
-			component: RegisterView,
+			component: () => import(/* webpackChunkName: "register" */ "../views/RegisterView.vue"),
 		},
 		{
 			path: "/login",
 			name: "login",
-			component: LoginView,
+			component: () => import(/* webpackChunkName: "login" */ "../views/LoginView.vue"),
+		},
+		{
+			path: "/decks",
+			name: "decks",
+			component: () => import(/* webpackChunkName: "decks-view" */ "../views/Deck/DecksView.vue"),
+		},
+		{
+			path: "/decks/:deck_id",
+			name: "deck",
+			component: () => import(/* webpackChunkName: "deck-view" */ "../views/Deck/DeckView.vue"),
+		},
+		{
+			path: "/decks/new",
+			name: "create-deck",
+			component: () => import(/* webpackChunkName: "create-deck" */ "../views/Deck/CreateDeckView.vue"),
+		},
+		{
+			path: "/collection",
+			name: "collection",
+			component: () => import(/* webpackChunkName: "collection" */ "../views/CollectionView.vue"),
+		},
+        {
+			path: "/search",
+			name: "search",
+			component: () => import(/* webpackChunkName: "search" */ "../views/SearchView.vue"),
+		},
+		{
+			path: "/cards/:oracle_id",
+			name: "oracles",
+			component: () => import(/* webpackChunkName: "oracles" */ "../views/OracleDetailView.vue"),
+		},
+		{
+			path: "/cards/:oracle_id/:card_id",
+			name: "cards",
+			component: () => import(/* webpackChunkName: "cards" */ "../views/CardDetailView.vue"),
 		},
 		{
 			path: "/:pathMatch(.*)*",
 			name: "not-found",
-			component: () => import("../views/NotFoundView.vue"),
+			component: () => import(/* webpackChunkName: "not-found" */ "../views/NotFoundView.vue"),
 		},
 	],
 });

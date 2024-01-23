@@ -35,5 +35,5 @@ coverage/**
 
 .idea/
 .vscode/
-
-venv
+venv/
+.vim/
