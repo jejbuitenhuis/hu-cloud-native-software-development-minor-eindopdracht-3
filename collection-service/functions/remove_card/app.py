@@ -18,6 +18,7 @@ DYNAMO_DB_COLLECTION_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
 table = DYNAMO_DB.Table(DYNAMO_DB_COLLECTION_TABLE_NAME)
 
 def lambda_handler(event, context):
+    LOGGER.info(f"Deleting card with id: {event['pathParameters']['instance_id']}")
     user_id = jwt.get_unverified_claims(event['headers']['Authorization'].replace("Bearer ", ""))["sub"]
 
     PK = f'UserId#{user_id}'
@@ -29,6 +30,7 @@ def lambda_handler(event, context):
     )
 
     if len(get_response['Items']) == 0:
+        LOGGER.info(f"Card with id: {event['pathParameters']['instance_id']} not found")
         return {
             "statusCode": 404
         }
@@ -41,10 +43,12 @@ def lambda_handler(event, context):
     )
 
     if delete_response['ResponseMetadata']['HTTPStatusCode'] != 200:
+        LOGGER.info(f"Error deleting card with id: {event['pathParameters']['instance_id']}")
         return {
             "statusCode": 500
         }
     else:
+        LOGGER.info(f"Card with id: {event['pathParameters']['instance_id']} has been deleted")
         return {
             "statusCode": 200,
             "body": "Card has been deleted",

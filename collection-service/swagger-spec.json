@@ -7,7 +7,7 @@
   "paths": {
     "/api/collection/search": {
       "get": {
-        "parameters" : [
+        "parameters": [
           {
             "name": "Authorization",
             "in": "header",
@@ -21,10 +21,9 @@
             "type": "string"
           }
         ],
-        "responses" : {
+        "responses": {
           "200": {
-            "description": "Succefull response"
-          
+            "description": "Successfull response"
           },
           "401": {
             "description": "Query string parameter not provided"
@@ -36,18 +35,22 @@
             "description": "JWT token not provided"
           }
         },
-        "x-amazon-apigateway-integration" : {
-          "httpMethod" : "POST",
-          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SearchFunction.Arn}/invocations"},
-          "passthroughBehavior" : "when_no_match",
-          "type" : "aws_proxy"
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SearchFunction.Arn}/invocations"
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
         }
       }
     },
     "/api/collections": {
       "get": {
         "security": [
-          { "cognito": [] }
+          {
+            "cognito": []
+          }
         ],
         "parameters": [
           {
@@ -180,9 +183,45 @@
       }
     },
     "/api/collections/{instance_id}": {
+      "delete": {
+        "security": [
+          {
+            "cognito": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "instance_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion of card instance"
+          },
+          "404": {
+            "description": "Card instance not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCollectionInstance.Arn}/invocations"
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      },
       "get": {
         "security": [
-          { "cognito": [] }
+          {
+            "cognito": []
+          }
         ],
         "parameters": [
           {
