@@ -64,18 +64,6 @@ Resources:
       Type: String
       Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
 
-  PingFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: functions/Ping/
-      Events:
-        HelloWorld:
-          Type: Api
-          Properties:
-            RestApiId: !Ref "MTGUserApi"
-            Path: /ping
-            Method: get
-
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
