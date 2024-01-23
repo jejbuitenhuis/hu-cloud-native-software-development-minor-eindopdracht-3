@@ -29,6 +29,10 @@ object Scenarios {
     "deckname" -> Random.alphanumeric.take(8).mkString
   ))
 
+  // Add Cards to DB on initial setup
+  val addCardsScenario = scenario("Add Cards to DB on initial setup")
+    .exec(addCardsFromJsonToTable())
+
   // Registration, Confirmation, Login, Collection, Deck and Cards Scenario
   val registerLoginCollectionDeckAndCardsScenario = scenario("Registration, Confirmation, Login, Collection, Deck and Cards Scenario")
     .feed(credentialsFeeder)

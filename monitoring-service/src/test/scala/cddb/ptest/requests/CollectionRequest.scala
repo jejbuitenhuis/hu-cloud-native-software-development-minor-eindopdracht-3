@@ -10,11 +10,11 @@ object CollectionRequest {
     "Content-Type" -> "application/json;charset=UTF-8", "Authorization" -> "Bearer ${authToken}"
     )
 
-  val getCollectionFromUser = http("Get collection from user")
+  val getCollectionFromUser = http("Get Collection from User")
     .get("/api/collections")
     .headers(contentTypeHeader)
 
-  val addCardToCollection = http("Add card to collection")
+  val addCardToCollection = http("Add Card to Collection")
     .post("/api/collections")
     .headers(contentTypeHeader)
     .body(StringBody("""{ "oracle_id": "${oracle_id}", "print_id": ${print_id}, "condition": "MINT" }""")).asJson

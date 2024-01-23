@@ -15,9 +15,9 @@ object UserRequest {
       .body(StringBody("""{ "password": "${password}", "email": "${email}" }""")).asJson
   }
 
-  val register = createUserRequest("register user")
+  val register = createUserRequest("Register User")
   
-  val existingRegister = createUserRequest("existing register user")
+  val existingRegister = createUserRequest("Existing Register User")
 
   val login = http("login user")
     .post("/api/users/login")

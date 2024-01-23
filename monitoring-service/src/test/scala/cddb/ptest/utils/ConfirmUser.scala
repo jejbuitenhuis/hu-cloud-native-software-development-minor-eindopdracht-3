@@ -1,4 +1,4 @@
-package cddb.ptest.config
+package cddb.ptest.utils
 
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProviderClientBuilder

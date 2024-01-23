@@ -20,7 +20,7 @@ object DeckRequest {
     .body(StringBody("""{ "name": "${deckname}" }""")).asJson
 
   val addCardToDeck = http("Add card to deck")
-    .post("/api/decks/{deck_id}")
+    .post("/api/decks/{deck_id}/cards")
     .headers(contentTypeHeader)
     .body(StringBody("""{ "oracle_id": "${oracle_id}", "card_instance_id": ${card_instance_id}, "card_location": "MAIN_DECK" }""")).asJson
 

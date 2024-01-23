@@ -10,16 +10,14 @@ object CardRequest {
     "Content-Type" -> "application/json;charset=UTF-8", "Authorization" -> "Bearer ${authToken}"
     )
 
-  val search = "search_query_here"
-
-  val searchCards = http("Search cards")
+  val searchSwamp = http("Search Swamp Cards")
     .get("/api/cards")
-    .queryParam("q", search)
+    .queryParam("q", "swamp")
 
-  val getCardByOracleId = http("Get card with oracle_id")
+  val getCardByOracleId = http("Get Card with Oracle_id")
     .get("/api/cards/{oracle_id}")
 
-  val getCardByOracleIdAndPrintId = http("Get card with oracle_id & print_id")
+  val getCardByOracleIdAndPrintId = http("Get Card with Oracle_id and Print_id")
     .get("/api/cards/{oracle_id}/{print_id}")
 
   // val getCollectionFromUser = http("get collection from user")

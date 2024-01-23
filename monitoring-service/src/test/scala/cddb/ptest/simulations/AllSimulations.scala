@@ -17,7 +17,7 @@ class AllSimulations extends Simulation {
   val levels = System.getProperty("levels", "3").toInt
   val startingRate = System.getProperty("startingRate", "0").toDouble
 
-  val pauseDuration = 5 
+  val pauseDuration = 1
 
   def httpProtocol = http.baseUrl(userApiUrl).userAgentHeader("Gatling/test")
 
@@ -28,6 +28,8 @@ class AllSimulations extends Simulation {
                .startingFrom(startingRate)
 
   setUp(
+    addCardsScenario,
+    nothingFor(pauseDuration seconds),
     registerAndLoginScenario.inject(users),
     existingUserScenario.inject(users)
   ).protocols(httpProtocol)
