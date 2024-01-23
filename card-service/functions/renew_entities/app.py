@@ -39,21 +39,23 @@ def turnCardIntoFaceItem(card):
     }
 
 
-def turnFaceIntoFaceItem(face):
+def turn_face_into_face_item(face, card_image_uri, card_colors):
     return {
         "OracleText": face.get('oracle_text', ''),
         "ManaCost": face.get('mana_cost', ''),
         "TypeLine": face.get('type_line', ''),
         "FaceName": face.get('name', ''),
         "FlavorText": face.get('flavor_text', ''),
-        "ImageUrl": face.get('image_uris', {}).get('png', ''),
-        "Colors": face.get('colors', []),
+        "ImageUrl": card_image_uri,
+        "Colors": card_colors,
         "LowercaseFaceName": str.lower(face.get('name', '')),
         "LowercaseOracleText": str.lower(face.get('oracle_text', ''))
     }
 
 
 def createCardInfo(card, oracle_id):
+    if card['prices']['eur'] is None:
+        card['prices']['eur'] = '0.00'
     try:
         return {
             "PK": f'OracleId#{oracle_id}',
@@ -65,11 +67,12 @@ def createCardInfo(card, oracle_id):
             "Price": card['prices']['eur'],
             "OracleId": oracle_id,
             "PrintId": card['id'],
-            "LowerCaseOracleName" : str.lower(card.get('name', ''))
+            "LowerCaseOracleName": str.lower(card.get('name', ''))
         }
     except Exception as error:
         logger.error(f"An error has occurred while processing card: \n{card}\n "
                      f"Error: \n {error}")
+
 
 def getOracleFromCard(card):
     if card.get('layout', '') == 'reversible_card':
@@ -83,7 +86,6 @@ def getCombinedLowerCaseOracleText(faces):
         loweredText += str.lower(face.get('OracleText', ''))
         loweredText += " "
     return loweredText
-
 
 
 # Can only handle 25 items at a time!
@@ -115,6 +117,32 @@ def cutTheListAndPersist(item_list, ttl):
 def countPersistedItems(amount):
     global persistedCounter
     persistedCounter += amount
+
+
+def get_image_uri_from_face(card):
+    if card.get("card_faces") is not None:
+        if 'image_uris' in card['card_faces'][0]:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+def get_Colors_from_face(card):
+    if card.get("card_faces") is not None:
+        if 'colors' in card['card_faces'][0]:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+def is_image_uri_missing(card):
+    if card['image_status'] == 'missing':
+        return True
+    else:
+        return False
 
 
 def lambda_handler(event, context):
@@ -150,13 +178,27 @@ def lambda_handler(event, context):
         for card in cards:
             oracle_id = getOracleFromCard(card)
             card_info = createCardInfo(card, oracle_id)
+            missing_image_uri = is_image_uri_missing(card)
             card_faces = []
 
             if card.get("card_faces") != None:
                 face_count = 0
                 for face in card['card_faces']:
+                    if missing_image_uri:
+                        card_image_uri = ''
+                    else:
+                        if get_image_uri_from_face(card):
+                            card_image_uri = face['image_uris'].get('png', '')
+                        else:
+                            card_image_uri = card['image_uris'].get('png', '')
+
+                    if get_Colors_from_face(card):
+                        card_colors = face['colors']
+                    else:
+                        card_colors = card['colors']
+
                     face_count += 1
-                    card_faces.append(turnFaceIntoFaceItem(face))
+                    card_faces.append(turn_face_into_face_item(face, card_image_uri, card_colors))
             else:
                 card_faces.append(turnCardIntoFaceItem(card))
 

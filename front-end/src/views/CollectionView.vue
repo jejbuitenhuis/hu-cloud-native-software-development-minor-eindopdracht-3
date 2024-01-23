@@ -13,13 +13,12 @@ const collectionLoading = ref<boolean>(true);
 async function getCollection() {
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
-  const response = await fetch("/api/collections", {headers: {Authorization: token}});
+  const response = await fetch("/api/collections", { headers: { Authorization: token } });
   if (!response.ok) {
     console.error(`Failed collections fetch. Status: ${response.status}`)
     return;
   }
-  const parsedData = await response.json() as any;
-  const data = await parsedData["Items"] as PrintCard[];
+  const data = await response.json() as PrintCard[];
   const newCollection: Collection = {};
 
   for (const instanceCard of data) {

@@ -5,7 +5,7 @@ Description: Wishlist-service
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 10
     MemorySize: 128
     Handler: app.lambda_handler
     Runtime: python3.9
@@ -35,6 +35,14 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: ./swagger-spec.json
+      Auth:
+        Authorizers:
+          CognitoAuth:
+            UserPoolArn:
+              Fn::ImportValue: !Sub user-service-${Stage}-cognito-user-pool
+            Identity:
+              Header: Authorization
+        DefaultAuthorizer: CognitoAuth
       MethodSettings:
         - ResourcePath: '/*'
           HttpMethod: '*'

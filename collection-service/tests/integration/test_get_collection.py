@@ -10,8 +10,8 @@ def test_get_collection(setup_dynamodb_collection):
 
     # Insert mock data into the table
     table = setup_dynamodb_collection
-    table.put_item(Item={'PK': 'USER#test-user', 'SK': 'CardInstanceId#1#Card', 'CardInstanceId': '1', 'DataType': 'Card', 'DeckId': '1', 'GSI1SK': 'DeckId#1'})
-    table.put_item(Item={'PK': 'USER#test-user', 'SK': 'CardInstanceId#2#Card', 'CardInstanceId': '2', 'DataType': 'Card'})
+    table.put_item(Item={'PK': 'UserId#test-user', 'SK': 'CardInstanceId#1#Card', 'CardInstanceId': '1', 'DataType': 'Card', 'DeckId': '1', 'GSI1SK': 'DeckId#1'})
+    table.put_item(Item={'PK': 'UserId#test-user', 'SK': 'CardInstanceId#2#Card', 'CardInstanceId': '2', 'DataType': 'Card'})
 
     # Mock API Gateway event
     event = {'headers': {'Authorization': f'Bearer {generate_test_jwt()}'}}

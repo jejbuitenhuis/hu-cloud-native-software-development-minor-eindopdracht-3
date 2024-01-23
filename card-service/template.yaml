@@ -6,7 +6,7 @@ Description: Card-service
 
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 10
     MemorySize: 128
     Handler: app.lambda_handler
     Runtime: python3.9
@@ -44,6 +44,14 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: ./swagger-spec.json
+      Auth:
+        Authorizers:
+          CognitoAuth:
+            UserPoolArn:
+              Fn::ImportValue: !Sub user-service-${Stage}-cognito-user-pool
+            Identity:
+              Header: Authorization
+        DefaultAuthorizer: CognitoAuth
       MethodSettings:
         - ResourcePath: '/*'
           HttpMethod: '*'
@@ -111,6 +119,24 @@ Resources:
           Properties:
             RestApiId: !Ref "MTGCardApi"
             Path: /api/cards/{oracle_id}
+            Method: get
+
+  SearchCardsFuncion:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-SearchCardsFuncion"
+      CodeUri: functions/Search/
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+      Events:
+        ApiRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCardApi"
+            Path: /api/cards/search
             Method: get
 
   GetCardFunction:

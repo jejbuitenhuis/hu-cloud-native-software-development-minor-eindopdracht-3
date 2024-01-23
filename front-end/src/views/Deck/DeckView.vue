@@ -78,13 +78,16 @@ function displayError(message : string){
 
 async function getDeck() {
   const token = localStorage.getItem("jwtToken");
+
   if (!token) return;
   const response = await fetch(`/api/decks/${route.params["deck_id"]}`, {headers: {Authorization: token}});
 
   if (!response.ok) {
     console.error(`Failed deck fetch. Status: ${response.status}`)
+
     return;
   }
+
   deck.value = await response.json() as Deck;
   // TODO: move to getcards
   loading.value = false;
