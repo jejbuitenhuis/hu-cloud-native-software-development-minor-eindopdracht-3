@@ -39,7 +39,7 @@ def turnCardIntoFaceItem(card):
     }
 
 
-def turn_face_into_face_item(face, card_image_uri):
+def turn_face_into_face_item(face, card_image_uri, card_colors):
     return {
         "OracleText": face.get('oracle_text', ''),
         "ManaCost": face.get('mana_cost', ''),
@@ -47,7 +47,7 @@ def turn_face_into_face_item(face, card_image_uri):
         "FaceName": face.get('name', ''),
         "FlavorText": face.get('flavor_text', ''),
         "ImageUrl": card_image_uri,
-        "Colors": face.get('colors', []),
+        "Colors": card_colors,
         "LowercaseFaceName": str.lower(face.get('name', '')),
         "LowercaseOracleText": str.lower(face.get('oracle_text', ''))
     }
@@ -77,7 +77,6 @@ def getOracleFromCard(card):
         return card['card_faces'][0]['oracle_id']
     else:
         return card['oracle_id']
-
 
 def getCombinedLowerCaseOracleText(faces):
     loweredText = "";
@@ -127,6 +126,15 @@ def get_image_uri_from_face(card):
     else:
         return False
 
+def get_Colors_from_face(card):
+    if card.get("card_faces") is not None:
+        if 'colors' in card['card_faces'][0]:
+            return True
+        else:
+            return False
+    else:
+        return False
+
 
 def lambda_handler(event, context):
     ttl = calculateTTL(ttlOffSetSecs, update_frequency_days)
@@ -167,13 +175,19 @@ def lambda_handler(event, context):
                 face_count = 0
                 for face in card['card_faces']:
                     logger.info(get_image_uri_from_face(card))
+
                     if get_image_uri_from_face(card):
                         card_image_uri = face['image_uris'].get('png', '')
                     else:
                         card_image_uri = card['image_uris'].get('png', '')
 
+                    if get_Colors_from_face(card):
+                        card_colors = face['colors']
+                    else:
+                        card_colors = card['colors']
+
                     face_count += 1
-                    card_faces.append(turn_face_into_face_item(face, card_image_uri))
+                    card_faces.append(turn_face_into_face_item(face, card_image_uri, card_colors))
             else:
                 card_faces.append(turnCardIntoFaceItem(card))
 
