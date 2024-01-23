@@ -5,21 +5,20 @@ import boto3
 import logging
 import ijson
 import uuid
+import random
 
 if 'DISABLE_XRAY' not in environ:
     patch_all()
 
 dynamodb = boto3.resource('dynamodb', 'us-east-1')
 DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
-update_frequency_days = os.getenv("CARDS_UPDATE_FREQUENCY")
+user_id = os.getenv("USERID")
+local_filename = os.getenv("CARD_JSON_LOCATION", "/tmp/default-cards.json")
 
 table = dynamodb.Table(DYNAMODB_TABLE_NAME)
 
-logger = logging.getLogger()
-logger.setLevel("INFO")
-
-ttlOffSetSecs = (3 * 60 * 60)
-local_filename = os.getenv("CARD_JSON_LOCATION", "/tmp/default-cards.json")
+LOGGER = logging.getLogger()
+LOGGER.setLevel("INFO")
 
 def parse_card_item_from_own_lambda(item, user_id, condition):
     card_instance_id = str(uuid.uuid4())
@@ -56,7 +55,7 @@ def parse_card_item_from_own_lambda(item, user_id, condition):
         "GSI1SK": ""
     }
 
-def createCardInfo(card, oracle_id):
+def create_card_info(card, oracle_id):
     try:
         return {
             "PK": f'OracleId#{oracle_id}',
@@ -71,10 +70,10 @@ def createCardInfo(card, oracle_id):
             "LowerCaseOracleName" : str.lower(card.get('name', ''))
         }
     except Exception as error:
-        logger.error(f"An error has occurred while processing card: \n{card}\n "
+        LOGGER.error(f"An error has occurred while processing card: \n{card}\n "
                      f"Error: \n {error}")
 
-def turnCardIntoFaceItem(card):
+def turn_card_into_face_item(card):
     image_uris = card.get('image_uris', {})
     return {
         "OracleText": card.get('oracle_text', ''),
@@ -89,7 +88,7 @@ def turnCardIntoFaceItem(card):
     }
 
 
-def turnFaceIntoFaceItem(face):
+def turn_face_into_face_item(face):
     return {
         "OracleText": face.get('oracle_text', ''),
         "ManaCost": face.get('mana_cost', ''),
@@ -130,6 +129,9 @@ def cutTheListAndPersist(item_list):
     writeBatchToDb(to_be_persisted, table)
     return to_be_continued
 
+def getRandomCondition():
+    conditions = ["Mint", "Near Mint", "Lightly Played", "Moderately Played", "Heavily Played", "Damaged"]
+    return random.choice(conditions)
 
 
 def lambda_handler(event, context):
@@ -143,20 +145,23 @@ def lambda_handler(event, context):
             if card_counter < 13000:
                 card_counter += 1
                 oracle_id = getOracleFromCard(card)
-                card_info = createCardInfo(card, oracle_id)
+                card_info = create_card_info(card, oracle_id)
                 card_faces = []
 
                 if card.get("card_faces") != None:
                     face_count = 0
                     for face in card['card_faces']:
                         face_count += 1
-                        card_faces.append(turnFaceIntoFaceItem(face))
+                        card_faces.append(turn_face_into_face_item(face))
                 else:
-                    card_faces.append(turnCardIntoFaceItem(card))
+                    card_faces.append(turn_card_into_face_item(card))
 
                 card_info['CardFaces'] = card_faces
                 card_info['CombinedLowercaseOracleText'] = getCombinedLowerCaseOracleText(card_faces)
-                item_list.append(card_info)
+
+                collection_card_info = parse_card_item_from_own_lambda(card_info, user_id, getRandomCondition())
+
+                item_list.append(collection_card_info)
                 item_list = cutTheListAndPersist(item_list)
             else:
                 break
@@ -165,5 +170,5 @@ def lambda_handler(event, context):
         if len(item_list) != 0:
             writeBatchToDb(item_list, table)
 
-        logger.info(f"Finished!")
+        LOGGER.info(f"Finished!")
     return True
