@@ -162,12 +162,6 @@
       "get": {
         "parameters" : [
           {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "type": "string"
-          },
-          {
             "name": "q",
             "in": "query",
             "required": true,

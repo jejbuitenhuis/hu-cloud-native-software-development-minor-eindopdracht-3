@@ -136,7 +136,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCardApi"
-            Path: /api/cards/search/{q}
+            Path: /api/cards/search
             Method: get
 
   GetCardFunction:
