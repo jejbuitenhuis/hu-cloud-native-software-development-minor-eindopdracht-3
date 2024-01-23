@@ -20,12 +20,12 @@ logger.setLevel("INFO")
         "EVENT_BUS_ARN": "",
     },
 )
-def test_search_works(setup_dynamodb_collection_with_items):
+def test_search_oraclename(setup_dynamodb_collection_with_items):
     from functions.Search.app import lambda_handler
 
     event = {
-        "headers": {"Authorization": generate_test_jwt()},
-        "queryStringParameters": {"q": "Bessie"},
+        "headers": {"Authorization": f"Bearer {generate_test_jwt()}"},
+        "queryStringParameters": {"q": "Beloved"},
     }
 
     # Act
@@ -35,9 +35,35 @@ def test_search_works(setup_dynamodb_collection_with_items):
 
     # Assert
     assert body["Items"][0]["PK"] == "USER#test-user"
-    assert body["Items"][0]["SK"] == "CardInstance#1Face#1"
-    assert body["Items"][0]["OracleName"] == "bessie, the doctor's roadster"
-    assert body["Items"][0]["DataType"] == "Card"
+    assert body["Items"][0]["SK"] == "CardInstance#1"
+    assert body["Items"][0]["OracleName"] == "Beloved Beggar // Generous Soul"
+
+
+@patch.dict(
+    os.environ,
+    {
+        "DYNAMODB_TABLE": DYNAMODB_TABLE_NAME,
+        "DISABLE_XRAY": "True",
+        "EVENT_BUS_ARN": "",
+    },
+)
+def test_search_oracletext(setup_dynamodb_collection_with_items):
+    from functions.Search.app import lambda_handler
+
+    event = {
+        "headers": {"Authorization": f"Bearer {generate_test_jwt()}"},
+        "queryStringParameters": {"q": "Graveyard"},
+    }
+
+    # Act
+    result = lambda_handler(event, None)
+
+    body = json.loads(result["body"])
+
+    # Assert
+    assert body["Items"][0]["PK"] == "USER#test-user"
+    assert body["Items"][0]["SK"] == "CardInstance#1"
+    assert body["Items"][0]["OracleName"] == "Beloved Beggar // Generous Soul"
 
 
 @patch.dict(
@@ -53,7 +79,7 @@ def test_search_not_found(setup_dynamodb_collection):
 
     # Arrange
     event = {
-        "headers": {"Authorization": generate_test_jwt()},
+        "headers": {"Authorization": f"Bearer {generate_test_jwt()}"},
         "queryStringParameters": {"q": "Invalid"},
     }
 

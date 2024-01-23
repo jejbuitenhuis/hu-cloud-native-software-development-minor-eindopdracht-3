@@ -51,8 +51,10 @@ def lambda_handler(event, context):
         }
 
     # Cognito username
-    decoded_token = jwt.get_unverified_claims(authorization_value)
-    cognito_username = decoded_token.get("cognito:username")
+    tmp_authorization_value = authorization_value.replace("Bearer ", "")
+    logger.info(f"tmp: {tmp_authorization_value}")
+    decoded_token = jwt.get_unverified_claims(tmp_authorization_value)
+    cognito_username = decoded_token.get("sub")
     logger.info(f"Cognito_username: {cognito_username}")
 
     # Search query
@@ -94,12 +96,10 @@ def search_for_querystring(table, key_expression, search_query):
     try:
         return table.query(
             KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
-            FilterExpression=
-            # # Facename and OracleText
-            Attr("Facename").contains(search_query)
-            & Attr("OracleText").contains(search_query)
-            # OracleName
-            | Attr("OracleName").contains(search_query),
+            FilterExpression=Attr("LowerCaseOracleName").contains(search_query)
+            | Attr("LowerCaseOracleText").contains(search_query)
+            | Attr("LowerCaseOracleName").contains(search_query)
+            & Attr("LowerCaseOracleText").contains(search_query),
         )
     except ClientError as e:
         logger.error(f"ClientError occured while scanning, { e }")

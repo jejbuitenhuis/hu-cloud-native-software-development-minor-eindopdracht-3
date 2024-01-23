@@ -2,6 +2,7 @@ import boto3
 import os
 import pytest
 from moto import mock_dynamodb
+from boto3.dynamodb.conditions import Key, Attr
 
 DYNAMODB_TABLE_NAME = "test-table"
 
@@ -57,19 +58,55 @@ def setup_dynamodb_collection_with_items(setup_dynamodb_collection):
     table.put_item(
         Item={
             "PK": "USER#test-user",
-            "SK": "CardInstance#1Face#1",
-            "OracleName": "bessie, the doctor's roadster",
+            "SK": "CardInstance#1",
+            "CardFaces": [
+                {
+                    "M": {
+                        "Colors": {"L": [{"S": "W"}]},
+                        "FlavorText": {
+                            "S": "Charity is rare on Innistrad, but kindness is always repaid."
+                        },
+                        "LowercaseFaceName": {"S": "beloved beggar"},
+                        "ManaCost": {"S": "{1}{W}"},
+                        "TypeLine": {"S": "Creature — Human Peasant"},
+                        "ImageUrl": {
+                            "S": "https://cards.scryfall.io/png/front/a/3/a3d5a0d4-1f7b-4a88-b375-b241c8e5e117.png?1673158500"
+                        },
+                        "FaceName": {"S": "Beloved Beggar"},
+                        "OracleText": {
+                            "S": "Disturb {4}{W}{W} (You may cast this card from your graveyard transformed for its disturb cost.)"
+                        },
+                        "LowercaseOracleText": {
+                            "S": "disturb {4}{w}{w} (you may cast this card from your graveyard transformed for its disturb cost.)"
+                        },
+                    }
+                },
+                {
+                    "M": {
+                        "Colors": {"L": [{"S": "W"}]},
+                        "FlavorText": {
+                            "S": "As long as evil threatens his town, the Blessed Sleep can wait."
+                        },
+                        "LowercaseFaceName": {"S": "generous soul"},
+                        "ManaCost": {"S": ""},
+                        "TypeLine": {"S": "Creature — Spirit"},
+                        "ImageUrl": {
+                            "S": "https://cards.scryfall.io/png/back/a/3/a3d5a0d4-1f7b-4a88-b375-b241c8e5e117.png?1673158500"
+                        },
+                        "FaceName": {"S": "Generous Soul"},
+                        "OracleText": {
+                            "S": "Flying, vigilance\nIf Generous Soul would be put into a graveyard from anywhere, exile it instead."
+                        },
+                        "LowercaseOracleText": {
+                            "S": "flying, vigilance\nif generous soul would be put into a graveyard from anywhere, exile it instead."
+                        },
+                    }
+                },
+            ],
+            "LowerCaseOracleName": "beloved beggar // generous soul",
+            "LowerCaseOracleText": "disturb {4}{w}{w} (you may cast this card from your graveyard transformed for its disturb cost. // Flying, vigilance\nIf Generous Soul would be put into a graveyard from anywhere, exile it instead.",
+            "OracleName": "Beloved Beggar // Generous Soul",
             "DataType": "Card",
-        },
-    )
-
-    table.put_item(
-        Item={
-            "PK": "USER#test-user",
-            "SK": "CardInstance#1#Card",
-            "FaceName": "bessie, the doctor's roadster",
-            "OracleText": "haste whenever bessie attacks, another target legendary creature can’t be blocked this turn. crew 2 (tap any number of creatures you control with total power 2 or more: this vehicle becomes an artifact creature until end of turn.",
-            "DataType": "Face",
         },
     )
 
