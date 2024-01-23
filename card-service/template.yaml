@@ -103,23 +103,41 @@ Resources:
       Policies:
         - AmazonDynamoDBFullAccess
 
+  GetCardsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-GetCardsFunction"
+      CodeUri: functions/get_cards/
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+      Events:
+        ApiRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCardApi"
+            Path: /api/cards/{oracle_id}
+            Method: get
+
   GetCardFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: !Sub "${Stage}-GetCardFunction"
       CodeUri: functions/get_card/
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
       Events:
-        GetCard:
+        ApiRequest:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCardApi"
             Path: /api/cards/{oracle_id}/{print_id}
             Method: get
-      Environment:
-        Variables:
-          DYNAMO_DB_CARD_TABLE_NAME: !Ref MTGCardDynamoDBTable
-      Policies:
-        - AmazonDynamoDBReadOnlyAccess
 
   SchedulerRole:
     Type: AWS::IAM::Role

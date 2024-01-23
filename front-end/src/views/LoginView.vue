@@ -44,7 +44,7 @@ function login() {
 }
 
 function storeSessionToken(token: string) {
-  localStorage.setItem("jwtToken", token);
+  localStorage.setItem("jwtToken", `Bearer ${token}`);
 }
 
 function showErrorMessage(error: string) {

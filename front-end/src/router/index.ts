@@ -36,7 +36,22 @@ const router = createRouter({
 		{
 			path: "/collection",
 			name: "collection",
-			component: () => import(/* webpackChunkName: "login" */ "../views/CollectionView.vue"),
+			component: () => import(/* webpackChunkName: "collection" */ "../views/CollectionView.vue"),
+		},
+        {
+			path: "/search",
+			name: "search",
+			component: () => import(/* webpackChunkName: "search" */ "../views/SearchView.vue"),
+		},
+		{
+			path: "/cards/:oracle_id",
+			name: "oracles",
+			component: () => import(/* webpackChunkName: "oracles" */ "../views/OracleDetailView.vue"),
+		},
+		{
+			path: "/cards/:oracle_id/:card_id",
+			name: "cards",
+			component: () => import(/* webpackChunkName: "cards" */ "../views/CardDetailView.vue"),
 		},
 		{
 			path: "/:pathMatch(.*)*",

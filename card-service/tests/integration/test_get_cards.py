@@ -1,19 +1,29 @@
-import importlib
 import json
-import time
-from unittest.mock import patch, MagicMock
 import os
-import pytest
-import boto3
-import requests
-import requests_mock
-from boto3.dynamodb.conditions import Key, Attr
-from moto import mock_dynamodb
+from unittest.mock import patch
+from .conftest import DYNAMODB_TABLE_NAME
 
-import logging
 
-logger = logging.getLogger()
-logger.setLevel("INFO")
+@patch.dict(os.environ, {"DYNAMODB_TABLE_NAME": DYNAMODB_TABLE_NAME, "DISABLE_XRAY": "True"})
+def test_get_collection(setup_dynamodb):
+    from functions.get_cards.app import lambda_handler
+
+    # Insert mock data into the table
+    table = setup_dynamodb
+    for card in setup_items():
+        table.put_item(Item=card)
+
+    # Mock API Gateway event
+    event = {'pathParameters': {'oracle_id': '562d71b9-1646-474e-9293-55da6947a758'}}
+
+    # Invoke the lambda handler
+    response = lambda_handler(event, {})
+
+    # Assert the response
+    assert response['statusCode'] == 200
+    body = json.loads(response['body'])["Items"]
+    assert len(body) == 1
+    assert len(body[0]["CardFaces"]) == 2
 
 
 def setup_items():
@@ -64,69 +74,3 @@ def setup_items():
         }
     ]
 
-def setup_table():
-    dynamodb = boto3.resource('dynamodb', 'us-east-1')
-    table = dynamodb.create_table(
-        TableName='test-card-table',
-        KeySchema=[{'AttributeName': 'PK', 'KeyType': 'HASH'}, {'AttributeName': 'SK', 'KeyType': 'RANGE'}],
-        AttributeDefinitions=[{"AttributeName": "PK", "AttributeType": "S"},
-                              {"AttributeName": "SK", "AttributeType": "S"}],
-        BillingMode='PAY_PER_REQUEST'
-    )
-    table.meta.client.get_waiter('table_exists').wait(TableName="test-card-table")
-
-    return table
-
-@patch.dict(os.environ, {"DISABLE_XRAY": "True",
-                         "EVENT_BUS_ARN": "",
-                         "DYNAMO_DB_CARD_TABLE_NAME": "test-card-table"})
-@mock_dynamodb
-def test_lambda_handler_successful():
-
-    # Arrange
-    table = setup_table()
-
-    event = {
-        "oracle_id": "562d71b9-1646-474e-9293-55da6947a758",
-        "print_id": "67f4c93b-080c-4196-b095-6a120a221988"
-    }
-
-    items = setup_items()
-
-    for card in items:
-        table.put_item(Item=card)
-
-    import functions.get_card.app
-    importlib.reload(functions.get_card.app)
-
-    # Act
-    result = functions.get_card.app.lambda_handler(event, {})
-
-    # Assert
-    assert result['statusCode'] == 200
-
-
-@patch.dict(os.environ, {"DISABLE_XRAY": "True",
-                         "EVENT_BUS_ARN": "",
-                         "DYNAMO_DB_CARD_TABLE_NAME": "test-card-table"})
-@mock_dynamodb
-def test_lambda_handler_card_not_found():
-
-    # Arrange
-    setup_table()
-
-    event = {
-        "oracle_id": "wrong_id",
-        "print_id": "wrong_id"
-    }
-
-    import functions.get_card.app
-    importlib.reload(functions.get_card.app)
-
-    # Act
-    result = functions.get_card.app.lambda_handler(event, {})
-
-    # Assert
-    assert result['statusCode'] == 404
-    response_body = json.loads(result['body'])
-    assert response_body['Message'] == 'Card not found.'

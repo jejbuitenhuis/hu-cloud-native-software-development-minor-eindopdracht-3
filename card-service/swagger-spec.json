@@ -5,7 +5,35 @@
     "version": "1.0"
   },
   "paths": {
-    "/cards/{oracle_id}/{print_id}": {
+    "/api/cards/{oracle_id}": {
+      "get": {
+        "security": [
+          { "cognito": [] }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "oracle_id",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "httpMethod": "POST",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCardsFunction.Arn}/invocations"
+          },
+          "passthroughBehavior": "when_no_match",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/api/cards/{oracle_id}/{print_id}": {
       "get": {
         "security": [
           { "cognito": [] }

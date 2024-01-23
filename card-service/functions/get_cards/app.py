@@ -3,6 +3,7 @@ import logging
 import boto3
 from os import environ
 from aws_xray_sdk.core import patch_all
+from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
 if 'DISABLE_XRAY' not in environ:
@@ -15,18 +16,15 @@ table = dynamodb.Table(environ['DYNAMODB_TABLE_NAME'])
 
 
 def lambda_handler(event, context):
-    LOGGER.info("Starting get card from database lambda")
-
-    card_oracle_id = event["pathParameters"]["oracle_id"]
-    card_print_id = event["pathParameters"]["print_id"]
+    oracleId = event["pathParameters"]["oracle_id"]
 
     try:
-        response = table.get_item(Key={
-            'PK': f'OracleId#{card_oracle_id}',
-            'SK': f'PrintId#{card_print_id}'
-        })
+        response = table.query(
+            KeyConditionExpression=Key('PK').eq(f"OracleId#{oracleId}"),
+        )
+        items = response["Items"]
 
-        if "Item" not in response:
+        if len(items) == 0:
             return {
                 "statusCode": 404,
                 "body": json.dumps({
@@ -41,12 +39,12 @@ def lambda_handler(event, context):
             "body": json.dumps({"Message": "Server error while fetching card."})
         }
 
-    item = response["Item"]
-    item.pop('RemoveAt', None)
+    LOGGER.info(f'items to be returned: {items}')
 
-    LOGGER.info(f'items to be returned: {item}')
+    for item in items:
+        item.pop('RemoveAt', None)
 
     return {
         "statusCode": 200,
-        "body": json.dumps(item)
+        "body": json.dumps({"Items": items})
     }

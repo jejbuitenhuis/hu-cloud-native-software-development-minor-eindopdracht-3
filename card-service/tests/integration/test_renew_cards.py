@@ -2,7 +2,6 @@ import importlib
 import json
 from unittest.mock import patch, MagicMock
 import os
-import pytest
 import boto3
 from boto3.dynamodb.conditions import Key
 from moto import mock_dynamodb
@@ -11,15 +10,6 @@ import time
 
 logger = logging.getLogger()
 logger.setLevel("INFO")
-
-@pytest.fixture(scope="function")
-def aws_credentials():
-    """Mocked AWS Credentials for moto."""
-    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
-    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
-    os.environ["AWS_SECURITY_TOKEN"] = "testing"
-    os.environ["AWS_SESSION_TOKEN"] = "testing"
-    os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
 
 def setup_table():
@@ -40,8 +30,8 @@ def setup_table():
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
-                         "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/single_faced_cards.json"})
+                         "CARDS_UPDATE_FREQUENCY": "7",
+                         "CARD_JSON_LOCATION": "tests/integration/single_faced_cards.json"})
 @mock_dynamodb
 def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credentials):
     # Arrange
@@ -55,7 +45,7 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credenti
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open(r'tests/renew_cards_tests/json_test_files/10_cards.json', 'r', encoding='utf-8') as file:
+        with open(r'tests/integration/json_test_files/10_cards.json', 'r', encoding='utf-8') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -99,14 +89,15 @@ def test_renew_cards_writes_correct_data_single_face(requests_mock, aws_credenti
         assert cardfaces[0]['ImageUrl'] == "https://cards.scryfall.io/png/front/0/0/0000579f-7b35-4ed3-b44c-db2a538066fe.png?1562894979"
         assert cardfaces[0]['Colors'] == ["R"]
 
-        os.remove('tests/renew_cards_tests/single_faced_cards.json')
+        os.remove('tests/integration/single_faced_cards.json')
+
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
-                         "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/two_faced_cards.json"})
+                         "CARDS_UPDATE_FREQUENCY": "7",
+                         "CARD_JSON_LOCATION": "tests/integration/two_faced_cards.json"})
 @mock_dynamodb
 def test_renew_cards_two_faced(requests_mock, aws_credentials):
     # Arrange
@@ -120,7 +111,7 @@ def test_renew_cards_two_faced(requests_mock, aws_credentials):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('tests/renew_cards_tests/json_test_files/double_faced_card_list.json', 'r', encoding='utf-8') as file:
+        with open('tests/integration/json_test_files/double_faced_card_list.json', 'r', encoding='utf-8') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -176,14 +167,14 @@ def test_renew_cards_two_faced(requests_mock, aws_credentials):
         assert cardfaces[1]['LowercaseFaceName'] == "agadeem, the undercrypt"
         assert cardfaces[1]['LowercaseOracleText'] == "as agadeem, the undercrypt enters the battlefield, you may pay 3 life. if you don't, it enters the battlefield tapped.\n{t}: add {b}."
 
-        os.remove('tests/renew_cards_tests/two_faced_cards.json')
+        os.remove('tests/integration/two_faced_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/ten_cards.json"})
+                         "CARD_JSON_LOCATION": "tests/integration/ten_cards.json"})
 @mock_dynamodb
 def test_renew_cards_ten_cards(requests_mock, aws_credentials):
     # Arrange
@@ -198,7 +189,7 @@ def test_renew_cards_ten_cards(requests_mock, aws_credentials):
             ]
         }
         print(f"PWD: {os.getcwd()}")
-        with open('tests/renew_cards_tests/json_test_files/10_cards.json', 'r') as file:
+        with open('tests/integration/json_test_files/10_cards.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -216,14 +207,14 @@ def test_renew_cards_ten_cards(requests_mock, aws_credentials):
         assert requests_mock.called
         assert requests_mock.call_count == 2
         assert len(cards['Items']) == 10
-        os.remove('tests/renew_cards_tests/ten_cards.json')
+        os.remove('tests/integration/ten_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/thirty_cards.json"})
+                         "CARD_JSON_LOCATION": "tests/integration/thirty_cards.json"})
 @mock_dynamodb
 def test_renew_cards_thirty_cards(requests_mock, aws_credentials):
     # Arrange
@@ -237,7 +228,7 @@ def test_renew_cards_thirty_cards(requests_mock, aws_credentials):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('tests/renew_cards_tests/json_test_files/30_cards.json', 'r') as file:
+        with open('tests/integration/json_test_files/30_cards.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
@@ -254,14 +245,14 @@ def test_renew_cards_thirty_cards(requests_mock, aws_credentials):
         assert len(cards['Items']) == 30
         assert requests_mock.called
         assert requests_mock.call_count == 2
-        os.remove('tests/renew_cards_tests/thirty_cards.json')
+        os.remove('tests/integration/thirty_cards.json')
 
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
                          "DYNAMODB_TABLE_NAME": "test-card-table",
                          "CARDS_UPDATE_FREQUENCY" : "7",
-                         "CARD_JSON_LOCATION": "tests/renew_cards_tests/correct_ttl.json"})
+                         "CARD_JSON_LOCATION": "tests/integration/correct_ttl.json"})
 @mock_dynamodb
 def test_renew_cards_has_correct_ttl(requests_mock, aws_credentials):
     # Arrange
@@ -275,14 +266,14 @@ def test_renew_cards_has_correct_ttl(requests_mock, aws_credentials):
                 {"type": "default_cards", "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
             ]
         }
-        with open('tests/renew_cards_tests/json_test_files/single_face_card_list.json', 'r') as file:
+        with open('tests/integration/json_test_files/single_face_card_list.json', 'r') as file:
             json_data = json.load(file)
         mock_file_content = json.dumps(json_data).encode('utf-8')
 
         requests_mock.get("https://api.scryfall.com/bulk-data", json=bulk_data_mock_response)
         requests_mock.get("https://data.scryfall.io/default-cards/default-cards-20240116100428.json", content=mock_file_content)
 
-
+        # Act
         import functions.renew_entities.app
         importlib.reload(functions.renew_entities.app)
         functions.renew_entities.app.lambda_handler({}, {})
@@ -302,4 +293,4 @@ def test_renew_cards_has_correct_ttl(requests_mock, aws_credentials):
             print(item['RemoveAt'])
             assert item['RemoveAt'] > int(time.time()) + CARDS_UPDATE_FREQUENCY
             assert item['RemoveAt'] <= int(time.time()) + 2 * CARDS_UPDATE_FREQUENCY
-        os.remove('tests/renew_cards_tests/correct_ttl.json')
+        os.remove('tests/integration/correct_ttl.json')
