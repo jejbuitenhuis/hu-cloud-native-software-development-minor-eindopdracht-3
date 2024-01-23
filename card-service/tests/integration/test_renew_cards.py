@@ -27,6 +27,84 @@ def setup_table():
     # Provide the table to the test
     return table
 
+@patch.dict(os.environ, {"DISABLE_XRAY": "True",
+                         "EVENT_BUS_ARN": "",
+                         "DYNAMODB_TABLE_NAME": "test-card-table",
+                         "CARDS_UPDATE_FREQUENCY": "7",
+                         "CARD_JSON_LOCATION": "tests/integration/missing_uri.json"})
+@mock_dynamodb
+def test_renew_cards_writes_correct_data_split_missing_uri(requests_mock, aws_credentials):
+    # Arrange
+    with patch('boto3.client') as mock_client:
+        table = setup_table()
+        mock_event_bridge = MagicMock()
+        mock_client.return_value = mock_event_bridge
+
+        bulk_data_mock_response = {
+            "data": [
+                {"type": "default_cards",
+                 "download_uri": "https://data.scryfall.io/default-cards/default-cards-20240116100428.json"}
+            ]
+        }
+        with open(r'tests/integration/json_test_files/missing_image_uri.json', 'r', encoding='utf-8') as file:
+            json_data = json.load(file)
+        mock_file_content = json.dumps(json_data).encode('utf-8')
+
+        requests_mock.get("https://api.scryfall.com/bulk-data", json=bulk_data_mock_response)
+        requests_mock.get("https://data.scryfall.io/default-cards/default-cards-20240116100428.json",
+                          content=mock_file_content)
+
+        # Act
+        import functions.renew_entities.app
+        importlib.reload(functions.renew_entities.app)
+        functions.renew_entities.app.lambda_handler({}, {})
+
+        # Assert
+        single_face_card_info = table.query(
+            KeyConditionExpression=Key('PK').eq('OracleId#ff2580fa-5f8d-4c06-9930-84c66f4a09f0') & Key('SK').eq(
+                'PrintId#0131ba2a-9cea-4c4b-b15e-5f527be565e3')
+        )
+
+        card = single_face_card_info['Items'][0]
+
+        assert requests_mock.called
+        assert requests_mock.call_count == 2
+        assert len(single_face_card_info['Items']) == 1
+
+        assert card['PK'] == 'OracleId#ff2580fa-5f8d-4c06-9930-84c66f4a09f0'
+        assert card['SK'] == 'PrintId#0131ba2a-9cea-4c4b-b15e-5f527be565e3'
+        assert card['OracleName'] == 'Memory Lapse // Memory Lapse'
+        assert card['SetName'] == 'Strixhaven Art Series'
+        assert card['ReleasedAt'] == '2021-04-23'
+        assert card['Rarity'] == 'common'
+        assert card['Price'] == '0.00'
+        assert card['OracleId'] == 'ff2580fa-5f8d-4c06-9930-84c66f4a09f0'
+        assert card['PrintId'] == '0131ba2a-9cea-4c4b-b15e-5f527be565e3'
+        assert card['LowerCaseOracleName'] == 'memory lapse // memory lapse'
+
+        assert card['CardFaces'][0]['OracleText'] == ''
+        assert card['CardFaces'][0]['ManaCost'] == ''
+        assert card['CardFaces'][0]['TypeLine'] == 'Card'
+        assert card['CardFaces'][0]['FaceName'] == 'Memory Lapse'
+        assert card['CardFaces'][0]['FlavorText'] == ''
+        assert card['CardFaces'][0]['ImageUrl'] == ''
+        assert card['CardFaces'][0]['Colors'] == []
+        assert card['CardFaces'][0]['LowercaseFaceName'] == 'memory lapse'
+        assert card['CardFaces'][0]['LowercaseOracleText'] == ''
+
+        assert card['CardFaces'][1]['OracleText'] == ''
+        assert card['CardFaces'][1]['ManaCost'] == ''
+        assert card['CardFaces'][1]['TypeLine'] == 'Card'
+        assert card['CardFaces'][1]['FaceName'] == 'Memory Lapse'
+        assert card['CardFaces'][1]['FlavorText'] == ''
+        assert card['CardFaces'][1]['ImageUrl'] == ''
+        assert card['CardFaces'][1]['Colors'] == []
+        assert card['CardFaces'][1]['LowercaseFaceName'] == 'memory lapse'
+        assert card['CardFaces'][1]['LowercaseOracleText'] == ''
+
+        os.remove('tests/integration/missing_uri.json')
+
+
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
@@ -66,13 +144,22 @@ def test_renew_cards_writes_correct_data_split_card(requests_mock, aws_credentia
                 'PrintId#01ce2601-ae94-4ab5-bbd2-65f47281ca28')
         )
 
-        logger.info(single_face_card_info)
-
         card = single_face_card_info['Items'][0]
 
         assert requests_mock.called
         assert requests_mock.call_count == 2
         assert len(single_face_card_info['Items']) == 1
+
+        assert card['PK'] == 'OracleId#41841bbf-1c51-494b-b299-c997cce88e44'
+        assert card['SK'] == 'PrintId#01ce2601-ae94-4ab5-bbd2-65f47281ca28'
+        assert card['OracleName'] == 'Turn // Burn'
+        assert card['SetName'] == 'GRN Guild Kit'
+        assert card['ReleasedAt'] == '2018-11-02'
+        assert card['Rarity'] == 'uncommon'
+        assert card['Price'] == '0.16'
+        assert card['OracleId'] == '41841bbf-1c51-494b-b299-c997cce88e44'
+        assert card['PrintId'] == '01ce2601-ae94-4ab5-bbd2-65f47281ca28'
+        assert card['LowerCaseOracleName'] == 'turn // burn'
 
         assert card['CardFaces'][0][
                    'OracleText'] == 'Until end of turn, target creature loses all abilities and becomes a red Weird with base power and toughness 0/1.\nFuse (You may cast one or both halves of this card from your hand.)'

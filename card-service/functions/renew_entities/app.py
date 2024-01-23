@@ -54,6 +54,8 @@ def turn_face_into_face_item(face, card_image_uri, card_colors):
 
 
 def createCardInfo(card, oracle_id):
+    if card['prices']['eur'] is None:
+        card['prices']['eur'] = '0.00'
     try:
         return {
             "PK": f'OracleId#{oracle_id}',
@@ -136,6 +138,13 @@ def get_Colors_from_face(card):
         return False
 
 
+def is_image_uri_missing(card):
+    if card['image_status'] == 'missing':
+        return True
+    else:
+        return False
+
+
 def lambda_handler(event, context):
     ttl = calculateTTL(ttlOffSetSecs, update_frequency_days)
 
@@ -169,17 +178,19 @@ def lambda_handler(event, context):
         for card in cards:
             oracle_id = getOracleFromCard(card)
             card_info = createCardInfo(card, oracle_id)
+            missing_image_uri = is_image_uri_missing(card)
             card_faces = []
 
             if card.get("card_faces") != None:
                 face_count = 0
                 for face in card['card_faces']:
-                    logger.info(get_image_uri_from_face(card))
-
-                    if get_image_uri_from_face(card):
-                        card_image_uri = face['image_uris'].get('png', '')
+                    if missing_image_uri:
+                        card_image_uri = ''
                     else:
-                        card_image_uri = card['image_uris'].get('png', '')
+                        if get_image_uri_from_face(card):
+                            card_image_uri = face['image_uris'].get('png', '')
+                        else:
+                            card_image_uri = card['image_uris'].get('png', '')
 
                     if get_Colors_from_face(card):
                         card_colors = face['colors']
