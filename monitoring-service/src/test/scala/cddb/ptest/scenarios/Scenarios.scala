@@ -31,6 +31,10 @@ object Scenarios {
   private val addCardsScenario = repeat(5) {
     feed(cardFeeder)
       .exec(CollectionRequest.addCardToCollection.check(status.is(201)))
+      .exec(session => {
+        println("addCard Session::: " + session)
+        session
+      })
       .pause(50 millis)
   }
 
@@ -44,6 +48,7 @@ object Scenarios {
 
     // Register and confirm user
     .exec(UserRequest.register.check(status.is(201)))
+    .pause(50 millis)
     .exec(session => {
       val email = session("email").as[String]
       ConfirmUser.adminConfirmUser(email)
@@ -52,14 +57,12 @@ object Scenarios {
     .pause(50 millis)
 
     // Login user and extract token
-    .exec(
-      exec(session => {
-        UserRequest.login.check(status.is(200))
-        println("Login token: " + session("authToken").as[String])
-        session
-      })
-    )
-    .pause(50 millis)
+    .exec(UserRequest.login)
+    .pause(1 second)
+    .exec(session => {
+      println("Login Session::: " + session)
+      session
+    })
 
     // Add to and get collection
     .exec(addCardsScenario)
