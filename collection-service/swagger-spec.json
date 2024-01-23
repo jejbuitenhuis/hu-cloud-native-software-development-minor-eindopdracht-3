@@ -26,6 +26,9 @@
             "description": "Succefull response"
           
           },
+          "401": {
+            "description": "Query string parameter not provided"
+          },
           "404": {
             "description": "Not Found"
           },
