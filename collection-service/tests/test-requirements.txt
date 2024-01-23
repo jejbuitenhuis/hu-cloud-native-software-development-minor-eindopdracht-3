@@ -6,5 +6,6 @@ python-jose
 requests_mock
 
 # Function requirements
+python-jose
 boto3
 aws_xray_sdk

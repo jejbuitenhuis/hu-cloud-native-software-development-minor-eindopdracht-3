@@ -5,6 +5,45 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/collection/search": {
+      "get": {
+        "parameters" : [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses" : {
+          "200": {
+            "description": "Succefull response"
+          
+          },
+          "401": {
+            "description": "Query string parameter not provided"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "406": {
+            "description": "JWT token not provided"
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SearchFunction.Arn}/invocations"},
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
+      }
+    },
     "/api/collections": {
       "get": {
         "security": [
