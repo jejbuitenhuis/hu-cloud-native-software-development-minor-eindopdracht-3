@@ -117,9 +117,9 @@ def getCombinedLowerCaseOracleText(faces):
 
 
 def writeBatchToDb(items, table):
-    # with table.batch_writer() as batch:
-    #     for item in items:
-    #         batch.put_item(Item=item)
+    with table.batch_writer() as batch:
+        for item in items:
+            batch.put_item(Item=item)
 
 
 def cutTheListAndPersist(item_list):
