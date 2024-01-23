@@ -5,13 +5,16 @@ import DecoratedText from "@/components/DecoratedText.vue";
 import type {PrintCard} from "@/models/cardModels";
 
 const route = useRoute();
+const oracleId = route.params["oracle_id"];
+const cardId = route.params["card_id"];
+const wantsToAddThisCard = ref<boolean>(false);
 const loading = ref(true)
 const card = ref<PrintCard | null>(null);
 
 async function getCard() {
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
-  const response = await fetch(`/api/cards/${route.params["oracle_id"]}/${route.params["card_id"]}`, {headers: {Authorization: token}});
+  const response = await fetch(`/api/cards/${oracleId}/${cardId}`, {headers: {Authorization: token}});
   if (!response.ok) {
     console.error(`Failed card fetch. Status: ${response.status}`)
     return;
@@ -20,6 +23,32 @@ async function getCard() {
   loading.value = false;
 }
 getCard();
+
+async function flipWantsToAddThisCard() {
+  wantsToAddThisCard.value = !wantsToAddThisCard.value;
+}
+
+async function addCardToCollection() {
+  const token = localStorage.getItem("jwtToken");
+  if (!token) return;
+  const response = await fetch(`/api/collections`,
+    {
+      headers: {
+        Authorization: token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "oracle_id": oracleId,
+        "print_id": cardId,
+        "condition": "mint"
+      }),
+      method: "post"
+    });
+  if (!response.ok) {
+    console.error(`Failed to add a card to the collection. Status: ${response.status}`)
+    return;
+  }
+}
 </script>
 
 <template>
@@ -42,7 +71,23 @@ getCard();
           <DecoratedText :text="face.FlavorText"/>
         </div>
         <div>
-          <sl-button class="add-to-collection-button">Add Card to Collection</sl-button>
+          <div v-if="!wantsToAddThisCard" class="add-to-collection-button-wrapper">
+            <sl-button @click="flipWantsToAddThisCard">Add Card to Collection</sl-button>
+          </div>
+          <div v-if="wantsToAddThisCard" class="add-to-collection-button-wrapper">
+            <sl-select label="Card condition" value="near_mint">
+              <sl-option value="mint">Mint</sl-option>
+              <sl-option value="near_mint">Near Mint</sl-option>
+              <sl-option value="slightly_played">Slightly Played</sl-option>
+              <sl-option value="played">Played</sl-option>
+              <sl-option value="heavily_played">Heavily Played</sl-option>
+              <sl-option value="poor">Poor</sl-option>
+            </sl-select>
+            <div class="add-card-confirmation-wrapper">
+              <sl-button variant="danger" outline @click="flipWantsToAddThisCard">Cancel</sl-button>
+              <sl-button variant="success" outline @click="addCardToCollection">Confirm</sl-button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -71,8 +116,22 @@ p {
   max-width: 25rem;
 }
 
-.add-to-collection-button {
+.add-to-collection-button-wrapper {
+  border-top: 1px solid #333;
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  width: fit-content;
+}
+
+.add-card-confirmation-wrapper {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
   margin-top: 1rem;
+
+  >* {
+    flex-grow: 1;
+  }
 }
 
 .face-info {
