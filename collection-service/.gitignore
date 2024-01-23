@@ -246,3 +246,5 @@ $RECYCLE.BIN/
 
 .aws-sam/
 .scannerwork/
+
+add_13000_cards/default-cards.json
