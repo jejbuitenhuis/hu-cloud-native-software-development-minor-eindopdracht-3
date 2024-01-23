@@ -111,7 +111,7 @@ Resources:
   GetCollection:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "collection-service-${Stage}-GetCollection"
+      FunctionName: !Sub "collection-service-${Stage}-GetCollectionFunction"
       CodeUri: functions/get_collection/
       Events:
         GetCollection:
@@ -129,7 +129,7 @@ Resources:
   GetCollectionInstance:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "collection-service-${Stage}-GetCollectionInstance"
+      FunctionName: !Sub "collection-service-${Stage}-GetCollectionInstanceFunction"
       CodeUri: functions/get_instance/
       Events:
         GetCollectionInstance:

@@ -169,10 +169,16 @@ Outputs:
   UserPoolClientId:
     Description: UserPool Client Id
     Value: !Ref UserPoolClient
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-user-pool-client-id'
 
   UserPoolId:
     Description: UserPool Id
     Value: !Ref UserPool
+    Export:
+      Name:
+        'Fn::Sub': '${AWS::StackName}-user-pool-id'
 
   UserPoolArn:
     Description: UserPool Arn
