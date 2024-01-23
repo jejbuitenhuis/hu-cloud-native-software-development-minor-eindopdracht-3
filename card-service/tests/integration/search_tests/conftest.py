@@ -30,23 +30,8 @@ def setup_dynamodb_collection(aws_credentials):
             AttributeDefinitions=[
                 {"AttributeName": "PK", "AttributeType": "S"},
                 {"AttributeName": "SK", "AttributeType": "S"},
-                {"AttributeName": "GSI1SK", "AttributeType": "S"},
             ],
             ProvisionedThroughput={"ReadCapacityUnits": 1, "WriteCapacityUnits": 1},
-            GlobalSecondaryIndexes=[
-                {
-                    "IndexName": "GSI-Collection-Cards-In-Deck",
-                    "KeySchema": [
-                        {"AttributeName": "PK", "KeyType": "HASH"},
-                        {"AttributeName": "GSI1SK", "KeyType": "RANGE"},
-                    ],
-                    "Projection": {"ProjectionType": "ALL"},
-                    "ProvisionedThroughput": {
-                        "ReadCapacityUnits": 1,
-                        "WriteCapacityUnits": 1,
-                    },
-                }
-            ],
         )
         yield table
 
@@ -57,56 +42,34 @@ def setup_dynamodb_collection_with_items(setup_dynamodb_collection):
 
     table.put_item(
         Item={
-            "PK": "USER#test-user",
-            "SK": "CardInstance#1",
+            "PK": "OracleId#517be4da-9aa0-4a83-a559-962df0450f2c",
+            "SK": "PrintId#faf65512-8228-48f4-ba7b-d861b66d28c9",
             "CardFaces": [
                 {
                     "M": {
-                        "Colors": {"L": [{"S": "W"}]},
+                        "Colors": {"L": [{"S": "B"}]},
                         "FlavorText": {
-                            "S": "Charity is rare on Innistrad, but kindness is always repaid."
+                            "S": '"Indulge the void. Become the void. Consume all you touch."\n—Drana, the last bloodchief'
                         },
-                        "LowercaseFaceName": {"S": "beloved beggar"},
-                        "ManaCost": {"S": "{1}{W}"},
-                        "TypeLine": {"S": "Creature — Human Peasant"},
+                        "LowercaseFaceName": {"S": "oblivion's hunger"},
+                        "ManaCost": {"S": "{1}{B}"},
+                        "TypeLine": {"S": "Instant"},
                         "ImageUrl": {
-                            "S": "https://cards.scryfall.io/png/front/a/3/a3d5a0d4-1f7b-4a88-b375-b241c8e5e117.png?1673158500"
+                            "S": "https://cards.scryfall.io/png/front/f/a/faf65512-8228-48f4-ba7b-d861b66d28c9.png?1604196298"
                         },
-                        "FaceName": {"S": "Beloved Beggar"},
+                        "FaceName": {"S": "Oblivion's Hunger"},
                         "OracleText": {
-                            "S": "Disturb {4}{W}{W} (You may cast this card from your graveyard transformed for its disturb cost.)"
+                            "S": 'Target creature you control gains indestructible until end of turn. Draw a card if that creature has a +1/+1 counter on it. (Damage and effects that say "destroy" don\'t destroy the creature.)'
                         },
                         "LowercaseOracleText": {
-                            "S": "disturb {4}{w}{w} (you may cast this card from your graveyard transformed for its disturb cost.)"
+                            "S": 'target creature you control gains indestructible until end of turn. draw a card if that creature has a +1/+1 counter on it. (damage and effects that say "destroy" don\'t destroy the creature.)'
                         },
                     }
-                },
-                {
-                    "M": {
-                        "Colors": {"L": [{"S": "W"}]},
-                        "FlavorText": {
-                            "S": "As long as evil threatens his town, the Blessed Sleep can wait."
-                        },
-                        "LowercaseFaceName": {"S": "generous soul"},
-                        "ManaCost": {"S": ""},
-                        "TypeLine": {"S": "Creature — Spirit"},
-                        "ImageUrl": {
-                            "S": "https://cards.scryfall.io/png/back/a/3/a3d5a0d4-1f7b-4a88-b375-b241c8e5e117.png?1673158500"
-                        },
-                        "FaceName": {"S": "Generous Soul"},
-                        "OracleText": {
-                            "S": "Flying, vigilance\nIf Generous Soul would be put into a graveyard from anywhere, exile it instead."
-                        },
-                        "LowercaseOracleText": {
-                            "S": "flying, vigilance\nif generous soul would be put into a graveyard from anywhere, exile it instead."
-                        },
-                    }
-                },
+                }
             ],
-            "LowerCaseOracleName": "beloved beggar // generous soul",
-            "CombinedLowercaseOracleText": "disturb {4}{w}{w} (you may cast this card from your graveyard transformed for its disturb cost. // Flying, vigilance\nIf Generous Soul would be put into a graveyard from anywhere, exile it instead.",
-            "OracleName": "Beloved Beggar // Generous Soul",
-            "DataType": "Card",
+            "LowerCaseOracleName": "oblivion's hunger",
+            "OracleName": "Oblivion's Hunger",
+            "CombinedLowercaseOracleText": 'target creature you control gains indestructible until end of turn. draw a card if that creature has a +1/+1 counter on it. (damage and effects that say "destroy" don\'t destroy the creature.)',
         },
     )
 
