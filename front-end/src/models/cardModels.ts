@@ -19,3 +19,8 @@ export type PrintFace = {
   OracleText: string,
   TypeLine: string,
 }
+export interface CardData {
+  cardInstanceId?: string,
+  cardLocation: string,
+  card: PrintCard
+}

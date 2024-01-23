@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type {PrintCard} from "@/models/cardModels";
+import type {CardData, PrintCard} from "@/models/cardModels";
 import { ref } from "vue";
+import CardDetailView from "./CardDetailView.vue";
 
 const faceName = ref();
 const manaCost = ref();
@@ -12,8 +13,10 @@ const colors = ref();
 let faceNumber = 0
 
 const props = defineProps<{
-  card: PrintCard
+  cardData: CardData
 }>()
+const card = props.cardData.card;
+
 setFace();
 
 let red = 255;
@@ -24,18 +27,17 @@ let alpha = 0.22;
 
 function flip(){
     faceNumber++;
-    if (faceNumber > props.card.CardFaces.length-1){
+    if (faceNumber > card.CardFaces.length-1){
         faceNumber = 0
     }
     setFace();
-    console.log(faceNumber);
 }
 
 function setFace(){
-    faceName.value = props.card.CardFaces[faceNumber].FaceName;
-    manaCost.value = props.card.CardFaces[faceNumber].ManaCost;
-    oracleText.value = props.card.CardFaces[faceNumber].OracleText;
-    image.value = props.card.CardFaces[faceNumber].ImageUrl;
+    faceName.value = card.CardFaces[faceNumber].FaceName;
+    manaCost.value = card.CardFaces[faceNumber].ManaCost;
+    oracleText.value = card.CardFaces[faceNumber].OracleText;
+    image.value = card.CardFaces[faceNumber].ImageUrl;
 }
 
 </script>
@@ -44,12 +46,12 @@ function setFace(){
         <div class="card" v-bind:style="{ 'background-image': 'url(' + image + ')', 
         'box-shadow': 'inset 0 0 0 1000px rgba(' + red + ',' + green + ',' + blue + ',' + alpha + ')'}">
             <span class="titlebox">
-                <p><span class="title">{{props.card.OracleName}}</span>{{ manaCost.valueOf() }}</p>
-                <p><span>{{ props.card.CardFaces[faceNumber].TypeLine }}</span></p>
-                <button v-if="props.card.CardFaces.length > 0" @click="flip">flip</button>
+                <p><span class="title">{{card.OracleName}}</span>{{ manaCost.valueOf() }}</p>
+                <p><span>{{ card.CardFaces[faceNumber].TypeLine }}</span></p>
+                <button v-if="card.CardFaces.length > 0" @click="flip">flip</button>
             </span>
             <div class="seperator"></div>
-            <span class="descriptionbox" :title="props.card.CardFaces[faceNumber].OracleText">
+            <span class="descriptionbox" :title="card.CardFaces[faceNumber].OracleText">
                 <p>
                     {{ oracleText.valueOf() }}
                 </p>
