@@ -41,8 +41,7 @@ Resources:
       Auth:
         Authorizers:
           CognitoAuth:
-            UserPoolArn:
-              Fn::ImportValue: !Sub user-service-${Stage}-cognito-user-pool
+            UserPoolArn: !GetAtt UserPool.Arn
             Identity:
               Header: Authorization
         DefaultAuthorizer: CognitoAuth
