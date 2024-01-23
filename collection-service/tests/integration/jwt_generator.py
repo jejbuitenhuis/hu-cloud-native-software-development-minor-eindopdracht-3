@@ -9,7 +9,7 @@ def generate_test_jwt(user_id='test-user', secret_key='secret', algorithm='HS256
     # Set default claims (you can customize these as needed)
     default_claims = {
         'iss': 'test_issuer',
-        'sub': 'test_subject',
+        'sub': user_id,
         'aud': 'test_audience',
         'exp': int(time.time()) + 3600,  # Expiration time (1 hour)
         'iat': int(time.time()),  # Issued at

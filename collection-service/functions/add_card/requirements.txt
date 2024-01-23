@@ -2,4 +2,4 @@ requests
 boto3
 botocore
 aws_xray_sdk
-jose
+python-jose

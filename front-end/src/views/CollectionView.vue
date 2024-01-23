@@ -18,8 +18,7 @@ async function getCollection() {
     console.error(`Failed collections fetch. Status: ${response.status}`)
     return;
   }
-  const parsedData = await response.json() as any;
-  const data = await parsedData["Items"] as PrintCard[];
+  const data = await response.json() as PrintCard[];
   const newCollection: Collection = {};
 
   for (const instanceCard of data) {

@@ -16,10 +16,10 @@ table = dynamodb.Table(environ['DYNAMODB_TABLE'])
 
 
 def lambda_handler(event, context):
-    claims = jwt.get_unverified_claims(event['headers']['Authorization'].replace("Bearer ", ""))
+    user_id = jwt.get_unverified_claims(event['headers']['Authorization'].replace("Bearer ", ""))["sub"]
 
     response = table.query(
-        KeyConditionExpression=Key('PK').eq(f"USER#{claims['cognito:username']}") & Key('SK').eq(f"CardInstanceId#{event['pathParameters']['instance_id']}"),
+        KeyConditionExpression=Key('PK').eq(f"UserId#{user_id}") & Key('SK').eq(f"CardInstanceId#{event['pathParameters']['instance_id']}"),
     )
 
     if len(response['Items']) == 0:
