@@ -125,7 +125,7 @@ Resources:
   SearchCardsFuncion:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "card-service-${Stage}-SearchCardsFuncion"
+      FunctionName: !Sub "card-service-${Stage}-SearchCardsFunction"
       CodeUri: functions/Search/
       Environment:
         Variables:
