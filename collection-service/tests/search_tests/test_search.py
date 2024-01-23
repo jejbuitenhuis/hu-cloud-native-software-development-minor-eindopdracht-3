@@ -112,7 +112,7 @@ def test_search_no_authorization(setup_dynamodb_collection):
 
     # Assert
     assert result["statusCode"] == 401
-    assert body["message"] == "JWT token not provided"
+    assert body["Message"] == "JWT token not provided"
 
 
 def test_search_no_query(setup_dynamodb_collection):
@@ -129,4 +129,4 @@ def test_search_no_query(setup_dynamodb_collection):
 
     # Assert
     assert result["statusCode"] == 406
-    assert body["message"] == "query string parameter not provided"
+    assert body["Message"] == "query string parameter not provided"
