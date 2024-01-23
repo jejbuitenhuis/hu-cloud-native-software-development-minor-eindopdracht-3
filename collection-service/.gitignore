@@ -247,4 +247,4 @@ $RECYCLE.BIN/
 .aws-sam/
 .scannerwork/
 
-tests/add_10000_cards_test/json_test_files/default-cards.json
+add_10000_cards/default-cards.json
