@@ -104,7 +104,7 @@ def setup_dynamodb_collection_with_items(setup_dynamodb_collection):
                 },
             ],
             "LowerCaseOracleName": "beloved beggar // generous soul",
-            "LowerCaseOracleText": "disturb {4}{w}{w} (you may cast this card from your graveyard transformed for its disturb cost. // Flying, vigilance\nIf Generous Soul would be put into a graveyard from anywhere, exile it instead.",
+            "CombinedLowercaseOracleText": "disturb {4}{w}{w} (you may cast this card from your graveyard transformed for its disturb cost. // Flying, vigilance\nIf Generous Soul would be put into a graveyard from anywhere, exile it instead.",
             "OracleName": "Beloved Beggar // Generous Soul",
             "DataType": "Card",
         },

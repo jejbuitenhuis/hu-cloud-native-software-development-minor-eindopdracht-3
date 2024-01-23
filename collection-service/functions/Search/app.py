@@ -97,9 +97,9 @@ def search_for_querystring(table, key_expression, search_query):
         return table.query(
             KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
             FilterExpression=Attr("LowerCaseOracleName").contains(search_query)
-            | Attr("LowerCaseOracleText").contains(search_query)
+            | Attr("CombinedLowercaseOracleText").contains(search_query)
             | Attr("LowerCaseOracleName").contains(search_query)
-            & Attr("LowerCaseOracleText").contains(search_query),
+            & Attr("CombinedLowercaseOracleText").contains(search_query),
         )
     except ClientError as e:
         logger.error(f"ClientError occured while scanning, { e }")
