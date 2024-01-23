@@ -99,6 +99,7 @@ def lambda_handler(event, context):
         api_response_code = api_response.status_code
         api_response_body = api_response.json()
 
+
         if api_response_code != 200:
             LOGGER.info(f"{api_response_code = }")
             LOGGER.info(f"{api_response_body = }")
