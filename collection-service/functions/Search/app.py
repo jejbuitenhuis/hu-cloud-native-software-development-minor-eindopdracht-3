@@ -38,7 +38,7 @@ def lambda_handler(event, context):
                 "Content-Type": "application/json",
             },
             "statusCode": 401,
-            "body": json.dumps({"message": "JWT token not provided"}),
+            "Body": json.dumps({"message": "JWT token not provided"}),
         }
 
     if not search_value:
@@ -47,7 +47,7 @@ def lambda_handler(event, context):
                 "Content-Type": "application/json",
             },
             "statusCode": 406,
-            "body": json.dumps({"message": "query string parameter not provided"}),
+            "Body": json.dumps({"message": "query string parameter not provided"}),
         }
 
     # Cognito username
@@ -80,7 +80,7 @@ def lambda_handler(event, context):
                 "Content-Type": "application/json",
             },
             "statusCode": 404,
-            "body": json.dumps({"message": "Not found"}),
+            "Body": json.dumps({"message": "Not found"}),
         }
 
     return {
@@ -88,7 +88,7 @@ def lambda_handler(event, context):
             "Content-Type": "application/json",
         },
         "statusCode": 200,
-        "body": json.dumps({"Items": items}),
+        "Body": json.dumps({"Items": items}),
     }
 
 
