@@ -14,11 +14,11 @@ capabilities = "CAPABILITY_IAM"
 confirm_changeset = false
 disable_rollback = false
 resolve_s3 = true
-stack_name = "collection-service-development"
-s3_prefix = "collection-service-development"
+stack_name = "collection-service-10000-cards"
+s3_prefix = "collection-service-10000-cards"
 region = "us-east-1"
 parameter_overrides = [
-    "Stage=development"
+    "Stage=10000-cards"
 ]
 
 [default.package.parameters]

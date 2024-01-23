@@ -13,7 +13,7 @@ if 'DISABLE_XRAY' not in environ:
 dynamodb = boto3.resource('dynamodb', 'us-east-1')
 DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
 user_id = os.getenv("USERID")
-local_filename = os.getenv("CARD_JSON_LOCATION", "/tmp/default-cards.json")
+local_filename = os.getenv("CARD_JSON_LOCATION")
 
 table = dynamodb.Table(DYNAMODB_TABLE_NAME)
 
@@ -81,21 +81,21 @@ def turn_card_into_face_item(card):
         "TypeLine": card.get('type_line', ''),
         "FaceName": card.get('name', ''),
         "FlavorText": card.get('flavor_text', ''),
-        "ImageUrl": image_uris.get('png', ''),
+        "ImageUrl": image_uris,
         "Colors": card.get('colors', []),
         "LowercaseFaceName": str.lower(card.get('name', '')),
         "LowercaseOracleText": str.lower(card.get('oracle_text', ''))
     }
 
 
-def turn_face_into_face_item(face):
+def turn_face_into_face_item(face, card_image_uri):
     return {
         "OracleText": face.get('oracle_text', ''),
         "ManaCost": face.get('mana_cost', ''),
         "TypeLine": face.get('type_line', ''),
         "FaceName": face.get('name', ''),
         "FlavorText": face.get('flavor_text', ''),
-        "ImageUrl": face.get('image_uris', {}).get('png', ''),
+        "ImageUrl": card_image_uri,
         "Colors": face.get('colors', []),
         "LowercaseFaceName": str.lower(face.get('name', '')),
         "LowercaseOracleText": str.lower(face.get('oracle_text', ''))
@@ -126,6 +126,8 @@ def cutTheListAndPersist(item_list):
     to_be_persisted = item_list[:25]
     to_be_continued = item_list[25:]
 
+    LOGGER.info(f"Persisting {len(to_be_persisted)} items")
+
     writeBatchToDb(to_be_persisted, table)
     return to_be_continued
 
@@ -133,9 +135,17 @@ def getRandomCondition():
     conditions = ["Mint", "Near Mint", "Lightly Played", "Moderately Played", "Heavily Played", "Damaged"]
     return random.choice(conditions)
 
+def get_image_uri_from_face(card):
+
+    if hasattr(card, 'card_faces'):
+        if hasattr(card['card_faces'][0], 'image_uris'):
+            return True
+        else:
+            return False
 
 def lambda_handler(event, context):
     with open(f'{local_filename}', "rb") as file:
+        LOGGER.info("Started the function")
         cards = ijson.items(file, 'item')
 
         card_counter = 0
@@ -151,8 +161,14 @@ def lambda_handler(event, context):
                 if card.get("card_faces") != None:
                     face_count = 0
                     for face in card['card_faces']:
+
+                        if get_image_uri_from_face(card):
+                            card_image_uri = face['image_uris'].get('png', '')
+                        else:
+                            card_image_uri = card['image_uris'].get('png', '')
+
                         face_count += 1
-                        card_faces.append(turn_face_into_face_item(face))
+                        card_faces.append(turn_face_into_face_item(face, card_image_uri))
                 else:
                     card_faces.append(turn_card_into_face_item(card))
 
@@ -164,10 +180,12 @@ def lambda_handler(event, context):
                 item_list.append(collection_card_info)
                 item_list = cutTheListAndPersist(item_list)
             else:
+                LOGGER.info(f"Finished adding: {card_counter} cards, breaking")
                 break
 
         item_list = cutTheListAndPersist(item_list)
         if len(item_list) != 0:
+            LOGGER.info(f"Persisting {len(item_list)} items")
             writeBatchToDb(item_list, table)
 
         LOGGER.info(f"Finished!")

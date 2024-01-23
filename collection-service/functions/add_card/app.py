@@ -106,6 +106,7 @@ def lambda_handler(event, context):
         api_response = requests.get(f'{api_url}/api/cards/{oracle_id}/{print_id}').json()
         api_response_code = api_response["statusCode"]
 
+
         if api_response_code != 200:
             api_response_body = json.loads(api_response["body"])['Message']
             LOGGER.error(f"Error while fetching card from api: {api_response_code}\n {api_response_body}")
