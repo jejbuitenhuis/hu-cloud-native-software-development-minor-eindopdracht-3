@@ -121,6 +121,24 @@ Resources:
             Path: /api/cards/{oracle_id}
             Method: get
 
+  SearchCardsFuncion:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-SearchCardsFuncion"
+      CodeUri: functions/Search/
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+      Events:
+        ApiRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCardApi"
+            Path: /api/cards/search/{q}
+            Method: get
+
   GetCardFunction:
     Type: AWS::Serverless::Function
     Properties:

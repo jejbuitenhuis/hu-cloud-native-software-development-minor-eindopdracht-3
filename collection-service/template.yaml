@@ -99,7 +99,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCollectionApi"
-            Path: /api/collection/search
+            Path: /api/collection/search/{q}
             Method: get
       Environment:
         Variables:
