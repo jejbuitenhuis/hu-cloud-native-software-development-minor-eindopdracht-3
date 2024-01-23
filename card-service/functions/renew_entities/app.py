@@ -39,14 +39,14 @@ def turnCardIntoFaceItem(card):
     }
 
 
-def turnFaceIntoFaceItem(face):
+def turn_face_into_face_item(face, card_image_uri):
     return {
         "OracleText": face.get('oracle_text', ''),
         "ManaCost": face.get('mana_cost', ''),
         "TypeLine": face.get('type_line', ''),
         "FaceName": face.get('name', ''),
         "FlavorText": face.get('flavor_text', ''),
-        "ImageUrl": face.get('image_uris', {}).get('png', ''),
+        "ImageUrl": card_image_uri,
         "Colors": face.get('colors', []),
         "LowercaseFaceName": str.lower(face.get('name', '')),
         "LowercaseOracleText": str.lower(face.get('oracle_text', ''))
@@ -65,11 +65,12 @@ def createCardInfo(card, oracle_id):
             "Price": card['prices']['eur'],
             "OracleId": oracle_id,
             "PrintId": card['id'],
-            "LowerCaseOracleName" : str.lower(card.get('name', ''))
+            "LowerCaseOracleName": str.lower(card.get('name', ''))
         }
     except Exception as error:
         logger.error(f"An error has occurred while processing card: \n{card}\n "
                      f"Error: \n {error}")
+
 
 def getOracleFromCard(card):
     if card.get('layout', '') == 'reversible_card':
@@ -77,13 +78,13 @@ def getOracleFromCard(card):
     else:
         return card['oracle_id']
 
+
 def getCombinedLowerCaseOracleText(faces):
     loweredText = "";
     for face in faces:
         loweredText += str.lower(face.get('OracleText', ''))
         loweredText += " "
     return loweredText
-
 
 
 # Can only handle 25 items at a time!
@@ -115,6 +116,16 @@ def cutTheListAndPersist(item_list, ttl):
 def countPersistedItems(amount):
     global persistedCounter
     persistedCounter += amount
+
+
+def get_image_uri_from_face(card):
+    if card.get("card_faces") is not None:
+        if 'image_uris' in card['card_faces'][0]:
+            return True
+        else:
+            return False
+    else:
+        return False
 
 
 def lambda_handler(event, context):
@@ -155,8 +166,14 @@ def lambda_handler(event, context):
             if card.get("card_faces") != None:
                 face_count = 0
                 for face in card['card_faces']:
+                    logger.info(get_image_uri_from_face(card))
+                    if get_image_uri_from_face(card):
+                        card_image_uri = face['image_uris'].get('png', '')
+                    else:
+                        card_image_uri = card['image_uris'].get('png', '')
+
                     face_count += 1
-                    card_faces.append(turnFaceIntoFaceItem(face))
+                    card_faces.append(turn_face_into_face_item(face, card_image_uri))
             else:
                 card_faces.append(turnCardIntoFaceItem(card))
 

@@ -136,12 +136,13 @@ def getRandomCondition():
     return random.choice(conditions)
 
 def get_image_uri_from_face(card):
-
-    if hasattr(card, 'card_faces'):
-        if hasattr(card['card_faces'][0], 'image_uris'):
+    if card.get("card_faces") is not None:
+        if 'image_uris' in card['card_faces'][0]:
             return True
         else:
             return False
+    else:
+        return False
 
 def lambda_handler(event, context):
     with open(f'{local_filename}', "rb") as file:
