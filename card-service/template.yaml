@@ -44,6 +44,14 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: ./swagger-spec.json
+      Auth:
+        Authorizers:
+          CognitoAuth:
+            UserPoolArn:
+              Fn::ImportValue: !Sub user-service-${Stage}-cognito-user-pool
+            Identity:
+              Header: Authorization
+        DefaultAuthorizer: CognitoAuth
       MethodSettings:
         - ResourcePath: '/*'
           HttpMethod: '*'
@@ -86,7 +94,7 @@ Resources:
   RenewEntitiesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/renewEntities
+      CodeUri: functions/renew_entities/
       MemorySize: 550
       Timeout: 360
       Environment:
@@ -95,16 +103,40 @@ Resources:
       Policies:
         - AmazonDynamoDBFullAccess
 
-  PingFunction:
+  GetCardsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/Ping/
+      FunctionName: !Sub "${Stage}-GetCardsFunction"
+      CodeUri: functions/get_cards/
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
       Events:
-        HelloWorld:
+        ApiRequest:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCardApi"
-            Path: /ping
+            Path: /api/cards/{oracle_id}
+            Method: get
+
+  GetCardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Stage}-GetCardFunction"
+      CodeUri: functions/get_card/
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCardDynamoDBTable
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+      Events:
+        ApiRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCardApi"
+            Path: /api/cards/{oracle_id}/{print_id}
             Method: get
 
   SchedulerRole:

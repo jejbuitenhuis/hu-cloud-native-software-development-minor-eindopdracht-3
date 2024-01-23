@@ -38,6 +38,13 @@ Resources:
           Name: AWS::Include
           Parameters:
             Location: ./swagger-spec.json
+      Auth:
+        Authorizers:
+          CognitoAuth:
+            UserPoolArn: !GetAtt UserPool.Arn
+            Identity:
+              Header: Authorization
+        DefaultAuthorizer: CognitoAuth
       MethodSettings:
         - ResourcePath: '/*'
           HttpMethod: '*'
@@ -169,18 +176,29 @@ Outputs:
   UserPoolClientId:
     Description: UserPool Client Id
     Value: !Ref UserPoolClient
+
   UserPoolId:
     Description: UserPool Id
     Value: !Ref UserPool
+
+  UserPoolArn:
+    Description: UserPool Arn
+    Value: !GetAtt UserPool.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-cognito-user-pool
+
   RegisterUserFunction:
     Description: Function
     Value: !GetAtt RegisterUserFunction.Arn
+
   LoginUserFunction:
     Description: Function
     Value: !GetAtt LoginUserFunction.Arn
+
   MTGUserApiUrl:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MTGUserApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
   MTGUserApi:
     Description: "Api gateway"
     Value: !Ref MTGUserApi
