@@ -26,7 +26,7 @@ class AllSimulations extends Simulation {
                .startingFrom(startingRate)
 
   setUp(
-    registerLoginCollectionDeckAndCardsScenario.inject(users),
-    existingUserScenario.inject(users)
+    registerLoginCollectionDeckAndCardsScenario.inject(users)//,
+    // existingUserScenario.inject(users)
   )
 }

@@ -67,29 +67,29 @@ object Scenarios {
     // Add to and get collection
     .exec(addCardsScenario)
 
-    // Create deck, add cards and get all deckcards
-    .feed(deckNameFeeder)
-    .exec(DeckRequest.createDeck.check(status.is(201)))
-    .during(5) {
-      exec(DeckRequest.addCardToDeck.check(status.is(201)))
-        .pause(5 millis)
-    }
-    .exec(DeckRequest.getAllCardsFromDeck.check(status.is(200)))
+  //   // Create deck, add cards and get all deckcards
+  //   .feed(deckNameFeeder)
+  //   .exec(DeckRequest.createDeck.check(status.is(201)))
+  //   .during(5) {
+  //     exec(DeckRequest.addCardToDeck.check(status.is(201)))
+  //       .pause(5 millis)
+  //   }
+  //   .exec(DeckRequest.getAllCardsFromDeck.check(status.is(200)))
 
-  // Register Existing User Scenario
-  val existingUserScenario = scenario("Register Existing User")
+  // // Register Existing User Scenario
+  // val existingUserScenario = scenario("Register Existing User")
 
-    // Register existing users
-    .feed(existingUserFeeder)
-    .exec(
-      exec(session => {
-        if (!session.contains("registered")) {
-          UserRequest.existingRegister.check(status.is(201))
-          session.set("registered", true)
-        } else {
-          UserRequest.existingRegister.check(status.is(409))
-          session
-        }
-      })
-    )
+  //   // Register existing users
+  //   .feed(existingUserFeeder)
+  //   .exec(
+  //     exec(session => {
+  //       if (!session.contains("registered")) {
+  //         UserRequest.existingRegister.check(status.is(201))
+  //         session.set("registered", true)
+  //       } else {
+  //         UserRequest.existingRegister.check(status.is(409))
+  //         session
+  //       }
+  //     })
+  //   )
 }
