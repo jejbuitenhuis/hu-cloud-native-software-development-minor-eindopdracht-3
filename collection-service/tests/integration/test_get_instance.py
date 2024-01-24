@@ -35,7 +35,7 @@ def test_get_card_instance_by_id(setup_dynamodb_collection):
 
     # Mock API Gateway event
     event = {
-        "pathParameters": {"oracle_id": "d6329dcc-b450-482a-8ee3-45449f7a4b3d"},
+        "pathParameters": {"instance_id": "d6329dcc-b450-482a-8ee3-45449f7a4b3d"},
         "headers": {"Authorization": f"Bearer {generate_test_jwt()}"},
     }
 
@@ -89,7 +89,7 @@ def test_get_card_instance_by_id_not_found(setup_dynamodb_collection):
 
     # Mock API Gateway event
     event = {
-        "pathParameters": {"oracle_id": "wrongdcc-b450-482a-8ee3-45449f7a4b3d"},
+        "pathParameters": {"instance_id": "wrongdcc-b450-482a-8ee3-45449f7a4b3d"},
         "headers": {"Authorization": f"Bearer {generate_test_jwt()}"},
     }
 

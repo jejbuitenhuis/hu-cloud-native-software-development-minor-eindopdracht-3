@@ -227,7 +227,7 @@
         ],
         "parameters": [
           {
-            "name": "oracle_id",
+            "name": "instance_id",
             "in": "path",
             "required": true,
             "type": "string"
