@@ -18,6 +18,7 @@ Globals:
           Fn::ImportValue:
             !Sub "common-service-${Stage}-MTGEventBus"
         DYNAMO_DB_DECK_TABLE_NAME: !Ref MTGDeckDynamoDBTable
+        STAGE: !Ref Stage
 
 Parameters:
   Stage:
@@ -83,6 +84,7 @@ Resources:
   CreateDeckFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-CreateDeckFunction"
       CodeUri: functions/CreateDeck/
       Events:
         HelloWorld:
@@ -97,6 +99,7 @@ Resources:
   GetDecksFromUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-GetDecksFromUserFunction"
       CodeUri: functions/GetDecksFromUser/
       Events:
         HelloWorld:
@@ -111,6 +114,7 @@ Resources:
   GetDeckByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-GetDeckByIdFunction"
       CodeUri: functions/GetDeckById/
       Events:
         HelloWorld:
@@ -125,9 +129,10 @@ Resources:
   GetCardsFromDeckFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-GetCardsFromDeckFunction"
       CodeUri: functions/GetCardsFromDeck/
       Events:
-        HelloWorld:
+        GetAllCardsFromDeck:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGDeckApi"
@@ -136,12 +141,28 @@ Resources:
       Policies:
         - AmazonDynamoDBReadOnlyAccess
 
+  AddCardToDeckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/AddCardToDeck/
+      Events:
+        AddCardToDeck:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGDeckApi"
+            Path: /api/decks/{deck_id}/cards/
+            Method: POST
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - AmazonSSMReadOnlyAccess
+
   GetCardByIdFromDeckFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-GetCardByIdFromDeckFunction"
       CodeUri: functions/GetCardByIdFromDeck/
       Events:
-        HelloWorld:
+        GetCardFromDeck:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGDeckApi"
@@ -149,6 +170,21 @@ Resources:
             Method: GET
       Policies:
         - AmazonDynamoDBReadOnlyAccess
+
+  EditDeckCardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/EditDeckCard/
+      Events:
+        EditDeckCard:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGDeckApi"
+            Path: /api/decks/{deck_id}/cards/{card_id}
+            Method: PATCH
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - AmazonSSMReadOnlyAccess
 
 Outputs:
   MTGDeckApiUrl:

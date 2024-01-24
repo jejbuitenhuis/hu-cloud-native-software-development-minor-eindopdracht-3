@@ -187,11 +187,6 @@ Resources:
           ViewerProtocolPolicy: redirect-to-https
           ForwardedValues:
             QueryString: true
-        CustomErrorResponses:
-          - ErrorCode: 404
-            ResponsePagePath: /index.html
-            ErrorCachingMinTTL: 30
-            ResponseCode: 200
   # }}}
 
   CloudfrontParameter: # {{{

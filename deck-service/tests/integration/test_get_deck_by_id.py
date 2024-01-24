@@ -21,8 +21,8 @@ def test_get_deck_by_id(setup_dynamodb_collection):
     })
     table.put_item(Item={
         "PK": "USER#test-user#DECK#1",
-        "SK": "DECKCARD#1",
-        "data_type": "DECKCARD",
+        "SK": "DECK_CARD#1",
+        "data_type": "DECK_CARD",
         "user_id": "test-user",
         "deck_id": "1",
         "deck_card_id": "1",
@@ -61,8 +61,8 @@ def test_get_deck_by_id_not_found(setup_dynamodb_collection):
     })
     table.put_item(Item={
         "PK": "USER#test-user#DECK#1",
-        "SK": "DECKCARD#1",
-        "data_type": "DECKCARD",
+        "SK": "DECK_CARD#1",
+        "data_type": "DECK_CARD",
         "user_id": "test-user",
         "deck_id": "1",
         "deck_card_id": "1",

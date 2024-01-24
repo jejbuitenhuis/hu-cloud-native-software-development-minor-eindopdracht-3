@@ -21,8 +21,8 @@ def test_get_collection(setup_dynamodb_collection):
     })
     table.put_item(Item={
         "PK": "USER#test-user#DECK#1",
-        "SK": "DECKCARD#1",
-        "DataType": "DECKCARD",
+        "SK": "DECK_CARD#1",
+        "DataType": "DECK_CARD",
         "UserId": "test-user",
         "DeckId": "1",
         "DeckCardId": "1",
@@ -30,8 +30,8 @@ def test_get_collection(setup_dynamodb_collection):
     })
     table.put_item(Item={
         "PK": "USER#test-user#DECK#1",
-        "SK": "DECKCARD#2",
-        "DataType": "DECKCARD",
+        "SK": "DECK_CARD#2",
+        "DataType": "DECK_CARD",
         "UserId": "test-user",
         "DeckId": "1",
         "DeckCardId": "2",
@@ -52,7 +52,7 @@ def test_get_collection(setup_dynamodb_collection):
     body = json.loads(response['body'])
     assert len(body) == 2
     item_1 = body[0]
-    assert item_1['DataType'] == 'DECKCARD'
+    assert item_1['DataType'] == 'DECK_CARD'
     assert item_1['UserId'] == 'test-user'
     assert item_1['DeckId'] == '1'
     assert item_1['DeckCardId'] == '1'

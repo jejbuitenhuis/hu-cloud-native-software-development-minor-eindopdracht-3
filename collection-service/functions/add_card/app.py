@@ -9,7 +9,7 @@ import requests
 import uuid
 from os import environ
 
-if 'DISABLE_XRAY' not in environ:
+if "DISABLE_XRAY" not in environ:
     patch_all()
 
 LOGGER = logging.getLogger()
@@ -19,7 +19,7 @@ DYNAMO_DB = boto3.resource("dynamodb", region_name="us-east-1")
 DYNAMO_DB_COLLECTION_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
 COLLECTION_TABLE = DYNAMO_DB.Table(DYNAMO_DB_COLLECTION_TABLE_NAME)
 STAGE = os.getenv("STAGE")
-ssm = boto3.client('ssm')
+ssm = boto3.client("ssm")
 
 
 def fetch_api_url():
@@ -33,41 +33,50 @@ def fetch_api_url():
         raise e
 
 
-def parse_card_item(item, user_id, condition):
+def parse_card_item(item, user_id, condition, deck_id):
     card_instance_id = str(uuid.uuid4())
     face_items = []
 
-    for face in item['CardFaces']:
-        face_items.append({
-            "OracleText": face['OracleText'],
-            "ManaCost": face['ManaCost'],
-            "TypeLine": face['TypeLine'],
-            "FaceName": face['FaceName'],
-            "FlavorText": face['FlavorText'],
-            "ImageUrl": face['ImageUrl'],
-            "Colors": face['Colors'],
-            "LowercaseFaceName": face['LowercaseFaceName'],
-            "LowercaseOracleText": face['LowercaseOracleText']
-        })
+    for face in item["CardFaces"]:
+        face_items.append(
+            {
+                "OracleText": face["OracleText"],
+                "ManaCost": face["ManaCost"],
+                "TypeLine": face["TypeLine"],
+                "FaceName": face["FaceName"],
+                "FlavorText": face["FlavorText"],
+                "ImageUrl": face["ImageUrl"],
+                "Colors": face["Colors"],
+                "LowercaseFaceName": face["LowercaseFaceName"],
+                "LowercaseOracleText": face["LowercaseOracleText"],
+            }
+        )
 
-    return {
-        "PK": f'UserId#{user_id}',
-        "SK": f'CardInstanceId#{card_instance_id}',
+    tmp = {
+        "PK": f"UserId#{user_id}",
+        "SK": f"CardInstanceId#{card_instance_id}",
         "PrintId": item["PrintId"],
-        "OracleId": item['OracleId'],
+        "OracleId": item["OracleId"],
         "CardInstanceId": card_instance_id,
         "Condition": condition,
-        "OracleName": item['OracleName'],
-        "SetName": item['SetName'],
-        "ReleasedAt": item['ReleasedAt'],
-        "Rarity": item['Rarity'],
-        "Price": item['Price'],
-        "LowerCaseOracleName": item['LowerCaseOracleName'],
+        "OracleName": item["OracleName"],
+        "SetName": item["SetName"],
+        "ReleasedAt": item["ReleasedAt"],
+        "Rarity": item["Rarity"],
+        "Price": item["Price"],
+        "LowerCaseOracleName": item["LowerCaseOracleName"],
         "CardFaces": face_items,
+        "GSI2SK": f"OracleId#{item['OracleId']}#CardInstanceId#{card_instance_id}",
     }
 
+    if deck_id:
+        tmp["DeckId"] = deck_id
+        tmp["GSI1SK"] = f"DeckId#{item['DeckId']}#CardInstanceId#{card_instance_id}"
 
-def save_card_to_db(item, user_id, condition):
+    return tmp
+
+
+def save_card_to_db(item, user_id, condition, deck_id):
     try:
         card_instance_item = parse_card_item(item, user_id, condition)
         LOGGER.info(f"Saving card instance: {card_instance_item}")
@@ -88,9 +97,10 @@ def lambda_handler(event, context):
     LOGGER.info(f"Event body: {event['body'] }")
 
     body = json.loads(event["body"])
-    oracle_id = body['oracle_id']
-    print_id = body['print_id']
-    condition = body['condition']
+    oracle_id = body["oracle_id"]
+    print_id = body["print_id"]
+    condition = body["condition"]
+    deck_id = body.get("deck_id", "")
     user_id = get_user_id(event)
 
     try:
@@ -99,8 +109,8 @@ def lambda_handler(event, context):
         LOGGER.info(f"Fetching card from api: {api_url}/api/cards/{oracle_id}/{print_id}")
 
         api_response = requests.get(
-            f'{api_url}/api/cards/{oracle_id}/{print_id}',
-            headers={'Authorization': event["headers"]["Authorization"]}
+            f"{api_url}/api/cards/{oracle_id}/{print_id}",
+            headers={"Authorization": event["headers"]["Authorization"]},
         )
 
         LOGGER.info(f"{api_response = }")
@@ -108,28 +118,25 @@ def lambda_handler(event, context):
         api_response_code = api_response.status_code
         api_response_body = api_response.json()
 
-
         if api_response_code != 200:
             LOGGER.info(f"{api_response_code = }")
             LOGGER.info(f"{api_response_body = }")
-            api_error_message = api_response_body['Message']
-            LOGGER.error(f"Error while fetching card from api: {api_response_code}\n {api_error_message}")
+            api_error_message = api_response_body["Message"]
+            LOGGER.error(
+                f"Error while fetching card from api: {api_response_code}\n {api_error_message}"
+            )
             return {
                 "statusCode": api_response_code,
-                "body": json.dumps({"Message": api_error_message})
+                "body": json.dumps({"Message": api_error_message}),
             }
 
-        saved_card = save_card_to_db(api_response_body, user_id, condition)
+        saved_card = save_card_to_db(api_response_body, user_id, condition, deck_id)
 
-        LOGGER.info(f"Successfully added the following card to the collection: {saved_card}")
+        LOGGER.info(
+            f"Successfully added the following card to the collection: {saved_card}"
+        )
 
-        return {
-            "statusCode": 201,
-            "body": json.dumps(saved_card)
-        }
+        return {"statusCode": 201, "body": json.dumps(saved_card)}
     except ClientError as e:
         LOGGER.error(f"Error while saving the card: {e}")
-        return {
-            "statusCode": 500,
-            "body": json.dumps({"Message": e.response})
-        }
+        return {"statusCode": 500, "body": json.dumps({"Message": e.response})}

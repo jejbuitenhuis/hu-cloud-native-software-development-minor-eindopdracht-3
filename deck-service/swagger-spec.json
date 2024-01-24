@@ -126,7 +126,7 @@
         }
       }
     },
-    "/api/decks/{deck_id}/cards": {
+    "/api/decks/{deck_id}/cards/": {
       "get": {
         "security": [
           { "cognito": [] }
@@ -155,9 +155,79 @@
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
         }
+      },
+      "post": {
+        "security": [
+          {
+          "cognito": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "deck_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "cardOracle",
+                "cardLocation"
+              ],
+              "properties": {
+                "cardOracle": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "cardInstanceId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "cardLocation": {
+                  "type": "string",
+                  "enum": [
+                    "COMMANDER",
+                    "MAIN_DECK",
+                    "SIDE_DECK"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "required": [
+                "deck_card_id"
+              ],
+              "properties": {
+                "deck_card_id": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri": {
+            "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddCardToDeckFunction.Arn}/invocations"
+          },
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
       }
     },
-    "/api/decks/{deck_id}/cards/{card_id}": {
+    "/api/decks/{deck_id}/cards/{card_id}/": {
       "get": {
         "security": [
           { "cognito": [] }
@@ -188,6 +258,75 @@
           "httpMethod" : "POST",
           "uri": {
             "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCardByIdFromDeckFunction.Arn}/invocations"
+          },
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
+      },
+
+      "patch": {
+
+        "security": [
+          {
+          "cognito": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "deck_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "card_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "cardLocation"
+              ],
+              "properties": {
+                "cardInstanceId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "cardPrintId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "cardLocation": {
+                  "type": "string",
+                  "enum": [
+                    "COMMANDER",
+                    "MAIN_DECK",
+                    "SIDE_DECK"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri": {
+            "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EditDeckCardFunction.Arn}/invocations"
           },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
