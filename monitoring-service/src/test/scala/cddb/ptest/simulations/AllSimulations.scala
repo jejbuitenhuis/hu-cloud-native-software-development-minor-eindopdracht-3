@@ -29,7 +29,7 @@ class AllSimulations extends Simulation {
                .startingFrom(startingRate)
 
   setUp(
-    registerLoginCollectionDeckAndCardsScenario.inject(users),
+    registerLoginCollectionAndCardsScenario.inject(users),
     existingUserScenario.inject(users)
   ).protocols(httpProtocol)
 }
