@@ -5,7 +5,7 @@ Description: Collection-service
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 10
     MemorySize: 128
     Handler: app.lambda_handler
     Runtime: python3.9
@@ -99,7 +99,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCollectionApi"
-            Path: /api/collection/search
+            Path: /api/collections/search
             Method: get
       Environment:
         Variables:
@@ -159,6 +159,7 @@ Resources:
           STAGE: !Sub "${Stage}"
       Policies:
         - AmazonDynamoDBFullAccess
+        - AmazonSSMReadOnlyAccess
 
 Outputs:
   MTGCollectionApiUrl:

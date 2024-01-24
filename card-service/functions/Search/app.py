@@ -19,8 +19,6 @@ collection_table = dynamodb.Table(environ["DYNAMODB_TABLE"])
 
 
 def lambda_handler(event, context):
-    # Input
-    authorization_value = event.get("headers", {}).get("Authorization", None)
     query_string_parameters = event.get("queryStringParameters", {})
 
     search_value = (
@@ -29,17 +27,7 @@ def lambda_handler(event, context):
         else None
     )
 
-    logger.info(f"Auth input: {authorization_value}")
     logger.info(f"Search input: {search_value}")
-
-    if not authorization_value:
-        return {
-            "headers": {
-                "Content-Type": "application/json",
-            },
-            "statusCode": 401,
-            "body": json.dumps({"Message": "JWT token not provided"}),
-        }
 
     if not search_value:
         return {
@@ -47,15 +35,8 @@ def lambda_handler(event, context):
                 "Content-Type": "application/json",
             },
             "statusCode": 406,
-            "body": json.dumps({"Message": "query string parameter not provided"}),
+            "Body": json.dumps({"message": "query string parameter not provided"}),
         }
-
-    # Cognito username
-    tmp_authorization_value = authorization_value.replace("Bearer ", "")
-    logger.info(f"tmp: {tmp_authorization_value}")
-    decoded_token = jwt.get_unverified_claims(tmp_authorization_value)
-    cognito_username = decoded_token.get("sub")
-    logger.info(f"Cognito_username: {cognito_username}")
 
     # Search query
 
@@ -65,7 +46,6 @@ def lambda_handler(event, context):
 
     result = search_for_querystring(
         table=collection_table,
-        key_expression=cognito_username,
         search_query=search_query,
     )
 
@@ -80,7 +60,7 @@ def lambda_handler(event, context):
                 "Content-Type": "application/json",
             },
             "statusCode": 404,
-            "body": json.dumps({"Message": "Not found"}),
+            "Body": json.dumps({"message": "Not found"}),
         }
 
     return {
@@ -88,14 +68,13 @@ def lambda_handler(event, context):
             "Content-Type": "application/json",
         },
         "statusCode": 200,
-        "body": json.dumps({"Items": items}),
+        "Body": json.dumps({"Items": items}),
     }
 
 
-def search_for_querystring(table, key_expression, search_query):
+def search_for_querystring(table, search_query):
     try:
-        return table.query(
-            KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
+        return table.scan(
             FilterExpression=Attr("LowerCaseOracleName").contains(search_query)
             | Attr("CombinedLowercaseOracleText").contains(search_query)
             | Attr("LowerCaseOracleName").contains(search_query)

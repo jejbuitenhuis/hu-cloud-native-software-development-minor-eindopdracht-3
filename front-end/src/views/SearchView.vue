@@ -6,7 +6,7 @@ import {useRoute, useRouter} from "vue-router";
 const router = useRouter();
 const route = useRoute();
 
-const searchQuery = ref(route.query.q);
+const searchQuery = ref(route.query.q ? route.query.q : "");
 const cards = ref([]);
 const errorText = ref("");
 
@@ -34,9 +34,11 @@ function canSubmit() {
     }, 500);
 
     return false;
-  } else {
-    return true;
   }
+
+  if (searchQuery.value === "") return false;
+
+  return true;
 }
 
 
