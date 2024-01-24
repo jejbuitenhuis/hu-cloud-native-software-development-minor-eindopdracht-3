@@ -39,132 +39,7 @@ CARD_ORACLE_1 = lambda oracle_id: {
     "PK": "OracleId#0dd894cb-1968-471c-af08-ea7ec5ce8428",
     "LowerCaseOracleName": "ghoulcaller gisa"
 }
-CARD_ORACLE_2 = lambda oracle_id: {
-    "OracleName": "Ghoulcaller Gisa",
-    "OracleId": oracle_id,
-    "SetName": "Jumpstart",
-    "PrintId": "0bcba8d3-725b-49f9-8281-eafac15208c5",
-    "CardFaces": [
-        {
-            "Colors": [
-                "B"
-            ],
-            "FlavorText": "\"Geralf, must you always whine? I agreed to nothing. I'll raise ghouls anytime I wish.\"",
-            "LowercaseFaceName": "ghoulcaller gisa",
-            "ManaCost": "{3}{B}{B}",
-            "TypeLine": "Legendary Creature — Human Wizard",
-            "ImageUrl": "https://cards.scryfall.io/png/front/0/b/0bcba8d3-725b-49f9-8281-eafac15208c5.png?1600700375",
-            "FaceName": "Ghoulcaller Gisa",
-            "OracleText": "{B}, {T}, Sacrifice another creature: Create X 2/2 black Zombie creature tokens, where X is the sacrificed creature's power.",
-            "LowercaseOracleText": "{b}, {t}, sacrifice another creature: create x 2/2 black zombie creature tokens, where x is the sacrificed creature's power."
-        }
-    ],
-    "Rarity": "mythic",
-    "ReleasedAt": "2020-07-17",
-    "Price": "1.24",
-    "SK": "PrintId#0bcba8d3-725b-49f9-8281-eafac15208c5",
-    "CombinedLowercaseOracleText": "{b}, {t}, sacrifice another creature: create x 2/2 black zombie creature tokens, where x is the sacrificed creature's power. ",
-    "PK": "OracleId#0dd894cb-1968-471c-af08-ea7ec5ce8428",
-    "LowerCaseOracleName": "ghoulcaller gisa"
-}
-CARD_ORACLE_3 = lambda oracle_id: {
-    "OracleName": "Ghoulcaller Gisa",
-    "OracleId": oracle_id,
-    "SetName": "Commander Collection: Black",
-    "PrintId": "779e3944-4342-4151-9963-87e8d41fd2ff",
-    "CardFaces": [
-        {
-            "Colors": [
-                "B"
-            ],
-            "FlavorText": "\"Come now, dear brother. If you wanted rules, you should have called it a *game*, not a *war*.\"\n—Gisa, to Geralf",
-            "LowercaseFaceName": "ghoulcaller gisa",
-            "ManaCost": "{3}{B}{B}",
-            "TypeLine": "Legendary Creature — Human Wizard",
-            "ImageUrl": "https://cards.scryfall.io/png/front/7/7/779e3944-4342-4151-9963-87e8d41fd2ff.png?1680135257",
-            "FaceName": "Ghoulcaller Gisa",
-            "OracleText": "{B}, {T}, Sacrifice another creature: Create X 2/2 black Zombie creature tokens, where X is the sacrificed creature's power.",
-            "LowercaseOracleText": "{b}, {t}, sacrifice another creature: create x 2/2 black zombie creature tokens, where x is the sacrificed creature's power."
-        }
-    ],
-    "Rarity": "mythic",
-    "ReleasedAt": "2022-01-28",
-    "Price": "1.08",
-    "SK": "PrintId#779e3944-4342-4151-9963-87e8d41fd2ff",
-    "CombinedLowercaseOracleText": "{b}, {t}, sacrifice another creature: create x 2/2 black zombie creature tokens, where x is the sacrificed creature's power. ",
-    "PK": "OracleId#0dd894cb-1968-471c-af08-ea7ec5ce8428",
-    "LowerCaseOracleName": "ghoulcaller gisa"
-}
-CARD_ORACLE_4 = lambda oracle_id: {
-    "OracleName": "Ghoulcaller Gisa",
-    "OracleId": oracle_id,
-    "SetName": "Commander Masters",
-    "PrintId": "44d7906e-8a89-4644-acb5-46fbe97ab39f",
-    "CardFaces": [
-        {
-            "Colors": [
-                "B"
-            ],
-            "FlavorText": "\"Geralf, must you always whine? I agreed to nothing. I'll raise ghouls anytime I wish.\"",
-            "LowercaseFaceName": "ghoulcaller gisa",
-            "ManaCost": "{3}{B}{B}",
-            "TypeLine": "Legendary Creature — Human Wizard",
-            "ImageUrl": "https://cards.scryfall.io/png/front/4/4/44d7906e-8a89-4644-acb5-46fbe97ab39f.png?1689997183",
-            "FaceName": "Ghoulcaller Gisa",
-            "OracleText": "{B}, {T}, Sacrifice another creature: Create X 2/2 black Zombie creature tokens, where X is the sacrificed creature's power.",
-            "LowercaseOracleText": "{b}, {t}, sacrifice another creature: create x 2/2 black zombie creature tokens, where x is the sacrificed creature's power."
-        }
-    ],
-    "Rarity": "rare",
-    "ReleasedAt": "2023-08-04",
-    "Price": "0.78",
-    "SK": "PrintId#44d7906e-8a89-4644-acb5-46fbe97ab39f",
-    "CombinedLowercaseOracleText": "{b}, {t}, sacrifice another creature: create x 2/2 black zombie creature tokens, where x is the sacrificed creature's power. ",
-    "PK": "OracleId#0dd894cb-1968-471c-af08-ea7ec5ce8428",
-    "LowerCaseOracleName": "ghoulcaller gisa"
-}
-CARD_ORACLE_5 = lambda oracle_id: {
-    "OracleName": "Ghoulcaller Gisa",
-    "OracleId": oracle_id,
-    "SetName": "Commander Masters",
-    "PrintId": "5219ed86-eb4e-43f5-9c75-f3b24abe42a5",
-    "CardFaces": [
-        {
-            "Colors": [
-                "B"
-            ],
-            "FlavorText": "\"Geralf, must you always whine? I agreed to nothing. I'll raise ghouls anytime I wish.\"",
-            "LowercaseFaceName": "ghoulcaller gisa",
-            "ManaCost": "{3}{B}{B}",
-            "TypeLine": "Legendary Creature — Human Wizard",
-            "ImageUrl": "https://cards.scryfall.io/png/front/5/2/5219ed86-eb4e-43f5-9c75-f3b24abe42a5.png?1690000805",
-            "FaceName": "Ghoulcaller Gisa",
-            "OracleText": "{B}, {T}, Sacrifice another creature: Create X 2/2 black Zombie creature tokens, where X is the sacrificed creature's power.",
-            "LowercaseOracleText": "{b}, {t}, sacrifice another creature: create x 2/2 black zombie creature tokens, where x is the sacrificed creature's power."
-        }
-    ],
-    "Rarity": "rare",
-    "ReleasedAt": "2023-08-04",
-    "Price": "0.00",
-    "SK": "PrintId#5219ed86-eb4e-43f5-9c75-f3b24abe42a5",
-    "CombinedLowercaseOracleText": "{b}, {t}, sacrifice another creature: create x 2/2 black zombie creature tokens, where x is the sacrificed creature's power. ",
-    "PK": "OracleId#0dd894cb-1968-471c-af08-ea7ec5ce8428",
-    "LowerCaseOracleName": "ghoulcaller gisa"
-}
 # }}}
-
-def get_mock_card_oracles_response(oracle_id: str) -> List[dict]:
-    return { # {{{
-        "Items": [
-            # Sort in random order
-            CARD_ORACLE_3(oracle_id),
-            CARD_ORACLE_2(oracle_id),
-            CARD_ORACLE_5(oracle_id),
-            CARD_ORACLE_4(oracle_id),
-            CARD_ORACLE_1(oracle_id),
-        ]
-    }
-    # }}}
 
 @mock_dynamodb
 @mock_ssm
@@ -188,7 +63,7 @@ class TestCreateDeck(unittest.TestCase):
         return token
 
     def get_sut(self):
-        from functions.AddCardToDeck import app
+        from functions.EditDeckCard import app
 
         return app
 
@@ -274,88 +149,49 @@ class TestCreateDeck(unittest.TestCase):
 
                     assert actual_card_face[key] == expected_card_face[key]
 
-    def test_card_oracle_without_card_instance_is_successfully_added_to_deck(self):
+    def test_card_print_is_changed_when_new_card_print_is_specified(self):
         oracle_id = "0dd894cb-1968-471c-af08-ea7ec5ce8428"
+        deck_card_id = str( uuid4() )
+        mock_card_oracle_response = CARD_ORACLE_1(oracle_id)
         deck_id = "some-deck-id"
         card_location = self.sut.AVAILABLE_DECK_LOCATIONS[0]
 
-        get_cards_by_oracle_request = responses.add(
-            responses.GET,
-            f"{self.CARD_ENDPOINT}/api/cards/{oracle_id}/",
-            status=200,
-            json=get_mock_card_oracles_response(oracle_id),
-        )
-
-        mock_event = {
-            "body": json.dumps({
-                "cardOracle": oracle_id,
-                "cardLocation": card_location,
-            }),
-            "pathParameters": {
-                "deck_id": deck_id,
-            },
-            "headers": {
-                "Authorization": f"Bearer {self.jwt_token}",
-            },
-        }
-        mock_context = {}
-
-        result = self.sut.lambda_handler(mock_event, mock_context)
-
-        assert result["statusCode"] == 201
-        assert "body" in result
-        assert result["body"] is not None
-
-        body = json.loads(result["body"])
-
-        assert "deck_card_id" in body
-        assert body["deck_card_id"] is not None
-
-        assert get_cards_by_oracle_request.call_count == 1
-
-        db_items = self.dynamodb_table.query(
-            KeyConditionExpression=Key("PK").eq(f"USER#{self.user_id}#DECK#{deck_id}")
-        )["Items"]
-
-        assert len(db_items) == 1
-
-        assert db_items[0]["PK"] == f"USER#{self.user_id}#DECK#{deck_id}"
-        assert "DECK_CARD#" in db_items[0]["SK"]
-
-        assert db_items[0]["data_type"] == "DECK_CARD"
-        assert db_items[0]["user_id"] == self.user_id
-        assert db_items[0]["deck_id"] == deck_id
-        assert db_items[0]["card_location"] == card_location
-        assert "card_instance_id" not in db_items[0]
-
-        expected_oracle = CARD_ORACLE_5(oracle_id)
-
-        self.assert_db_deck_card_oracle_keys_equal_to_expected_oracle(db_items[0], expected_oracle)
-
-    def test_card_oracle_with_card_instance_is_successfully_added_to_deck(self):
-        oracle_id = "0dd894cb-1968-471c-af08-ea7ec5ce8428"
-        card_instance_id = str( uuid4() )
-        mock_card_oracle_response = CARD_ORACLE_3(oracle_id)
-        card_print_id = mock_card_oracle_response["PrintId"]
-        deck_id = "some-deck-id"
-        card_location = self.sut.AVAILABLE_DECK_LOCATIONS[0]
+        original_card_instance_id = str( uuid4() )
+        new_card_instance_id = str( uuid4() )
+        original_card_print_id = str( uuid4() )
+        new_card_print_id = mock_card_oracle_response["PrintId"]
 
         get_cards_by_oracle_request = responses.add(
             responses.GET,
-            f"{self.CARD_ENDPOINT}/api/cards/{oracle_id}/{card_print_id}/",
+            f"{self.CARD_ENDPOINT}/api/cards/{oracle_id}/{new_card_print_id}/",
             status=200,
             json=mock_card_oracle_response,
         )
 
+        self.dynamodb_table.put_item(Item={
+            "PK": f"USER#{self.user_id}#DECK#{deck_id}",
+            "SK": f"DECK_CARD#{deck_card_id}",
+
+            "data_type": "DECK_CARD",
+            "user_id": self.user_id,
+            "deck_id": deck_id,
+            "deck_card_id": deck_card_id,
+            "card_location": card_location,
+            "card_instance_id": original_card_instance_id,
+
+            "PrintId": original_card_print_id,
+            "OracleId": oracle_id,
+        })
+
         mock_event = {
             "body": json.dumps({
-                "cardOracle": oracle_id,
                 "cardLocation": card_location,
-                "cardInstanceId": card_instance_id,
-                "cardPrintId": card_print_id,
+                "cardInstanceId": new_card_instance_id,
+                "cardPrintId": new_card_print_id,
             }),
             "pathParameters": {
                 "deck_id": deck_id,
+                "deck_card_id": deck_card_id,
             },
             "headers": {
                 "Authorization": f"Bearer {self.jwt_token}",
@@ -365,16 +201,15 @@ class TestCreateDeck(unittest.TestCase):
 
         result = self.sut.lambda_handler(mock_event, mock_context)
 
-        assert result["statusCode"] == 201
+        assert get_cards_by_oracle_request.call_count == 1
+
+        assert result["statusCode"] == 204
         assert "body" in result
         assert result["body"] is not None
 
         body = json.loads(result["body"])
 
-        assert "deck_card_id" in body
-        assert body["deck_card_id"] is not None
-
-        assert get_cards_by_oracle_request.call_count == 1
+        assert body is None
 
         db_items = self.dynamodb_table.query(
             KeyConditionExpression=Key("PK").eq(f"USER#{self.user_id}#DECK#{deck_id}")
@@ -389,29 +224,54 @@ class TestCreateDeck(unittest.TestCase):
         assert db_items[0]["user_id"] == self.user_id
         assert db_items[0]["deck_id"] == deck_id
         assert db_items[0]["card_location"] == card_location
-        assert db_items[0]["card_instance_id"] == card_instance_id
+        assert db_items[0]["card_instance_id"] == new_card_instance_id
+
+        assert db_items[0]["PrintId"] == new_card_print_id
+        assert db_items[0]["OracleId"] == oracle_id
 
         self.assert_db_deck_card_oracle_keys_equal_to_expected_oracle(db_items[0], mock_card_oracle_response)
 
-    def test_lambda_returns_not_found_when_no_existing_oracle_id_is_send(self):
-        oracle_id = "non-existent"
+    def test_card_location_is_changed_when_new_card_location_is_specified(self):
+        oracle_id = "0dd894cb-1968-471c-af08-ea7ec5ce8428"
+        deck_card_id = str( uuid4() )
+        mock_card_oracle_response = CARD_ORACLE_1(oracle_id)
+        deck_id = "some-deck-id"
+
+        original_card_instance_id = str( uuid4() )
+        original_card_print_id = mock_card_oracle_response["PrintId"]
+        original_card_location = self.sut.AVAILABLE_DECK_LOCATIONS[0]
+        new_card_location = self.sut.AVAILABLE_DECK_LOCATIONS[1]
 
         get_cards_by_oracle_request = responses.add(
             responses.GET,
-            f"{self.CARD_ENDPOINT}/api/cards/{oracle_id}/",
-            status=404,
-            json={
-                "Message": "Card not found.",
-            },
+            f"{self.CARD_ENDPOINT}/api/cards/{oracle_id}/{original_card_print_id}/",
+            status=500,
         )
+
+        self.dynamodb_table.put_item(Item={
+            "PK": f"USER#{self.user_id}#DECK#{deck_id}",
+            "SK": f"DECK_CARD#{deck_card_id}",
+
+            "data_type": "DECK_CARD",
+            "user_id": self.user_id,
+            "deck_id": deck_id,
+            "deck_card_id": deck_card_id,
+            "card_location": original_card_location,
+            "card_instance_id": original_card_instance_id,
+
+            "PrintId": original_card_print_id,
+            "OracleId": oracle_id,
+        })
 
         mock_event = {
             "body": json.dumps({
-                "cardOracle": oracle_id,
-                "cardLocation": self.sut.AVAILABLE_DECK_LOCATIONS[0],
+                "cardLocation": new_card_location,
+                "cardInstanceId": original_card_instance_id,
+                "cardPrintId": original_card_print_id,
             }),
             "pathParameters": {
-                "deck_id": str( uuid4() ),
+                "deck_id": deck_id,
+                "deck_card_id": deck_card_id,
             },
             "headers": {
                 "Authorization": f"Bearer {self.jwt_token}",
@@ -421,14 +281,93 @@ class TestCreateDeck(unittest.TestCase):
 
         result = self.sut.lambda_handler(mock_event, mock_context)
 
-        assert result["statusCode"] == 404
+        assert result["statusCode"] == 204
+        assert "body" in result
+        assert result["body"] is not None
+
+        body = json.loads(result["body"])
+
+        assert body is None
+
+        assert get_cards_by_oracle_request.call_count == 0
+
+        db_items = self.dynamodb_table.query(
+            KeyConditionExpression=Key("PK").eq(f"USER#{self.user_id}#DECK#{deck_id}")
+        )["Items"]
+
+        assert len(db_items) == 1
+
+        assert db_items[0]["PK"] == f"USER#{self.user_id}#DECK#{deck_id}"
+        assert "DECK_CARD#" in db_items[0]["SK"]
+
+        assert db_items[0]["data_type"] == "DECK_CARD"
+        assert db_items[0]["user_id"] == self.user_id
+        assert db_items[0]["deck_id"] == deck_id
+        assert db_items[0]["card_location"] == new_card_location
+        assert db_items[0]["card_instance_id"] == original_card_instance_id
+
+        assert db_items[0]["PrintId"] == original_card_print_id
+        assert db_items[0]["OracleId"] == oracle_id
+
+    def test_bad_request_is_returned_if_no_card_print_is_found(self):
+        oracle_id = "0dd894cb-1968-471c-af08-ea7ec5ce8428"
+        deck_card_id = str( uuid4() )
+        mock_card_oracle_response = CARD_ORACLE_1(oracle_id)
+        deck_id = "some-deck-id"
+        card_location = self.sut.AVAILABLE_DECK_LOCATIONS[0]
+
+        original_card_instance_id = str( uuid4() )
+        new_card_instance_id = str( uuid4() )
+        original_card_print_id = str( uuid4() )
+        new_card_print_id = mock_card_oracle_response["PrintId"]
+
+        get_cards_by_oracle_request = responses.add(
+            responses.GET,
+            f"{self.CARD_ENDPOINT}/api/cards/{oracle_id}/{new_card_print_id}/",
+            status=404,
+        )
+
+        self.dynamodb_table.put_item(Item={
+            "PK": f"USER#{self.user_id}#DECK#{deck_id}",
+            "SK": f"DECK_CARD#{deck_card_id}",
+
+            "data_type": "DECK_CARD",
+            "user_id": self.user_id,
+            "deck_id": deck_id,
+            "deck_card_id": deck_card_id,
+            "card_location": card_location,
+            "card_instance_id": original_card_instance_id,
+
+            "PrintId": original_card_print_id,
+            "OracleId": oracle_id,
+        })
+
+        mock_event = {
+            "body": json.dumps({
+                "cardLocation": card_location,
+                "cardInstanceId": new_card_instance_id,
+                "cardPrintId": new_card_print_id,
+            }),
+            "pathParameters": {
+                "deck_id": deck_id,
+                "deck_card_id": deck_card_id,
+            },
+            "headers": {
+                "Authorization": f"Bearer {self.jwt_token}",
+            },
+        }
+        mock_context = {}
+
+        result = self.sut.lambda_handler(mock_event, mock_context)
+
+        assert result["statusCode"] == 400
         assert "body" in result
         assert result["body"] is not None
 
         body = json.loads(result["body"])
 
         assert "message" in body
-        assert body["message"] == f"Card with oracle with id '{oracle_id}' was not found"
+        assert body["message"] == f"No card with oracle '{oracle_id}' and print '{new_card_print_id}' found"
 
         assert get_cards_by_oracle_request.call_count == 1
 
@@ -475,7 +414,7 @@ class TestCreateDeck(unittest.TestCase):
         body = json.loads(result["body"])
 
         assert "message" in body
-        assert body["message"] == "Missing 'cardOracle'"
+        assert body["message"] == "Missing 'cardLocation'"
 
     def test_lambda_returns_bad_request_when_no_card_location_is_send(self):
         mock_event = {
