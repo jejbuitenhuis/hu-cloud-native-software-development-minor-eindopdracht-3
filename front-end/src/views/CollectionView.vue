@@ -8,17 +8,37 @@ type Collection = {
 }
 
 const collection = ref<Collection>({});
+const collectionFilterQuery = ref<string>("");
+const collectionOffsetPK = ref<string | null>(null);
+const collectionOffsetSK = ref<string | null>(null);
 const collectionLoading = ref<boolean>(true);
+
+function constructGetCollectionUrl() {
+  let url = "/api/collections";
+  if (collectionFilterQuery.value != "") {
+    url += `?q=${encodeURIComponent(collectionFilterQuery.value)}`
+  }
+  if (collectionOffsetPK.value != null && collectionOffsetSK.value != null) {
+     url += collectionFilterQuery.value === "" ? "?" : "&";
+     url += `pk-last-evaluated=${encodeURIComponent(collectionOffsetPK.value)}&sk-last-evaluated=${encodeURIComponent(collectionOffsetSK.value)}`
+  }
+  return url;
+}
 
 async function getCollection() {
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
-  const response = await fetch("/api/collections", { headers: { Authorization: token } });
+
+  collectionOffsetPK.value = null;
+  collectionOffsetSK.value = null;
+
+  const response = await fetch(constructGetCollectionUrl(), { headers: { Authorization: token } });
   if (!response.ok) {
     console.error(`Failed collections fetch. Status: ${response.status}`)
     return;
   }
-  const data = await response.json() as PrintCard[];
+  const body = await response.json() as any;
+  const data = body["Items"] as PrintCard[];
   const newCollection: Collection = {};
 
   for (const instanceCard of data) {
@@ -29,14 +49,50 @@ async function getCollection() {
     newCollection[instanceCard.OracleId] = [instanceCard]
   }
 
+  collectionOffsetPK.value = body["pk-last-evaluated"]
+  collectionOffsetSK.value = body["sk-last-evaluated"]
   collection.value = newCollection;
   collectionLoading.value = false;
 }
 getCollection();
+
+async function loadMoreFromCollection() {
+  const token = localStorage.getItem("jwtToken");
+  if (!token) return;
+
+  if (collectionOffsetPK.value == null || collectionOffsetSK.value == null) return;
+
+  const response = await fetch(constructGetCollectionUrl(), {
+    headers: { Authorization: token },
+  });
+  if (!response.ok) {
+    console.error(`Failed collections fetch. Status: ${response.status}`)
+    return;
+  }
+  const body = await response.json() as any;
+  const data = body["Items"] as PrintCard[];
+
+  for (const instanceCard of data) {
+    if (instanceCard.OracleId in collection.value) {
+      collection.value[instanceCard.OracleId].push(instanceCard)
+      continue;
+    }
+    collection.value[instanceCard.OracleId] = [instanceCard]
+  }
+
+  collectionOffsetPK.value = body["pk-last-evaluated"]
+  collectionOffsetSK.value = body["sk-last-evaluated"]
+  collectionLoading.value = false;
+}
 </script>
 
 <template>
   <div class="collection-wrapper">
+    <div class="search-collection-input-wrapper">
+      <sl-input label="Filter collection" v-model="collectionFilterQuery" />
+      <sl-button @click="getCollection">Filter</sl-button>
+    </div>
+
     <p v-if="Object.keys(collection).length === 0 && !collectionLoading" class="centered-content">
       Your collection is empty.
     </p>
@@ -51,6 +107,7 @@ getCollection();
         <div>Instances: {{card.length}}</div>
       </sl-card>
     </section>
+    <sl-button class="load-more-button" @click="loadMoreFromCollection" :disabled="collectionOffsetPK == null || collectionOffsetSK == null">Load more</sl-button>
   </div>
 </template>
 
@@ -59,6 +116,12 @@ getCollection();
     display: flex;
     padding-top: 1rem;
     flex-direction: column;
+}
+.search-collection-input-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0.2rem;
 }
 .cards-container {
   display: flex;
@@ -76,5 +139,8 @@ getCollection();
 .centered-content {
   margin-top: 20%;
   text-align: center;
+}
+.load-more-button {
+  margin: 0 2rem 2rem 2rem;
 }
 </style>
