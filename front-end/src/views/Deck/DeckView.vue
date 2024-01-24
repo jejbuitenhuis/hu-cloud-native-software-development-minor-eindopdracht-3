@@ -8,6 +8,7 @@ import CardListPreview from "./CardListPreview.vue";
 import type { DeckCard } from "@/models/cardModels";
 import AddCardToDeckView from "./AddCardToDeckView.vue";
 import DeckSearchView from "./DeckSearchView.vue";
+import ValidationBar from "@/components/Deck/ValidationBar.vue";
 
 type Deck = {
   id: string,
@@ -26,7 +27,7 @@ const commanders = ref<DeckCard[]>([]);
 
 function sortCards() {
   for (let card of cardsList.value) {
-      sortInCard(card);
+    sortInCard(card);
   }
 }
 
@@ -147,8 +148,14 @@ getCards();
   <p v-if="errorMesssage !== ''" class="error">{{ errorMesssage }}</p>
   <div v-if="!loading && deck != null" class="page-content">
     <h2>Deck: {{deck.name}}</h2>
-    <div class="cardList">
 
+    <ValidationBar
+      :commanders="commanders"
+      :main-deck="mainDeck"
+      :side-deck="sideDeck"
+    />
+
+    <div class="cardList">
       <h3>Commander(s):</h3>
       <div v-for="card in commanders">
         <CardListPreview :card="card" @delete="deleteCard"></CardListPreview>

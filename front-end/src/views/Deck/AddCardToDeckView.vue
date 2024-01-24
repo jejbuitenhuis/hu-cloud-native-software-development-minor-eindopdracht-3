@@ -52,13 +52,13 @@ function addCardToDeck(event : any){
     let toSend = {
         'cardOracle' : event['oracleId'],
         'cardLocation' : event['location'],
-        'printId' : event['printId'],
+        'cardPrintId' : event['printId'],
         'cardInstanceId' : event['cardInstance']
     }
     const token = localStorage.getItem("jwtToken");
     if (!token) return;
-    
-    fetch(`/api/decks/${route.params["deck_id"]}/cards/`, 
+
+    fetch(`/api/decks/${route.params["deck_id"]}/cards/`,
     {
         method: "POST",
         headers: {Authorization: token},

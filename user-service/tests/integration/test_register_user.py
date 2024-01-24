@@ -55,7 +55,6 @@ def test_lambda_handler_successful():
         assert response_user
 
 
-
 @mock_cognitoidp
 def test_lambda_handler_email_exists():
 

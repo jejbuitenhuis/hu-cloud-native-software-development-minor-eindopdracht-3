@@ -114,6 +114,9 @@
                 },
                 "condition": {
                   "type": "string"
+                },
+                "deck_id": {
+                  "type": "string"
                 }
               },
               "required": [

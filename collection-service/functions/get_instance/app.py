@@ -3,11 +3,8 @@ import logging
 import boto3
 from os import environ
 from jose import jwt
-from aws_xray_sdk.core import patch_all
 from boto3.dynamodb.conditions import Key
 
-if "DISABLE_XRAY" not in environ:
-    patch_all()
 
 logger = logging.getLogger()
 logger.setLevel("INFO")
@@ -20,9 +17,14 @@ def lambda_handler(event, context):
         event["headers"]["Authorization"].replace("Bearer ", "")
     )["sub"]
 
+    logger.info(event)
+
+    oracle_id = event["pathParameters"]["instance_id"]
+
     response = table.query(
+        IndexName="GSI-Collection-OracleId",
         KeyConditionExpression=Key("PK").eq(f"UserId#{user_id}")
-        & Key("SK").eq(f"CardInstanceId#{event['pathParameters']['instance_id']}"),
+        & Key("GSI2SK").begins_with(f"OracleId#{oracle_id}"),
     )
 
     if len(response["Items"]) == 0:

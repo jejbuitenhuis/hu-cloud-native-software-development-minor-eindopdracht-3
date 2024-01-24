@@ -96,6 +96,23 @@ Resources:
       Policies:
         - AmazonDynamoDBFullAccess
 
+  RemoveCardFromDeckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/RemoveCard/
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGDeckApi"
+            Path: /api/decks/{deck_id}/cards/{card_id}
+            Method: DELETE
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGDeckDynamoDBTable
+      Policies:
+        - AmazonDynamoDBFullAccess
+
   GetDecksFromUserFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -170,6 +187,21 @@ Resources:
             Method: GET
       Policies:
         - AmazonDynamoDBReadOnlyAccess
+
+  EditDeckCardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/EditDeckCard/
+      Events:
+        EditDeckCard:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGDeckApi"
+            Path: /api/decks/{deck_id}/cards/{card_id}
+            Method: PATCH
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - AmazonSSMReadOnlyAccess
 
 Outputs:
   MTGDeckApiUrl:

@@ -61,3 +61,16 @@ jobs:
           --parameter-overrides Stage=${{ inputs.environment }} 
           --stack-name '${{inputs.service-name}}-${{inputs.environment}}' 
           --s3-prefix '${{inputs.service-name}}-${{inputs.environment}}'
+
+      - name: Run performance tests if monitoring service and staging
+        if: ${{ inputs.service-name == 'monitoring-service' && inputs.environment == 'staging' }}
+        run: |
+          sudo apt-get install maven
+          mvn gatling:test -DStage=${{ inputs.environment }} -Dsimulation=AllSimulations
+
+      - name: Upload test results
+        if: ${{ inputs.service-name == 'monitoring-service' && inputs.environment == 'staging' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: gatling-results
+          path: ./${{inputs.service-name}}/target/gatling/**
