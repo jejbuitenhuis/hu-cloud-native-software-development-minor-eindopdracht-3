@@ -87,7 +87,7 @@ def lambda_handler(event, context):
     pk_last_evaluated = None
     sk_last_evaluated = None
 
-    if items and items == limit_value:
+    if items and len(items) == limit_value:
         last_item = items[-1]
         pk_last_evaluated = last_item["PK"]
         sk_last_evaluated = last_item["SK"]
