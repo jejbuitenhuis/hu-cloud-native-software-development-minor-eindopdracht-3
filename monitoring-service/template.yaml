@@ -566,7 +566,7 @@ Resources:
                        "properties": {
                            "metrics": [
                                [ { "expression": "FILL(METRICS(), 0)", "label": "", "id": "e1" } ],
-                               [ "AWS/Lambda", "Invocations", "FunctionName", "collection-service-${Stage}-GetCollectionFunction", { "region": "${AWS::Region}", "id": "m1", "visible": false } ]
+                               [ "AWS/Lambda", "Invocations", "FunctionName", "collection-service-${Stage}-SearchCardsFunction", { "region": "${AWS::Region}", "id": "m1", "visible": false } ]
                            ],
                            "view": "timeSeries",
                            "stacked": false,
@@ -591,7 +591,7 @@ Resources:
                        "properties": {
                            "metrics": [
                                [ { "expression": "FILL(METRICS(), 0)", "label": "", "id": "e1" } ],
-                               [ "AWS/Lambda", "Duration", "FunctionName", "collection-service-${Stage}-GetCollectionFunction", { "region": "${AWS::Region}", "id": "m1", "visible": false } ]
+                               [ "AWS/Lambda", "Duration", "FunctionName", "collection-service-${Stage}-SearchCardsFunction", { "region": "${AWS::Region}", "id": "m1", "visible": false } ]
                            ],
                            "view": "timeSeries",
                            "stacked": false,
@@ -616,7 +616,7 @@ Resources:
                        "properties": {
                            "metrics": [
                                [ { "expression": "FILL(METRICS(), 0)", "label": "", "id": "e1", "region": "${AWS::Region}" } ],
-                               [ "AWS/Lambda", "Errors", "FunctionName", "collection-service-${Stage}-GetCollectionFunction", { "id": "m1", "region": "${AWS::Region}", "visible": false } ]
+                               [ "AWS/Lambda", "Errors", "FunctionName", "collection-service-${Stage}-SearchCardsFunction", { "id": "m1", "region": "${AWS::Region}", "visible": false } ]
                            ],
                            "view": "timeSeries",
                            "stacked": false,
