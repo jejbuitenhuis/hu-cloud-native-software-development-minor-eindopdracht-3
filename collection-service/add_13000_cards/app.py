@@ -3,14 +3,14 @@ from os import environ
 from aws_xray_sdk.core import patch_all
 import boto3
 import logging
-import ijson
+import json
 import uuid
 import random
 
-if 'DISABLE_XRAY' not in environ:
+if "DISABLE_XRAY" not in environ:
     patch_all()
 
-dynamodb = boto3.resource('dynamodb', 'us-east-1')
+dynamodb = boto3.resource("dynamodb", "us-east-1")
 DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
 user_id = os.getenv("USERID")
 local_filename = os.getenv("CARD_JSON_LOCATION")
@@ -20,55 +20,58 @@ table = dynamodb.Table(DYNAMODB_TABLE_NAME)
 LOGGER = logging.getLogger()
 LOGGER.setLevel("INFO")
 
+
 def parse_card_item_from_own_lambda(item, user_id, condition):
     card_instance_id = str(uuid.uuid4())
     face_items = []
 
-    for face in item['CardFaces']:
-        face_items.append({
-            "OracleText": face['OracleText'],
-            "ManaCost": face['ManaCost'],
-            "TypeLine": face['TypeLine'],
-            "FaceName": face['FaceName'],
-            "FlavorText": face['FlavorText'],
-            "ImageUrl": face['ImageUrl'],
-            "Colors": face['Colors'],
-            "LowercaseFaceName": face['LowercaseFaceName'],
-            "LowercaseOracleText": face['LowercaseOracleText']
-        })
+    for face in item["CardFaces"]:
+        face_items.append(
+            {
+                "OracleText": face["OracleText"],
+                "ManaCost": face["ManaCost"],
+                "TypeLine": face["TypeLine"],
+                "FaceName": face["FaceName"],
+                "FlavorText": face["FlavorText"],
+                "ImageUrl": face["ImageUrl"],
+                "Colors": face["Colors"],
+                "LowercaseFaceName": face["LowercaseFaceName"],
+                "LowercaseOracleText": face["LowercaseOracleText"],
+            }
+        )
 
     return {
-        "PK": f'UserId#{user_id}',
-        "SK": f'CardInstanceId#{card_instance_id}',
+        "PK": f"UserId#{user_id}",
+        "SK": f"CardInstanceId#{card_instance_id}",
         "PrintId": item["PrintId"],
-        "OracleId": item['OracleId'],
+        "OracleId": item["OracleId"],
         "CardInstanceId": card_instance_id,
         "Condition": condition,
-        "DeckId": "",
-        "OracleName": item['OracleName'],
-        "SetName": item['SetName'],
-        "ReleasedAt": item['ReleasedAt'],
-        "Rarity": item['Rarity'],
-        "Price": item['Price'],
-        "LowerCaseOracleName": item['LowerCaseOracleName'],
-        "CardFaces": face_items
+        "OracleName": item["OracleName"],
+        "SetName": item["SetName"],
+        "ReleasedAt": item["ReleasedAt"],
+        "Rarity": item["Rarity"],
+        "Price": item["Price"],
+        "LowerCaseOracleName": item["LowerCaseOracleName"],
+        "CardFaces": face_items,
+        "GSI2SK": f"OracleId#{item['OracleId']}#CardInstanceId#{card_instance_id}",
     }
 
 
 def create_card_info(card, oracle_id):
-    if card['prices']['eur'] is None:
-        card['prices']['eur'] = '0.00'
+    if card["prices"]["eur"] is None:
+        card["prices"]["eur"] = "0.00"
     return {
-        "PK": f'OracleId#{oracle_id}',
+        "PK": f"OracleId#{oracle_id}",
         "SK": f'PrintId#{card["id"]}',
-        "OracleName": card['name'],
-        "SetName": card['set_name'],
-        "ReleasedAt": card['released_at'],
-        "Rarity": card['rarity'],
-        "Price": card['prices']['eur'],
+        "OracleName": card["name"],
+        "SetName": card["set_name"],
+        "ReleasedAt": card["released_at"],
+        "Rarity": card["rarity"],
+        "Price": card["prices"]["eur"],
         "OracleId": oracle_id,
-        "PrintId": card['id'],
-        "LowerCaseOracleName": str.lower(card.get('name', ''))
+        "PrintId": card["id"],
+        "LowerCaseOracleName": str.lower(card.get("name", "")),
     }
 
 
@@ -89,29 +92,29 @@ def turn_card_into_face_item(card):
 
 def turn_face_into_face_item(face, card_image_uri, card_colors):
     return {
-        "OracleText": face.get('oracle_text', ''),
-        "ManaCost": face.get('mana_cost', ''),
-        "TypeLine": face.get('type_line', ''),
-        "FaceName": face.get('name', ''),
-        "FlavorText": face.get('flavor_text', ''),
+        "OracleText": face.get("oracle_text", ""),
+        "ManaCost": face.get("mana_cost", ""),
+        "TypeLine": face.get("type_line", ""),
+        "FaceName": face.get("name", ""),
+        "FlavorText": face.get("flavor_text", ""),
         "ImageUrl": card_image_uri,
         "Colors": card_colors,
-        "LowercaseFaceName": str.lower(face.get('name', '')),
-        "LowercaseOracleText": str.lower(face.get('oracle_text', ''))
+        "LowercaseFaceName": str.lower(face.get("name", "")),
+        "LowercaseOracleText": str.lower(face.get("oracle_text", "")),
     }
 
 
 def getOracleFromCard(card):
-    if card.get('layout', '') == 'reversible_card':
-        return card['card_faces'][0]['oracle_id']
+    if card.get("layout", "") == "reversible_card":
+        return card["card_faces"][0]["oracle_id"]
     else:
-        return card['oracle_id']
+        return card["oracle_id"]
 
 
 def getCombinedLowerCaseOracleText(faces):
-    loweredText = "";
+    loweredText = ""
     for face in faces:
-        loweredText += str.lower(face.get('OracleText', ''))
+        loweredText += str.lower(face.get("OracleText", ""))
         loweredText += " "
     return loweredText
 
@@ -133,13 +136,20 @@ def cutTheListAndPersist(item_list):
 
 
 def getRandomCondition():
-    conditions = ["Mint", "Near Mint", "Lightly Played", "Moderately Played", "Heavily Played", "Damaged"]
+    conditions = [
+        "Mint",
+        "Near Mint",
+        "Lightly Played",
+        "Moderately Played",
+        "Heavily Played",
+        "Damaged",
+    ]
     return random.choice(conditions)
 
 
 def get_image_uri_from_face(card):
     if card.get("card_faces") is not None:
-        if 'image_uris' in card['card_faces'][0]:
+        if "image_uris" in card["card_faces"][0]:
             return True
         else:
             return False
@@ -149,7 +159,7 @@ def get_image_uri_from_face(card):
 
 def get_Colors_from_face(card):
     if card.get("card_faces") is not None:
-        if 'colors' in card['card_faces'][0]:
+        if "colors" in card["card_faces"][0]:
             return True
         else:
             return False
@@ -158,16 +168,16 @@ def get_Colors_from_face(card):
 
 
 def is_image_uri_missing(card):
-    if card['image_status'] == 'missing':
+    if card["image_status"] == "missing":
         return True
     else:
         return False
 
 
 def lambda_handler(event, context):
-    with open(f'{local_filename}', "rb") as file:
+    with open(f"{local_filename}", "rb") as file:
         LOGGER.info("Started the function")
-        cards = ijson.items(file, 'item')
+        cards = ijson.items(file, "item")
         card_counter = 0
         item_list = []
         for card in cards:
@@ -179,30 +189,33 @@ def lambda_handler(event, context):
 
                 if card.get("card_faces") != None:
                     face_count = 0
-                    for face in card['card_faces']:
+                    for face in card["card_faces"]:
                         if missing_image_uri:
-                            card_image_uri = ''
+                            card_image_uri = ""
                         else:
                             if get_image_uri_from_face(card):
-                                card_image_uri = face['image_uris']['png']
+                                card_image_uri = face["image_uris"].get("png", "")
                             else:
-                                card_image_uri = card['image_uris']['png']
+                                card_image_uri = card["image_uris"].get("png", "")
 
                         if get_Colors_from_face(card):
-                            card_colors = face['colors']
+                            card_colors = face["colors"]
                         else:
-                            card_colors = card['colors']
+                            card_colors = card["colors"]
 
                         face_count += 1
-                        LOGGER.info(f'{card_image_uri}')
-                        card_faces.append(turn_face_into_face_item(face, card_image_uri, card_colors))
+                        card_faces.append(
+                            turn_face_into_face_item(face, card_image_uri, card_colors)
+                        )
                 else:
                     card_faces.append(turn_card_into_face_item(card))
 
-                card_info['CardFaces'] = card_faces
-                card_info['CombinedLowercaseOracleText'] = getCombinedLowerCaseOracleText(card_faces)
+                card_info["CardFaces"] = card_faces
+                card_info["CombinedLowercaseOracleText"] = getCombinedLowerCaseOracleText(card_faces)
 
-                collection_card_info = parse_card_item_from_own_lambda(card_info, user_id, getRandomCondition())
+                collection_card_info = parse_card_item_from_own_lambda(
+                    card_info, user_id, getRandomCondition()
+                )
 
                 item_list.append(collection_card_info)
                 item_list = cutTheListAndPersist(item_list)

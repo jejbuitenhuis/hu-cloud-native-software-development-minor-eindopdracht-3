@@ -114,6 +114,9 @@
                 },
                 "condition": {
                   "type": "string"
+                },
+                "deck_id": {
+                  "type": "string"
                 }
               },
               "required": [
@@ -224,7 +227,7 @@
         ],
         "parameters": [
           {
-            "name": "instance_id",
+            "name": "oracle_id",
             "in": "path",
             "required": true,
             "type": "string"
