@@ -89,29 +89,7 @@ getInstances();
         </div>
       </div>
       <br>
-      Cards in your collection:
 
-      <div class="prints-info">
-        <table>
-          <thead>
-          <tr>
-            <th>Set name</th>
-            <th>Release date</th>
-            <th>Rarity</th>
-            <th>Price</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="instance in instances.valueOf()">
-            <td>{{ instance['condition'] }}</td>
-            <!-- <td>{{ new Date(print.ReleasedAt).toLocaleDateString("nl-nl") }}</td> -->
-            <!-- <td>{{ print.Rarity }}</td> -->
-            <!-- <td>{{ print.Price == null ? "-" : `€${print.Price}` }}</td> -->
-            <td><button @click="">Add from collection</button></td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   </div>
 </template>
