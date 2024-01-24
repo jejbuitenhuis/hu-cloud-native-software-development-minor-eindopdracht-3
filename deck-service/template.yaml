@@ -109,7 +109,7 @@ Resources:
             Method: DELETE
       Environment:
         Variables:
-          DYNAMODB_TABLE: !Ref MTGDeckDynamoDBTable
+          DYNAMODB_TABLE_NAME: !Ref MTGDeckDynamoDBTable
       Policies:
         - AmazonDynamoDBFullAccess
 

@@ -21,7 +21,7 @@ def lambda_handler(event, context):
     LOGGER.info(f"Deleting card with id: {event['pathParameters']['deck_card_id']}")
     user_id = jwt.get_unverified_claims(event['headers']['Authorization'].replace("Bearer ", ""))["sub"]
     deck_id = event["pathParameters"]["deck_id"]
-    deck_card_id = event["pathParameters"]["deck_card_id"]
+    deck_card_id = event["pathParameters"]["card_id"]
 
     PK = f'USER#{user_id}#DECK#{deck_id}'
     SK = f'DECK_CARD#{deck_card_id}'
