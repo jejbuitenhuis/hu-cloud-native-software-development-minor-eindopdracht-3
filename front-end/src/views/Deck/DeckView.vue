@@ -65,7 +65,6 @@ async function getCards() {
   }
 
   cardsList.value = await response.json() as DeckCard[];
-  console.log(JSON.stringify(cardsList.value[0]))
   sortCards();
 }
 
@@ -121,6 +120,7 @@ function deleteCard(card : DeckCard){
     (response) =>
     {
       if (response.ok) {
+        cardsList.value = cardsList.value.filter((originalCard) => originalCard.deck_card_id !== card.deck_card_id)
         switch (card.card_location){
           case ('COMMANDER'):
             commanders.value = commanders.value.filter((originalCard) => originalCard.deck_card_id !== card.deck_card_id)

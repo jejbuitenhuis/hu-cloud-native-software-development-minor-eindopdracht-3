@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import DecoratedText from "@/components/DecoratedText.vue";
 import type {DeckCard} from "@/models/cardModels";
 import { ref } from "vue";
 
 const emit = defineEmits(['delete'])
+
 
 const faceName = ref();
 const manaCost = ref();
@@ -10,14 +12,16 @@ const oracleText = ref();
 const image = ref();
 const typeline = ref();
 const colors = ref();
-
+const borderColor = ref("black");
 let faceNumber = 0;
 
 const props = defineProps<{
   card: DeckCard
 }>()
-const card = props.card;
 
+if (props.card.card_instance_id) {
+    borderColor.value = "green";
+}
 
 setFace();
 
@@ -29,45 +33,45 @@ let alpha = 0.22;
 
 function flip(){
     faceNumber++;
-    if (faceNumber > card.CardFaces.length-1){
+    if (faceNumber > props.card.CardFaces.length-1){
         faceNumber = 0
     }
     setFace();
 }
 
 function deleteCard(){
-    if (confirm("Are you sure you want to delete: \"" + card.OracleName + "\"?")){
-        emit('delete', card);
+    if (confirm("Are you sure you want to delete: \"" + props.card.OracleName + "\"?")){
+        emit('delete', props.card);
     }
 }
 
 function setFace(){
-    faceName.value = card.CardFaces[faceNumber].FaceName;
-    manaCost.value = card.CardFaces[faceNumber].ManaCost;
-    oracleText.value = card.CardFaces[faceNumber].OracleText;
-    image.value = card.CardFaces[faceNumber].ImageUrl;
-    typeline.value = card.CardFaces[faceNumber].TypeLine;
-    colors.value = card.CardFaces[faceNumber].Colors;
+    faceName.value = props.card.CardFaces[faceNumber].FaceName;
+    manaCost.value = props.card.CardFaces[faceNumber].ManaCost;
+    oracleText.value = props.card.CardFaces[faceNumber].OracleText;
+    image.value = props.card.CardFaces[faceNumber].ImageUrl;
+    typeline.value = props.card.CardFaces[faceNumber].TypeLine;
+    colors.value = props.card.CardFaces[faceNumber].Colors;
 }
 
 </script>
 
 <template>
-        <div class="card" v-bind:style="{ 'background-image': 'url(' + image + ')', 
-        'box-shadow': 'inset 0 0 0 1000px rgba(' + red + ',' + green + ',' + blue + ',' + alpha + ')'}">
-            <span class="titlebox">
-                <p><span class="title">{{card.OracleName}}</span>{{ manaCost }}</p>
-                <p><span>{{ typeline }}</span></p>
-                <button v-if="card.CardFaces.length > 1" @click="flip">flip</button>
-            </span>
-            <div class="seperator"></div>
-            <span class="descriptionbox" :title="oracleText">
-                <p>
-                    {{ oracleText }}
-                </p>
-            </span>
-            <button @click="deleteCard()">x</button>
-        </div>
+    <div class="card" v-bind:style="{ 'background-image': 'url(' + image + ')', 
+    'box-shadow': 'inset 0 0 0 1000px rgba(' + red + ',' + green + ',' + blue + ',' + alpha + ')'}">
+        <span class="titlebox">
+            <p><span class="title">{{props.card.OracleName}}</span><DecoratedText :text="manaCost"></DecoratedText></p>
+            <p><span>{{ typeline }}</span></p>
+            <button v-if="props.card.CardFaces.length > 1" @click="flip">flip</button>
+        </span>
+        <div class="seperator"></div>
+        <span class="descriptionbox" :title="oracleText">
+            <p>
+                <DecoratedText :text="oracleText"></DecoratedText>
+            </p>
+        </span>
+        <button @click="deleteCard()">x</button>
+    </div>
 </template>
 
 <style scoped lang="scss">
@@ -85,7 +89,7 @@ function setFace(){
     max-width: 550px;
     display: inline-flex;
     height: 70px;
-    border: 2px solid black;
+    border: 2px solid v-bind(borderColor);
 }
 
 p {

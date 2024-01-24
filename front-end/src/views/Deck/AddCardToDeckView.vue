@@ -45,7 +45,6 @@ function unselectPrint() {
 
 function backToSearch(){
     selecting.value = false;
-    console.log("back")
 }
 
 function addCardToDeck(event : any){
@@ -53,7 +52,7 @@ function addCardToDeck(event : any){
         'cardOracle' : event['oracleId'],
         'cardLocation' : event['location'],
         'cardPrintId' : event['printId'],
-        'cardInstanceId' : event['instance']
+        'cardInstanceId' : event['cardInstance']
     }
     const token = localStorage.getItem("jwtToken");
     if (!token) return;

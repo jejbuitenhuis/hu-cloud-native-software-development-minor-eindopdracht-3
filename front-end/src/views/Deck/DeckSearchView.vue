@@ -98,7 +98,6 @@ class CardNotFoundError extends Error {
 }
 
 function selectCard(card : any){
-  console.log(card)
   emit('cardClicked', {card: card, location: location})
 }
 </script>

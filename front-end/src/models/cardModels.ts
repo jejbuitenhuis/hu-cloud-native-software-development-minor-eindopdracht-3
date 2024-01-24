@@ -37,6 +37,7 @@ export type DeckCard = {
   ReleasedAt: string,
   SetName: string,
   user_id: string
+  card_instance_id?: string
 }
 
 export type CardFace = {
@@ -75,4 +76,18 @@ export type CollectionPrintFace = {
   ManaCost: string,
   OracleText: string,
   TypeLine: string,
+}
+
+export type CardInstance =
+{
+  "CardFaces": CardFace[],
+  "CardInstanceId": string,
+  "Condition": string,
+  "OracleId": string,
+  "OracleName": string,
+  "Price": string,
+  "PrintId": string,
+  "Rarity": string,
+  "ReleasedAt": string,
+  "SetName": string,
 }

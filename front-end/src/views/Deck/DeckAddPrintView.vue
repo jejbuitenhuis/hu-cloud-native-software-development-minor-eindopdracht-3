@@ -1,28 +1,22 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import DecoratedText from "@/components/DecoratedText.vue";
-import type {PrintCard} from "@/models/cardModels";
+import type {CardInstance, PrintCard} from "@/models/cardModels";
 
 const props = defineProps<{card : any, location : any, printId : string}>()
 const emit = defineEmits(['addCard', 'unselectPrint'])
 
 
-const oracleId = props.card['oracle_id'];
-const cardId = props.printId;
 const loading = ref(true)
 const card = ref<PrintCard | null>(null);
-const instances = ref([
-  {
-    'Condition' : "MINT"
-  }
-])
+const instances = ref<CardInstance[]>([])
 
 let loadingRemaining = 2;
 
 async function getCard() {
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
-  const response = await fetch(`/api/cards/${oracleId}/${cardId}`, {headers: {Authorization: token}});
+  const response = await fetch(`/api/cards/${props.card['oracle_id']}/${props.printId}`, {headers: {Authorization: token}});
   if (!response.ok) {
     console.error(`Failed card fetch. Status: ${response.status}`)
     return;
@@ -36,12 +30,13 @@ async function getCard() {
 async function getInstances() {
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
-  const response = await fetch(`/api/collection/${cardId}`, {headers: {Authorization: token}});
+  const response = await fetch(`/api/collections/${props.card['oracle_id']}`, {headers: {Authorization: token}});
   if (!response.ok) {
     console.error(`Failed card instances. Status: ${response.status}`)
     return;
   }
-  instances.value = await response.json() as any[];
+  const unfilteredInstances = await response.json() as CardInstance[];
+  instances.value = unfilteredInstances.filter((instance) => instance.PrintId === props.printId)
   loaded()
 }
 
@@ -56,8 +51,8 @@ function unselectPrint(){
   emit("unselectPrint");
 }
 
-function addCardToDeck(instance : string | undefined) {
-    emit('addCard', {oracleId : props.card['oracle_id'], location : props.location, cardInstance : instance, printId : cardId})
+function addCardToDeck(instance? : string) {
+    emit('addCard', {oracleId : props.card['oracle_id'], location : props.location, cardInstance : instance, printId : props.printId})
 }
 
 getCard();
@@ -85,11 +80,33 @@ getInstances();
           <DecoratedText :text="face.FlavorText"/>
         </div>
         <div>
-          <sl-button class="add-to-deck-button" @click="addCardToDeck">Add Card to Deck</sl-button>
+          <sl-button class="add-to-deck-button" @click="addCardToDeck()">Add Card to Deck</sl-button>
         </div>
+        <div class="instances">
+        <table>
+          <thead>
+          <tr>
+            <th>Set name</th>
+            <th>Release date</th>
+            <th>Rarity</th>
+            <th>Price</th>
+            <th>Condition</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="instance in instances">
+            <td>{{ instance.SetName }}</td>
+            <td>{{ new Date(instance.ReleasedAt).toLocaleDateString("nl-nl") }}</td>
+            <td>{{ instance.Rarity }}</td>
+            <td>{{ instance.Price == null ? "-" : `€${instance.Price}` }}</td>
+            <td>{{ instance.Condition }}</td>
+            <!-- show in which deck instance currently is -->
+            <td><button @click="addCardToDeck(instance.CardInstanceId)">Select this print</button></td>
+          </tr>
+          </tbody>
+        </table>
       </div>
-      <br>
-
+      </div>
     </div>
   </div>
 </template>
