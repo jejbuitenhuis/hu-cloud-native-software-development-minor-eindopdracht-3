@@ -149,7 +149,7 @@ Resources:
             Path: /api/decks/{deck_id}/cards/
             Method: POST
       Policies:
-        - AmazonDynamoDBReadOnlyAccess
+        - AmazonDynamoDBFullAccess
         - AmazonSSMReadOnlyAccess
 
   GetCardByIdFromDeckFunction:
