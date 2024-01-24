@@ -30,8 +30,8 @@ def lambda_handler(event, context):
     search_value = query_string_parameters.get("q", "")
 
     tmp_limit = query_string_parameters.get("limit")
-    tmp_pk_last_evaluated = query_string_parameters.get("PKLastEvaluated")
-    tmp_sk_last_evaluated = query_string_parameters.get("SKLastEvaluated")
+    tmp_pk_last_evaluated = query_string_parameters.get("pk-last-evaluated")
+    tmp_sk_last_evaluated = query_string_parameters.get("sk-last-evaluated")
 
     if tmp_pk_last_evaluated and tmp_sk_last_evaluated:
         last_evaluated_key = {"PK": tmp_pk_last_evaluated, "SK": tmp_sk_last_evaluated}
@@ -87,7 +87,7 @@ def lambda_handler(event, context):
     pk_last_evaluated = None
     sk_last_evaluated = None
 
-    if items:
+    if items and items == limit_value:
         last_item = items[-1]
         pk_last_evaluated = last_item["PK"]
         sk_last_evaluated = last_item["SK"]
@@ -102,8 +102,8 @@ def lambda_handler(event, context):
         "body": json.dumps(
             {
                 "Items": items,
-                "PKLastEvaluated": pk_last_evaluated,
-                "SKLastEvaluated": sk_last_evaluated,
+                "pk-last-evaluated": pk_last_evaluated,
+                "sk-last-evaluated": sk_last_evaluated,
             }
         ),
     }
