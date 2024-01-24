@@ -32,7 +32,7 @@ def lambda_handler(event, context):
 
     db_response = DECK_TABLE.get_item(Key={
         "PK": f"USER#{user_id}#DECK#{deck_id}",
-        "SK": f"DECKCARD#{card_id}"
+        "SK": f"DECK_CARD#{card_id}"
     })
 
     LOGGER.info(f"{db_response = }")
