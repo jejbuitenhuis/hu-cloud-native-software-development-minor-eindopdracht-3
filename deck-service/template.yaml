@@ -18,6 +18,7 @@ Globals:
           Fn::ImportValue:
             !Sub "common-service-${Stage}-MTGEventBus"
         DYNAMO_DB_DECK_TABLE_NAME: !Ref MTGDeckDynamoDBTable
+        STAGE: !Ref Stage
 
 Parameters:
   Stage:
@@ -121,6 +122,21 @@ Resources:
             Method: GET
       Policies:
         - AmazonDynamoDBReadOnlyAccess
+
+  AddCardToDeckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/AddCardToDeck/
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGDeckApi"
+            Path: /api/decks/{deck_id}/cards/
+            Method: POST
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+        - AmazonSSMReadOnlyAccess
 
 Outputs:
   MTGDeckApiUrl:
