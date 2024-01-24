@@ -25,8 +25,9 @@ ssm = boto3.client("ssm")
 def fetch_api_url():
     LOGGER.info("Fetching api url from ssm")
     try:
-        parameter = ssm.get_parameter(Name=f"/{STAGE}/MTGCardApi/url")
-        return parameter["Parameter"]["Value"]
+        parameter = ssm.get_parameter(Name=f'/{STAGE}/MTGCardApi/url')
+        LOGGER.info(f"Fetched api url: {parameter['Parameter']['Value']}")
+        return parameter['Parameter']['Value']
     except ClientError as e:
         LOGGER.error(f"Error while fetching api url from ssm: {e}")
         raise e
@@ -78,6 +79,7 @@ def parse_card_item(item, user_id, condition, deck_id):
 def save_card_to_db(item, user_id, condition, deck_id):
     try:
         card_instance_item = parse_card_item(item, user_id, condition, deck_id)
+        LOGGER.info(f"Saving card instance: {card_instance_item}")
         COLLECTION_TABLE.put_item(Item=card_instance_item)
         return card_instance_item
     except ClientError as e:
@@ -92,6 +94,7 @@ def get_user_id(event: dict) -> str:
 
 def lambda_handler(event, context):
     LOGGER.info("Starting add card to collection lambda")
+    LOGGER.info(f"Event body: {event['body'] }")
 
     body = json.loads(event["body"])
     oracle_id = body["oracle_id"]
@@ -102,10 +105,16 @@ def lambda_handler(event, context):
 
     try:
         api_url = fetch_api_url()
+
+        LOGGER.info(f"Fetching card from api: {api_url}/api/cards/{oracle_id}/{print_id}")
+
         api_response = requests.get(
             f"{api_url}/api/cards/{oracle_id}/{print_id}",
             headers={"Authorization": event["headers"]["Authorization"]},
         )
+
+        LOGGER.info(f"{api_response = }")
+
         api_response_code = api_response.status_code
         api_response_body = api_response.json()
 

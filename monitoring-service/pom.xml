@@ -17,23 +17,29 @@
 
   <dependencies>
     <dependency>
-        <groupId>io.gatling.highcharts</groupId>
-        <artifactId>gatling-charts-highcharts</artifactId>
-        <version>${gatling.version}</version>
+      <groupId>io.gatling.highcharts</groupId>
+      <artifactId>gatling-charts-highcharts</artifactId>
+      <version>${gatling.version}</version>
     </dependency>
 
     <dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>ssm</artifactId>
-        <version>2.17.77</version>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-buffer</artifactId>
+      <version>4.1.54.Final</version>
     </dependency>
 
     <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-buffer</artifactId>
-        <version>4.1.54.Final</version> <!-- Specify the version -->
-      </dependency>
-    </dependencies>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-cognitoidp</artifactId>
+      <version>1.11.792</version>
+    </dependency>
+
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>ssm</artifactId>
+      <version>2.17.77</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>

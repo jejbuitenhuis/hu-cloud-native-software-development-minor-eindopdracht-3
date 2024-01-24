@@ -39,10 +39,6 @@ def lambda_handler(event, context):
 
     logger.info(f'EventType: {type(event)}')
     logger.info(f'Event: {event}')
-    
-    logger.info(f'Client: {client}')
-    logger.info(f'ClientID: {client_id}')
-    logger.info(f'UserPoolID: {user_pool_id}')
 
     body = json.loads(event['body'])
     password = body['password']
@@ -84,8 +80,7 @@ def lambda_handler(event, context):
         logger.info(f'User Registered: {response}')
 
         return {
-            "statusCode": 201,
-            "body": json.dumps(response)
+            "statusCode": 201
         }
     else:
         return email_exists
