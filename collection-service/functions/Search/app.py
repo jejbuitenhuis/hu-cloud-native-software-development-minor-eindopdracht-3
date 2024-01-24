@@ -23,11 +23,21 @@ def lambda_handler(event, context):
     authorization_value = event.get("headers", {}).get("Authorization", None)
     query_string_parameters = event.get("queryStringParameters", {})
 
-    search_value = (
-        query_string_parameters.get("q")
-        if query_string_parameters is not None
-        else None
-    )
+    search_value = ""
+    last_evaluated_key = None
+    limit_value = 40
+
+    search_value = query_string_parameters.get("q", "")
+
+    tmp_limit = query_string_parameters.get("limit")
+    tmp_pk_last_evaluated = query_string_parameters.get("pk-last-evaluated")
+    tmp_sk_last_evaluated = query_string_parameters.get("sk-last-evaluated")
+
+    if tmp_pk_last_evaluated and tmp_sk_last_evaluated:
+        last_evaluated_key = {"PK": tmp_pk_last_evaluated, "SK": tmp_sk_last_evaluated}
+
+    if tmp_limit is not None:
+        limit_value = tmp_limit
 
     logger.info(f"Auth input: {authorization_value}")
     logger.info(f"Search input: {search_value}")
@@ -41,15 +51,6 @@ def lambda_handler(event, context):
             "body": json.dumps({"Message": "JWT token not provided"}),
         }
 
-    if not search_value:
-        return {
-            "headers": {
-                "Content-Type": "application/json",
-            },
-            "statusCode": 406,
-            "body": json.dumps({"Message": "query string parameter not provided"}),
-        }
-
     # Cognito username
     tmp_authorization_value = authorization_value.replace("Bearer ", "")
     logger.info(f"tmp: {tmp_authorization_value}")
@@ -58,52 +59,51 @@ def lambda_handler(event, context):
     logger.info(f"Cognito_username: {cognito_username}")
 
     # Search query
-
     search_query = search_value
     search_query = search_query.casefold()
     logger.info(f"Search_query: {search_query}")
 
-    result = search_for_querystring(
-        table=collection_table,
-        key_expression=cognito_username,
-        search_query=search_query,
-    )
+    params = {
+        "KeyConditionExpression": Key("PK").eq(f"USER#{cognito_username}"),
+        "Limit": limit_value,
+    }
+
+    if search_query:
+        params["FilterExpression"] = (
+            Attr("LowerCaseOracleName").contains(search_query)
+            | Attr("CombinedLowercaseOracleText").contains(search_query)
+            | Attr("LowerCaseOracleName").contains(search_query)
+            & Attr("CombinedLowercaseOracleText").contains(search_query)
+        )
+
+    if last_evaluated_key:
+        params["ExclusiveStartKey"] = last_evaluated_key
+
+    result = collection_table.query(**params)
 
     logger.info(f"Query success: {result}")
     items = result["Items"]
-    logger.info(f"All of the items returned: {items}")
 
-    if not items:
-        logger.info("No items found")
-        return {
-            "headers": {
-                "Content-Type": "application/json",
-            },
-            "statusCode": 404,
-            "body": json.dumps({"Message": "Not found"}),
-        }
+    pk_last_evaluated = None
+    sk_last_evaluated = None
+
+    if items and len(items) == limit_value:
+        last_item = items[-1]
+        pk_last_evaluated = last_item["PK"]
+        sk_last_evaluated = last_item["SK"]
+
+    logger.info(f"All of the items returned: {items}")
 
     return {
         "headers": {
             "Content-Type": "application/json",
         },
         "statusCode": 200,
-        "body": json.dumps({"Items": items}),
+        "body": json.dumps(
+            {
+                "Items": items,
+                "pk-last-evaluated": pk_last_evaluated,
+                "sk-last-evaluated": sk_last_evaluated,
+            }
+        ),
     }
-
-
-def search_for_querystring(table, key_expression, search_query):
-    try:
-        return table.query(
-            KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
-            FilterExpression=Attr("LowerCaseOracleName").contains(search_query)
-            | Attr("CombinedLowercaseOracleText").contains(search_query)
-            | Attr("LowerCaseOracleName").contains(search_query)
-            & Attr("CombinedLowercaseOracleText").contains(search_query),
-        )
-    except ClientError as e:
-        logger.error(f"ClientError occured while scanning, { e }")
-        raise
-    except:
-        logger.error(f"Error occured while scanning, { e }")
-        raise
