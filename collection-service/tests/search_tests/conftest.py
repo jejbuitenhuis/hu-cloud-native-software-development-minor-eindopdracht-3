@@ -58,7 +58,7 @@ def setup_dynamodb_collection_with_items(setup_dynamodb_collection):
     table.put_item(
         Item={
             "PK": "USER#test-user",
-            "SK": "CardInstance#1",
+            "SK": "CardInstanceId#1",
             "CardFaces": [
                 {
                     "M": {
@@ -120,7 +120,7 @@ def setup_dynamodb_collection_with_multiple_items(setup_dynamodb_collection):
     table.put_item(
         Item={
             "PK": "USER#test-user",
-            "SK": "CardInstance#1",
+            "SK": "CardInstanceId#1",
             "CardFaces": [
                 {
                     "M": {
@@ -205,3 +205,45 @@ def setup_dynamodb_collection_with_multiple_items(setup_dynamodb_collection):
             "DataType": "Card",
         }
     )
+    yield table
+
+
+@pytest.fixture()
+def setup_dynamodb_collection_with_three_items(
+    setup_dynamodb_collection_with_multiple_items,
+):
+    table = setup_dynamodb_collection_with_multiple_items
+    table.put_item(
+        Item={
+            "PK": "USER#test-user",
+            "SK": "CardInstanceId#691387cd-0ff9-41fc-825c-1b1cdb6a52e1",
+            "CardFaces": [
+                {
+                    "M": {
+                        "Colors": {"L": [{"S": "R"}]},
+                        "FlavorText": {
+                            "S": '"That\'s a lotta nuggets."\n—Jaya Ballard, task mage'
+                        },
+                        "LowercaseFaceName": {"S": "chicken egg"},
+                        "ManaCost": {"S": "{1}{R}"},
+                        "TypeLine": {"S": "Creature — Egg"},
+                        "ImageUrl": {
+                            "S": "https://cards.scryfall.io/png/front/6/4/640ac565-331b-47e2-b2af-a8a94a96488a.png?1582935068"
+                        },
+                        "FaceName": {"S": "Chicken Egg"},
+                        "OracleText": {
+                            "S": "At the beginning of your upkeep, roll a six-sided die. If you roll a 6, sacrifice Chicken Egg and create a 4/4 red Giant Bird creature token."
+                        },
+                        "LowercaseOracleText": {
+                            "S": "at the beginning of your upkeep, roll a six-sided die. if you roll a 6, sacrifice chicken egg and create a 4/4 red giant bird creature token."
+                        },
+                    }
+                }
+            ],
+            "LowerCaseOracleName": "chicken egg",
+            "CombinedLowercaseOracleText": "at the beginning of your upkeep, roll a six-sided die. if you roll a 6, sacrifice chicken egg and create a 4/4 red giant bird creature token.",
+            "OracleName": "69 Chicken Egg",
+            "DataType": "Card",
+        }
+    )
+    yield table

@@ -35,7 +35,7 @@ def test_search_oraclename(setup_dynamodb_collection_with_items):
 
     # Assert
     assert body["Items"][0]["PK"] == "USER#test-user"
-    assert body["Items"][0]["SK"] == "CardInstance#1"
+    assert body["Items"][0]["SK"] == "CardInstanceId#1"
     assert body["Items"][0]["OracleName"] == "Beloved Beggar // Generous Soul"
 
 
@@ -62,7 +62,7 @@ def test_search_oracletext(setup_dynamodb_collection_with_items):
 
     # Assert
     assert body["Items"][0]["PK"] == "USER#test-user"
-    assert body["Items"][0]["SK"] == "CardInstance#1"
+    assert body["Items"][0]["SK"] == "CardInstanceId#1"
     assert body["Items"][0]["OracleName"] == "Beloved Beggar // Generous Soul"
 
 
@@ -127,9 +127,64 @@ def test_search_no_query(setup_dynamodb_collection_with_multiple_items):
     result = lambda_handler(event, None)
     body = json.loads(result["body"])
 
+    # Assert
     assert body["Items"][0]["PK"] == "USER#test-user"
-    assert body["Items"][0]["SK"] == "CardInstance#1"
+    assert body["Items"][0]["SK"] == "CardInstanceId#1"
     assert body["Items"][0]["OracleName"] == "Beloved Beggar // Generous Soul"
+
+    assert body["Items"][1]["PK"] == "USER#test-user"
+    assert (
+        body["Items"][1]["SK"] == "CardInstanceId#ed1387cd-0ff9-41fc-825c-1b1cdb6a52e1"
+    )
+    assert body["Items"][1]["OracleName"] == "Chicken Egg"
+
+
+def test_search_limit_2(setup_dynamodb_collection_with_three_items):
+    from functions.Search.app import lambda_handler
+
+    # Arrange
+    event = {
+        "headers": {"Authorization": generate_test_jwt()},
+        "queryStringParameters": {"limit": 2},
+    }
+
+    # Act
+    result = lambda_handler(event, None)
+    body = json.loads(result["body"])
+
+    items_length = len(body["Items"])
+
+    # Assert
+    assert items_length == 2
+
+
+def test_search_limit_2_start_at_second(setup_dynamodb_collection_with_three_items):
+    from functions.Search.app import lambda_handler
+
+    # Arrange
+    event = {
+        "headers": {"Authorization": generate_test_jwt()},
+        "queryStringParameters": {
+            "limit": 2,
+            "offset": {"PK": "USER#test-user", "SK": "CardInstanceId#1"},
+        },
+    }
+
+    # Act
+    result = lambda_handler(event, None)
+    body = json.loads(result["body"])
+
+    items_length = len(body["Items"])
+
+    # Assert
+    assert items_length == 2
+
+    # Items in a dynamodb database are sorted in lexicographical order so numbers first
+    assert body["Items"][0]["PK"] == "USER#test-user"
+    assert (
+        body["Items"][0]["SK"] == "CardInstanceId#691387cd-0ff9-41fc-825c-1b1cdb6a52e1"
+    )
+    assert body["Items"][0]["OracleName"] == "69 Chicken Egg"
 
     assert body["Items"][1]["PK"] == "USER#test-user"
     assert (

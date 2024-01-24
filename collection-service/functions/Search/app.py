@@ -23,9 +23,20 @@ def lambda_handler(event, context):
     authorization_value = event.get("headers", {}).get("Authorization", None)
     query_string_parameters = event.get("queryStringParameters", {})
 
-    search_value = (
-        query_string_parameters.get("q") if query_string_parameters is not None else ""
-    )
+    search_value = ""
+    last_evaluated_key = None
+    limit_value = 40
+
+    search_value = query_string_parameters.get("q", "")
+
+    tmp_last_evaluated_key = query_string_parameters.get("offset")
+    tmp_limit = query_string_parameters.get("limit")
+
+    if tmp_last_evaluated_key is not None:
+        last_evaluated_key = tmp_last_evaluated_key
+
+    if tmp_limit is not None:
+        limit_value = tmp_limit
 
     logger.info(f"Auth input: {authorization_value}")
     logger.info(f"Search input: {search_value}")
@@ -39,9 +50,6 @@ def lambda_handler(event, context):
             "body": json.dumps({"Message": "JWT token not provided"}),
         }
 
-    if not search_value:
-        search_value = ""
-
     # Cognito username
     tmp_authorization_value = authorization_value.replace("Bearer ", "")
     logger.info(f"tmp: {tmp_authorization_value}")
@@ -50,16 +58,27 @@ def lambda_handler(event, context):
     logger.info(f"Cognito_username: {cognito_username}")
 
     # Search query
-
     search_query = search_value
     search_query = search_query.casefold()
     logger.info(f"Search_query: {search_query}")
 
-    result = search_for_querystring(
-        table=collection_table,
-        key_expression=cognito_username,
-        search_query=search_query,
-    )
+    params = {
+        "KeyConditionExpression": Key("PK").eq(f"USER#{cognito_username}"),
+        "Limit": limit_value,
+    }
+
+    if search_query:
+        params["FilterExpression"] = (
+            Attr("LowerCaseOracleName").contains(search_query)
+            | Attr("CombinedLowercaseOracleText").contains(search_query)
+            | Attr("LowerCaseOracleName").contains(search_query)
+            & Attr("CombinedLowercaseOracleText").contains(search_query)
+        )
+
+    if last_evaluated_key:
+        params["ExclusiveStartKey"] = last_evaluated_key
+
+    result = collection_table.query(**params)
 
     logger.info(f"Query success: {result}")
     items = result["Items"]
@@ -82,25 +101,3 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": json.dumps({"Items": items}),
     }
-
-
-def search_for_querystring(table, key_expression, search_query):
-    try:
-        if not search_query:
-            return table.query(
-                KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
-            )
-
-        return table.query(
-            KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
-            FilterExpression=Attr("LowerCaseOracleName").contains(search_query)
-            | Attr("CombinedLowercaseOracleText").contains(search_query)
-            | Attr("LowerCaseOracleName").contains(search_query)
-            & Attr("CombinedLowercaseOracleText").contains(search_query),
-        )
-    except ClientError as e:
-        logger.error(f"ClientError occured while scanning, { e }")
-        raise
-    except:
-        logger.error(f"Error occured while scanning, { e }")
-        raise
