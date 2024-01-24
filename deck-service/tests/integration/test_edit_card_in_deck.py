@@ -191,7 +191,7 @@ class TestCreateDeck(unittest.TestCase):
             }),
             "pathParameters": {
                 "deck_id": deck_id,
-                "deck_card_id": deck_card_id,
+                "card_id": deck_card_id,
             },
             "headers": {
                 "Authorization": f"Bearer {self.jwt_token}",
