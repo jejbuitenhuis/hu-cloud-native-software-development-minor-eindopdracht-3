@@ -19,7 +19,7 @@ def lambda_handler(event, context):
 
     logger.info(event)
 
-    oracle_id = event["pathParameters"]["oracle_id"]
+    oracle_id = event["pathParameters"]["instance_id"]
 
     response = table.query(
         IndexName="GSI-Collection-OracleId",

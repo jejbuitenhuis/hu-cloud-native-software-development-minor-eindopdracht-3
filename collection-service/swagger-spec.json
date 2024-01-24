@@ -218,9 +218,7 @@
           "passthroughBehavior": "when_no_match",
           "type": "aws_proxy"
         }
-      }
-    },
-    "/api/collections/{oracle_id}": {
+      },
       "get": {
         "security": [
           {
@@ -229,7 +227,7 @@
         ],
         "parameters": [
           {
-            "name": "oracle_id",
+            "name": "instance_id",
             "in": "path",
             "required": true,
             "type": "string"

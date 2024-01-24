@@ -8,7 +8,7 @@ Globals:
     Timeout: 10
     MemorySize: 128
     Handler: app.lambda_handler
-    Runtime: python3.9
+    Runtime: python3.10
     Architectures:
       - x86_64
     Tracing: Active
@@ -128,7 +128,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCollectionApi"
-            Path: /api/collections/{oracle_id}
+            Path: /api/collections/{instance_id}
             Method: get
       Environment:
         Variables:
