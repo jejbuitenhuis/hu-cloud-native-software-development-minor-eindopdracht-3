@@ -126,6 +126,23 @@ Resources:
       Policies:
         - AmazonDynamoDBReadOnlyAccess
 
+  DeleteCardInstanceFromCollection:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/remove_card/
+      Events:
+        DeleteCardInstanceFromCollection:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCollectionApi"
+            Path: /api/collections/{instance_id}
+            Method: delete
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCollectionDynamoDBTable
+      Policies:
+        - AmazonDynamoDBFullAccess
+
   AddCardToCollectionFunction:
     Type: AWS::Serverless::Function
     Properties:
