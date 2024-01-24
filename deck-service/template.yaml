@@ -5,7 +5,7 @@ Description: Deck-service
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 10
     MemorySize: 128
     Handler: app.lambda_handler
     Runtime: python3.9
@@ -123,12 +123,26 @@ Resources:
       Policies:
         - AmazonDynamoDBReadOnlyAccess
 
+  GetCardsFromDeckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/GetCardsFromDeck/
+      Events:
+        GetAllCardsFromDeck:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGDeckApi"
+            Path: /api/decks/{deck_id}/cards
+            Method: GET
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+
   AddCardToDeckFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/AddCardToDeck/
       Events:
-        HelloWorld:
+        AddCardToDeck:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGDeckApi"
@@ -137,6 +151,20 @@ Resources:
       Policies:
         - AmazonDynamoDBReadOnlyAccess
         - AmazonSSMReadOnlyAccess
+
+  GetCardByIdFromDeckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/GetCardByIdFromDeck/
+      Events:
+        GetCardFromDeck:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGDeckApi"
+            Path: /api/decks/{deck_id}/cards/{card_id}
+            Method: GET
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
 
 Outputs:
   MTGDeckApiUrl:

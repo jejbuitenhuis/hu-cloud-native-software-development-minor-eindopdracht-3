@@ -6,9 +6,7 @@ import os
 import boto3
 from jose import jwt
 from moto import mock_dynamodb
-from botocore.stub import Stubber
 from boto3.dynamodb.conditions import Key
-import requests_mock
 import pytest
 import logging
 
@@ -150,7 +148,7 @@ def setup_table():
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
-                         "DYNAMO_DB_CARD_TABLE_NAME": "test-collection-table",
+                         "DYNAMODB_TABLE_NAME": "test-collection-table",
                          "STAGE": "test-stage"})
 @mock_dynamodb
 @patch('functions.add_card.app.uuid.uuid4')
@@ -159,21 +157,16 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, aws_credentials
     # Arrange
     mocked_url = "https://mockapi.example.com"
     mock_ssm = mock_boto3_client.return_value
-    mock_ssm.get_parameter.return_value = {'Parameter': {'Value': f'{mocked_url}'}}
+    mock_ssm.get_parameter.return_value = {'Parameter': {'Value': mocked_url}}
 
     mocked_uuid = "6c538e3f-068d-44af-9117-ef3f653831d2"
     mock_uuid.return_value = mocked_uuid
 
     table = setup_table()
-    get_card_response = {
-        "statusCode": 200,
-        "body": json.dumps(setup_get_card_response())
-    }
-    jwt_token = generate_jwt_token()
 
     event = {
         "headers": {
-            "Authorization": f"Bearer {jwt_token}"
+            "Authorization": f"Bearer {generate_jwt_token()}"
         },
         "body": json.dumps({
             "oracle_id": "562d71b9-1646-474e-9293-55da6947a758",
@@ -184,7 +177,7 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, aws_credentials
 
     requests_mock.get(
         f"{mocked_url}/api/cards/562d71b9-1646-474e-9293-55da6947a758/67f4c93b-080c-4196-b095-6a120a221988",
-        json=get_card_response)
+        json=setup_get_card_response())
 
     import functions.add_card.app
     importlib.reload(functions.add_card.app)
@@ -226,7 +219,7 @@ def test_lambda_handler_successful(mock_boto3_client, mock_uuid, aws_credentials
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "EVENT_BUS_ARN": "",
-                         "DYNAMO_DB_CARD_TABLE_NAME": "test-collection-table",
+                         "DYNAMODB_TABLE_NAME": "test-collection-table",
                          "STAGE": "test-stage"})
 @mock_dynamodb
 @patch('functions.add_card.app.uuid.uuid4')
@@ -240,18 +233,9 @@ def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid, aws_credent
     mocked_uuid = "6c538e3f-068d-44af-9117-ef3f653831d2"
     mock_uuid.return_value = mocked_uuid
 
-    get_card_response = {
-        "statusCode": 404,
-        "body": json.dumps({
-            "Message": "Card not found."
-        })
-    }
-
-    jwt_token = generate_jwt_token()
-
     event = {
         "headers": {
-            "Authorization": f"Bearer {jwt_token}"
+            "Authorization": f"Bearer {generate_jwt_token()}"
         },
         "body": json.dumps({
             "oracle_id": "wrong-id",
@@ -261,8 +245,10 @@ def test_lambda_handler_card_not_found(mock_boto3_client, mock_uuid, aws_credent
     }
 
     requests_mock.get(
-    f"{mocked_url}/api/cards/wrong-id/wrong-id",
-    json=get_card_response)
+        f"{mocked_url}/api/cards/wrong-id/wrong-id",
+        json={"Message": "Card not found."},
+        status_code=404
+    )
 
     import functions.add_card.app
     importlib.reload(functions.add_card.app)

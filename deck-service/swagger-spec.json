@@ -127,6 +127,35 @@
       }
     },
     "/api/decks/{deck_id}/cards/": {
+      "get": {
+        "security": [
+          { "cognito": [] }
+        ],
+        "parameters" : [
+          {
+            "name": "deck_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses" : {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri": {
+            "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCardsFromDeckFunction.Arn}/invocations"
+          },
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
+      },
       "post": {
         "security": [
           {
@@ -192,6 +221,43 @@
           "httpMethod" : "POST",
           "uri": {
             "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddCardToDeckFunction.Arn}/invocations"
+          },
+          "passthroughBehavior" : "when_no_match",
+          "type" : "aws_proxy"
+        }
+      }
+    },
+    "/api/decks/{deck_id}/cards/{card_id}": {
+      "get": {
+        "security": [
+          { "cognito": [] }
+        ],
+        "parameters" : [
+          {
+            "name": "deck_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "card_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses" : {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "NOT_FOUND"
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "httpMethod" : "POST",
+          "uri": {
+            "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCardByIdFromDeckFunction.Arn}/invocations"
           },
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
