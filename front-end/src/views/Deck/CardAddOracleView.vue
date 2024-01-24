@@ -5,7 +5,7 @@ import DecoratedText from "@/components/DecoratedText.vue";
 import type {PrintCard} from "@/models/cardModels";
 
 const props = defineProps<{card : any, location : any}>()
-const emit = defineEmits(['addCard'])
+const emit = defineEmits(['addCard', 'switchToPrint', 'back'])
 
 const route = useRoute();
 const allPrints = ref<PrintCard[] | null>()
@@ -36,13 +36,22 @@ async function getOracle() {
 function addCardToDeck(instance : string | undefined) {
     emit('addCard', {oracleId : props.card['oracle_id'], location : props.location, cardInstance : instance})
 }
+
+function switchToPrint(print : string){
+  emit('switchToPrint', {oracleId : props.card['oracle_id'], location : props.location, printId : print})
+}
+
+function back() {
+  emit('back')
+}
+
 getOracle();
 </script>
 
 <template>
-    {{ props.card }}
   <p v-if="loading" class="centered-content">Loading</p>
   <div v-if="!loading && oracle != null" class="oracle-wrapper">
+    <button class="backbutton" @click="back">Back</button>
     <div class="oracle-image">
       <img v-for="face in oracle.CardFaces" :src="face.ImageUrl" :alt="face.FaceName">
     </div>
@@ -80,7 +89,7 @@ getOracle();
             <td>{{ new Date(print.ReleasedAt).toLocaleDateString("nl-nl") }}</td>
             <td>{{ print.Rarity }}</td>
             <td>{{ print.Price == null ? "-" : `€${print.Price}` }}</td>
-            <td><router-link :to="`/cards/${print.OracleId}/${print.PrintId}`">View</router-link></td>
+            <td><button @click="switchToPrint(print.PrintId)">Select this print</button></td>
           </tr>
           </tbody>
         </table>

@@ -4,7 +4,7 @@ import "@shoelace-style/shoelace/dist/components/card/card";
 import "@shoelace-style/shoelace/dist/components/icon/icon";
 import {useRoute} from "vue-router";
 import {ref} from "vue";
-import CardListPreview from "../CardListPreview.vue";
+import CardListPreview from "./CardListPreview.vue";
 import type { PrintCard, CardData } from "@/models/cardModels";
 import AddCardToDeckView from "./AddCardToDeckView.vue";
 import DeckSearchView from "./DeckSearchView.vue";

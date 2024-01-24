@@ -22,5 +22,5 @@ export type PrintFace = {
 export interface CardData {
   cardInstanceId?: string,
   cardLocation: string,
-  card: PrintCard
+  card: PrintCard,
 }

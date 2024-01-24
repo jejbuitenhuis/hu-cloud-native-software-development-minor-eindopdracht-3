@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { onDeactivated, ref, toRefs } from 'vue';
 import DeckSearchView from './DeckSearchView.vue';
-import CardAddView from './CardAddView.vue';
+import CardAddOracleView from './CardAddOracleView.vue';
 import { useRoute } from 'vue-router';
+import DeckAddPrintView from './DeckAddPrintView.vue'
 
 const route = useRoute();
 
@@ -13,8 +14,10 @@ const emit = defineEmits(['cardAdded'])
 
 const inactive = ref(true);
 const selecting = ref(false);
+const print = ref(false);
 
 const selectedCard = ref();
+const selectedPrint = ref();
 
 function activate() {
     inactive.value = false;
@@ -30,19 +33,27 @@ function cardClicked(event : any){
     selecting.value = true;
 }
 
+function selectPrint(event : any) {
+    print.value = true;
+    selectedPrint.value = event['printId'];
+}
+
+function unselectPrint() {
+    print.value = false;
+    selectedPrint.value = "";
+}
+
+function backToSearch(){
+    selecting.value = false;
+    console.log("back")
+}
+
 function addCardToDeck(event : any){
-    let toSend = {}
-    if (event['cardLocation'] === undefined) {
-        toSend = {
-            'cardOracle' : event['oracleId'],
-            'cardLocation' : event['location'],
-        }
-    } else {
-        toSend = {
-            'cardOracle' : event['oracleId'],
-            'cardLocation' : event['location'],
-            'cardInstanceId' : event['instance']
-        }
+    let toSend = {
+        'cardOracle' : event['oracleId'],
+        'cardLocation' : event['location'],
+        'printId' : event['printId'],
+        'cardInstanceId' : event['instance']
     }
     const token = localStorage.getItem("jwtToken");
     if (!token) return;
@@ -85,7 +96,8 @@ function confirmCardAdded(deckCardId : string){
 
     <DeckSearchView v-bind:location="props.location" v-on:card-clicked="cardClicked" v-if="!selecting.valueOf()"></DeckSearchView>
 
-    <CardAddView v-if="selecting.valueOf()" v-bind:card="selectedCard.valueOf()" v-bind:location="location" v-on:add-card="addCardToDeck"></CardAddView>
+    <CardAddOracleView v-if="selecting.valueOf() && !print.valueOf()" v-bind:card="selectedCard.valueOf()" v-bind:location="location" v-on:add-card="addCardToDeck" v-on:switch-to-print="selectPrint" v-on:back="backToSearch"></CardAddOracleView>
+    <DeckAddPrintView v-if="selecting.valueOf() && print.valueOf()" v-bind:card="selectedCard.valueOf()" v-bind:location="location" v-bind:printId="selectedPrint.valueOf()" v-on:add-card="addCardToDeck" v-on:unselect-print="unselectPrint"></DeckAddPrintView>
 </div>
 </template>
 
