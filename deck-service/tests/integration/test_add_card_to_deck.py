@@ -275,7 +275,7 @@ class TestCreateDeck(unittest.TestCase):
     def test_card_oracle_without_card_instance_is_successfully_added_to_deck(self):
         oracle_id = "0dd894cb-1968-471c-af08-ea7ec5ce8428"
         deck_id = "some-deck-id"
-        card_location = "MAIN_DECK"
+        card_location = self.sut.AVAILABLE_DECK_LOCATIONS[0]
 
         get_cards_by_oracle_request = responses.add(
             responses.GET,
@@ -336,7 +336,7 @@ class TestCreateDeck(unittest.TestCase):
         mock_card_oracle_response = CARD_ORACLE_3(oracle_id)
         card_print_id = mock_card_oracle_response["PrintId"]
         deck_id = "some-deck-id"
-        card_location = "MAIN_DECK"
+        card_location = self.sut.AVAILABLE_DECK_LOCATIONS[0]
 
         get_cards_by_oracle_request = responses.add(
             responses.GET,
@@ -390,3 +390,167 @@ class TestCreateDeck(unittest.TestCase):
         assert db_items[0]["card_instance_id"] == card_instance_id
 
         self.assert_db_deck_card_oracle_keys_equal_to_expected_oracle(db_items[0], mock_card_oracle_response)
+
+    def test_lambda_returns_not_found_when_no_existing_oracle_id_is_send(self):
+        oracle_id = "non-existent"
+
+        get_cards_by_oracle_request = responses.add(
+            responses.GET,
+            f"{self.CARD_ENDPOINT}/api/cards/{oracle_id}/",
+            status=404,
+            json={
+                "Message": "Card not found.",
+            },
+        )
+
+        mock_event = {
+            "body": json.dumps({
+                "cardOracle": oracle_id,
+                "cardLocation": self.sut.AVAILABLE_DECK_LOCATIONS[0],
+            }),
+            "pathParameters": {
+                "deck_id": str( uuid4() ),
+            },
+            "headers": {
+                "Authorization": f"Bearer {self.jwt_token}",
+            },
+        }
+        mock_context = {}
+
+        result = self.sut.lambda_handler(mock_event, mock_context)
+
+        assert result["statusCode"] == 404
+        assert "body" in result
+        assert result["body"] is not None
+
+        body = json.loads(result["body"])
+
+        assert "message" in body
+        assert body["message"] == f"Card with oracle with id '{oracle_id}' was not found"
+
+        assert get_cards_by_oracle_request.call_count == 1
+
+    def test_lambda_returns_bad_request_when_no_body_is_send(self):
+        mock_event = {
+            "pathParameters": {
+                "deck_id": str( uuid4() ),
+            },
+            "headers": {
+                "Authorization": f"Bearer {self.jwt_token}",
+            },
+        }
+        mock_context = {}
+
+        result = self.sut.lambda_handler(mock_event, mock_context)
+
+        assert result["statusCode"] == 400
+        assert "body" in result
+        assert result["body"] is not None
+
+        body = json.loads(result["body"])
+
+        assert "message" in body
+        assert body["message"] == "Missing body in request"
+
+    def test_lambda_returns_bad_request_when_empty_body_is_send(self):
+        mock_event = {
+            "body": json.dumps({}),
+            "pathParameters": {
+                "deck_id": str( uuid4() ),
+            },
+            "headers": {
+                "Authorization": f"Bearer {self.jwt_token}",
+            },
+        }
+        mock_context = {}
+
+        result = self.sut.lambda_handler(mock_event, mock_context)
+
+        assert result["statusCode"] == 400
+        assert "body" in result
+        assert result["body"] is not None
+
+        body = json.loads(result["body"])
+
+        assert "message" in body
+        assert body["message"] == "Missing 'cardOracle'"
+
+    def test_lambda_returns_bad_request_when_no_card_location_is_send(self):
+        mock_event = {
+            "body": json.dumps({
+                "cardOracle": str( uuid4() ),
+            }),
+            "pathParameters": {
+                "deck_id": str( uuid4() ),
+            },
+            "headers": {
+                "Authorization": f"Bearer {self.jwt_token}",
+            },
+        }
+        mock_context = {}
+
+        result = self.sut.lambda_handler(mock_event, mock_context)
+
+        assert result["statusCode"] == 400
+        assert "body" in result
+        assert result["body"] is not None
+
+        body = json.loads(result["body"])
+
+        assert "message" in body
+        assert body["message"] == "Missing 'cardLocation'"
+
+    def test_lambda_returns_bad_request_when_invalid_card_location_is_send(self):
+        card_location = "invalid-location"
+
+        mock_event = {
+            "body": json.dumps({
+                "cardOracle": str( uuid4() ),
+                "cardLocation": card_location,
+            }),
+            "pathParameters": {
+                "deck_id": str( uuid4() ),
+            },
+            "headers": {
+                "Authorization": f"Bearer {self.jwt_token}",
+            },
+        }
+        mock_context = {}
+
+        result = self.sut.lambda_handler(mock_event, mock_context)
+
+        assert result["statusCode"] == 400
+        assert "body" in result
+        assert result["body"] is not None
+
+        body = json.loads(result["body"])
+
+        assert "message" in body
+        assert  f"Invalid deck location: '{card_location}'. Expected one of: " in body["message"]
+
+    def test_lambda_returns_bad_request_when_an_instance_id_is_send_without_a_print_id(self):
+        mock_event = {
+            "body": json.dumps({
+                "cardOracle": str( uuid4() ),
+                "cardInstanceId": str( uuid4() ),
+                "cardLocation": self.sut.AVAILABLE_DECK_LOCATIONS[0],
+            }),
+            "pathParameters": {
+                "deck_id": str( uuid4() ),
+            },
+            "headers": {
+                "Authorization": f"Bearer {self.jwt_token}",
+            },
+        }
+        mock_context = {}
+
+        result = self.sut.lambda_handler(mock_event, mock_context)
+
+        assert result["statusCode"] == 400
+        assert "body" in result
+        assert result["body"] is not None
+
+        body = json.loads(result["body"])
+
+        assert "message" in body
+        assert body["message"] == "'cardPrintId' should be set when 'cardInstanceId' is set"

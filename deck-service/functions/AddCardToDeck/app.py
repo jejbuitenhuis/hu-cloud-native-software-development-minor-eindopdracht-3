@@ -129,6 +129,11 @@ def get_card(bearer_token: str, oracle_id: str, print_id: Optional[str] = None) 
 
     response_body = response.json()
 
+    if response.status_code == 404:
+        LOGGER.info(f"Found no card with oracle id '{oracle_id}' (and instance id '{print_id}')")
+
+        return None
+
     if response.status_code != 200:
         message = response_body["Message"]
 
@@ -175,7 +180,7 @@ def lambda_handler(event, context):
         LOGGER.info(msg)
 
         return {
-            "statusCode": 400,
+            "statusCode": 404,
             "body": json.dumps({
                 "message": msg,
             })
