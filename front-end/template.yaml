@@ -202,6 +202,14 @@ Resources:
       Value: !Ref CloudFront
   # }}}
 
+  CloudfrontUrlParameter: # {{{
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${Stage}/frontEnd/cloudFrontUrl
+      Type: String
+      Value: !Sub "https://${CloudFront.DomainName}"
+  # }}}
+
 Outputs:
   FrontEndS3BucketDomainName:
     Description: Front-end S3 bucket domain name

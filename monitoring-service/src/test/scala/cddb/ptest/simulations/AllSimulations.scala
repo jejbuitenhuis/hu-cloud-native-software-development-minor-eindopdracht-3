@@ -7,6 +7,7 @@ import io.gatling.http.Predef._
 import io.gatling.jdbc.Predef._
 
 import cddb.ptest.scenarios.Scenarios._
+import cddb.ptest.config.UrlConfig.baseUrl
 
 
 class AllSimulations extends Simulation {
@@ -19,6 +20,8 @@ class AllSimulations extends Simulation {
 
   val pauseDuration = 1
 
+  def httpProtocol = http.baseUrl(baseUrl).userAgentHeader("Gatling/test")
+
   val users = incrementUsersPerSec(userIncrease)
                .times(levels)
                .eachLevelLasting(levelDuration)
@@ -28,5 +31,5 @@ class AllSimulations extends Simulation {
   setUp(
     registerLoginCollectionDeckAndCardsScenario.inject(users)//,
     // existingUserScenario.inject(users)
-  )
+  ).protocols(httpProtocol)
 }

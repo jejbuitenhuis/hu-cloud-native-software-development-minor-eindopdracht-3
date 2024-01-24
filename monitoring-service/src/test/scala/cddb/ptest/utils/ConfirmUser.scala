@@ -10,12 +10,12 @@ object ConfirmUser {
   private val cognitoClient: AWSCognitoIdentityProvider = AWSCognitoIdentityProviderClientBuilder.defaultClient()
   
   val stage: String = System.getProperty("Stage", "development")
-  // val userPool: String = retrieveParameterValue(s"/$stage/Cognito/UserPoolId")
+  val userPoolId: String = retrieveParameterValue(s"/$stage/Cognito/userPoolId")
 
   def adminConfirmUser(username: String) = {
     val confirmRequest = new AdminConfirmSignUpRequest()
       .withUsername(username)
-      .withUserPoolId("us-east-1_xL2nw1K58")
+      .withUserPoolId(userPoolId)
 
     cognitoClient.adminConfirmSignUp(confirmRequest)
   }

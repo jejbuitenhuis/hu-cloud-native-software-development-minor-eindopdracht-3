@@ -30,7 +30,7 @@ object Scenarios {
 
   private val addCardsScenario = repeat(5) {
     feed(cardFeeder)
-      .exec(CollectionRequest.addCardToCollection.check(status.is(201)))
+      .exec(CollectionRequest.addCardToCollection.headers(Map("Authorization" -> "Bearer #{authToken}")).check(status.is(201)))
       .exec(session => {
         println("addCard Session::: " + session)
         session

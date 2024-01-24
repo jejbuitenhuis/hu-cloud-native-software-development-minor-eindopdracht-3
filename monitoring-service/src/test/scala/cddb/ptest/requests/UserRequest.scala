@@ -4,15 +4,13 @@ import scala.concurrent.duration._
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import cddb.ptest.config.ApiUrlConfig
 
 object UserRequest {
   private val contentTypeHeader = Map("Content-Type" -> "application/json;charset=UTF-8")
-  val baseUrl = ApiUrlConfig.userApiUrl
 
   def createUserRequest(requestName: String) = {
     http(requestName)
-      .post(s"$baseUrl/api/users")
+      .post("/api/users")
       .headers(contentTypeHeader)
       .body(StringBody("""{ "password": "${password}", "email": "${email}" }""")).asJson
   }
@@ -22,7 +20,7 @@ object UserRequest {
   val existingRegister = createUserRequest("Existing Register User")
 
   val login = http("Login user")
-    .post(s"$baseUrl/api/users/login")
+    .post("/api/users/login")
     .headers(contentTypeHeader)
     .body(StringBody("""{ "password": "${password}", "email": "${email}" }""")).asJson
     .check(
