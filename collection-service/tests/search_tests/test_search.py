@@ -142,8 +142,8 @@ def test_search_limit_2_start_at_second(setup_dynamodb_collection_with_three_ite
         "headers": {"Authorization": generate_test_jwt()},
         "queryStringParameters": {
             "limit": 2,
-            "PKLastEvaluated": "USER#test-user",
-            "SKLastEvaluated": "CardInstanceId#1",
+            "pk-last-evaluated": "USER#test-user",
+            "sk-last-evaluated": "CardInstanceId#1",
         },
     }
 
