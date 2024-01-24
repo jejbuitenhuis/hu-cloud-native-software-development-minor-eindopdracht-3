@@ -23,23 +23,41 @@ def setup_dynamodb_collection(aws_credentials):
         table = dynamodb.create_table(
             TableName=DYNAMODB_TABLE_NAME,
             KeySchema=[
-                {'AttributeName': 'PK', 'KeyType': 'HASH'},
-                {'AttributeName': 'SK', 'KeyType': 'RANGE'}
+                {"AttributeName": "PK", "KeyType": "HASH"},
+                {"AttributeName": "SK", "KeyType": "RANGE"},
             ],
             AttributeDefinitions=[
-                {'AttributeName': 'PK', 'AttributeType': 'S'},
-                {'AttributeName': 'SK', 'AttributeType': 'S'},
-                {'AttributeName': 'GSI1SK', 'AttributeType': 'S'}
+                {"AttributeName": "PK", "AttributeType": "S"},
+                {"AttributeName": "SK", "AttributeType": "S"},
+                {"AttributeName": "GSI1SK", "AttributeType": "S"},
+                {"AttributeName": "GSI2SK", "AttributeType": "S"},
             ],
-            ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1},
-            GlobalSecondaryIndexes=[{
-                'IndexName': 'GSI-Collection-Cards-In-Deck',
-                'KeySchema': [
-                    {'AttributeName': 'PK', 'KeyType': 'HASH'},
-                    {'AttributeName': 'GSI1SK', 'KeyType': 'RANGE'}
-                ],
-                'Projection': {'ProjectionType': 'ALL'},
-                'ProvisionedThroughput': {'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
-            }]
+            ProvisionedThroughput={"ReadCapacityUnits": 1, "WriteCapacityUnits": 1},
+            GlobalSecondaryIndexes=[
+                {
+                    "IndexName": "GSI-Collection-Cards-In-Deck",
+                    "KeySchema": [
+                        {"AttributeName": "PK", "KeyType": "HASH"},
+                        {"AttributeName": "GSI1SK", "KeyType": "RANGE"},
+                    ],
+                    "Projection": {"ProjectionType": "ALL"},
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 1,
+                        "WriteCapacityUnits": 1,
+                    },
+                },
+                {
+                    "IndexName": "GSI-Collection-OracleId",
+                    "KeySchema": [
+                        {"AttributeName": "PK", "KeyType": "HASH"},
+                        {"AttributeName": "GSI2SK", "KeyType": "RANGE"},
+                    ],
+                    "Projection": {"ProjectionType": "ALL"},
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 1,
+                        "WriteCapacityUnits": 1,
+                    },
+                },
+            ],
         )
         yield table
