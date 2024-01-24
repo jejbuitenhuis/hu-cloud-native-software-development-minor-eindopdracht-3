@@ -12,10 +12,10 @@ import cddb.ptest.config.UrlConfig.baseUrl
 
 class AllSimulations extends Simulation {
 
-  val levelDuration = System.getProperty("levelDuration", "1").toInt seconds
+  val levelDuration = System.getProperty("levelDuration", "3").toInt seconds
   val rampDuration = System.getProperty("rampDuration", "2").toInt seconds
-  val userIncrease = System.getProperty("userIncrease", "0").toDouble
-  val levels = System.getProperty("levels", "1").toInt
+  val userIncrease = System.getProperty("userIncrease", "1").toDouble
+  val levels = System.getProperty("levels", "3").toInt
   val startingRate = System.getProperty("startingRate", "1").toDouble
 
   val pauseDuration = 1
@@ -29,7 +29,7 @@ class AllSimulations extends Simulation {
                .startingFrom(startingRate)
 
   setUp(
-    registerLoginCollectionDeckAndCardsScenario.inject(users)//,
-    // existingUserScenario.inject(users)
+    registerLoginCollectionDeckAndCardsScenario.inject(users),
+    existingUserScenario.inject(users)
   ).protocols(httpProtocol)
 }
