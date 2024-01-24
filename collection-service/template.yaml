@@ -154,7 +154,7 @@ Resources:
             Method: delete
       Environment:
         Variables:
-          DYNAMODB_TABLE: !Ref MTGCollectionDynamoDBTable
+          DYNAMODB_TABLE_NAME: !Ref MTGCollectionDynamoDBTable
       Policies:
         - AmazonDynamoDBFullAccess
 
