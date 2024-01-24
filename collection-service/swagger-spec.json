@@ -60,8 +60,8 @@
                       "Condition": "MINT",
                       "DataType": "DataType"
                     },
-                    "PKLastEvaluated": "UserId#{user_id}",
-                    "SKLastEvaluated": "CardInstanceId#{card_instance_id}#{item_type}"
+                    "pk-last-evaluated": "UserId#{user_id}",
+                    "sk-last-evaluated": "CardInstanceId#{card_instance_id}#{item_type}"
                   }
                 }
               }
