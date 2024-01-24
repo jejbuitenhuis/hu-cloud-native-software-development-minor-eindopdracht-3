@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const {text} = defineProps<{ text: string }>();
-const textParts = text.split("{");
 
 function getIconUrl(t: string): string {
   let image_name: string
@@ -177,8 +176,8 @@ function getIconDescription(t: string): string {
 
 <template>
   <p>
-    <span>{{ textParts[0] }}</span>
-    <span v-for="textPart in textParts.splice(1)">
+    <span>{{ text.split("{")[0] }}</span>
+    <span v-for="textPart in text.split('{').splice(1)">
       <img
         :src="getIconUrl(textPart.slice(0, textPart.indexOf('}')))"
         :alt="`${getIconDescription(textPart.slice(0, textPart.indexOf('}')))} icon`"

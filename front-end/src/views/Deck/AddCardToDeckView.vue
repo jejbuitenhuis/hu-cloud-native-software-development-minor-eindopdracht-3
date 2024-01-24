@@ -53,7 +53,7 @@ function addCardToDeck(event : any){
         'cardOracle' : event['oracleId'],
         'cardLocation' : event['location'],
         'printId' : event['printId'],
-        'cardInstanceId' : event['instance']
+        'cardInstanceId' : event['cardInstance']
     }
     const token = localStorage.getItem("jwtToken");
     if (!token) return;

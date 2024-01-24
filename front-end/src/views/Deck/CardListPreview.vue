@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DecoratedText from "@/components/DecoratedText.vue";
 import type {DeckCard} from "@/models/cardModels";
 import { ref } from "vue";
 
@@ -56,14 +57,14 @@ function setFace(){
         <div class="card" v-bind:style="{ 'background-image': 'url(' + image + ')', 
         'box-shadow': 'inset 0 0 0 1000px rgba(' + red + ',' + green + ',' + blue + ',' + alpha + ')'}">
             <span class="titlebox">
-                <p><span class="title">{{card.OracleName}}</span>{{ manaCost }}</p>
+                <p><span class="title">{{card.OracleName}}</span><DecoratedText :text="manaCost"></DecoratedText></p>
                 <p><span>{{ typeline }}</span></p>
                 <button v-if="card.CardFaces.length > 1" @click="flip">flip</button>
             </span>
             <div class="seperator"></div>
             <span class="descriptionbox" :title="oracleText">
                 <p>
-                    {{ oracleText }}
+                    <DecoratedText :text="oracleText"></DecoratedText>
                 </p>
             </span>
             <button @click="deleteCard()">x</button>

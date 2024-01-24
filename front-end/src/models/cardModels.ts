@@ -76,3 +76,17 @@ export type CollectionPrintFace = {
   OracleText: string,
   TypeLine: string,
 }
+
+export type CardInstance =
+{
+  "CardFaces": CardFace[],
+  "CardInstanceId": string,
+  "Condition": string,
+  "OracleId": string,
+  "OracleName": string,
+  "Price": string,
+  "PrintId": string,
+  "Rarity": string,
+  "ReleasedAt": string,
+  "SetName": string,
+}

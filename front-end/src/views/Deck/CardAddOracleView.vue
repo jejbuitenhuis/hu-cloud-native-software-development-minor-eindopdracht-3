@@ -2,7 +2,7 @@
 import {useRoute} from "vue-router";
 import {ref} from "vue";
 import DecoratedText from "@/components/DecoratedText.vue";
-import type {PrintCard} from "@/models/cardModels";
+import type {CardInstance, PrintCard} from "@/models/cardModels";
 
 const props = defineProps<{card : any, location : any}>()
 const emit = defineEmits(['addCard', 'switchToPrint', 'back'])
@@ -12,7 +12,7 @@ const allPrints = ref<PrintCard[] | null>()
 const oracle = ref<PrintCard | null>()
 const loading = ref(true)
 let loadingRemaining = 2;
-const instances = ref();
+const instances = ref<CardInstance[]>([]);
 
 
 function loaded(){
@@ -47,17 +47,17 @@ async function getOracle() {
 async function getInstances() {
   const token = localStorage.getItem("jwtToken");
   if (!token) return;
-  const response = await fetch(`/api/collection/${oracle.value?.OracleId}`, {headers: {Authorization: token}});
+  const response = await fetch(`/api/collections/${oracle.value?.OracleId}`, {headers: {Authorization: token}});
   if (!response.ok) {
     console.error(`Failed card instances. Status: ${response.status}`)
     return;
   }
-  instances.value = await response.json() as any[];
+  instances.value = await response.json() as CardInstance[];
   loaded()
 }
 
-function addCardToDeck(instance : string | undefined) {
-    emit('addCard', {oracleId : props.card['oracle_id'], location : props.location, cardInstance : instance})
+function addCardToDeck(instance : string | undefined, printId : string | undefined) {
+    emit('addCard', {oracleId : props.card['oracle_id'], location : props.location, cardInstance : instance, printId : printId})
 }
 
 function switchToPrint(print : string){
@@ -68,7 +68,9 @@ function back() {
   emit('back')
 }
 
-getOracle();
+getOracle().then(() =>
+  getInstances()
+);
 </script>
 
 <template>
@@ -94,7 +96,30 @@ getOracle();
           <sl-button class="add-to-deck-button" @click="addCardToDeck">Add Card to Deck</sl-button>
         </div>
       </div>
-
+      <div class="instances">
+        <table>
+          <thead>
+          <tr>
+            <th>Set name</th>
+            <th>Release date</th>
+            <th>Rarity</th>
+            <th>Price</th>
+            <th>Condition</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="instance in instances">
+            <td>{{ instance.SetName }}</td>
+            <td>{{ new Date(instance.ReleasedAt).toLocaleDateString("nl-nl") }}</td>
+            <td>{{ instance.Rarity }}</td>
+            <td>{{ instance.Price == null ? "-" : `€${instance.Price}` }}</td>
+            <td>{{ instance.Condition }}</td>
+            <!-- show in which deck instance currently is -->
+            <td><button @click="addCardToDeck(instance.CardInstanceId, instance.PrintId)">Select this print</button></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div class="prints-info">
         <table>
