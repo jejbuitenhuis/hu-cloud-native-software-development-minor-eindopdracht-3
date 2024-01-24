@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/collection/search": {
+    "/api/collections": {
       "get": {
         "parameters" : [
           {
@@ -17,23 +17,61 @@
           {
             "name": "q",
             "in": "query",
-            "required": true,
+            "required": false,
             "type": "string"
+          },
+          {
+            "name": "pk-last-evaluated",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sk-last-evaluated",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "number"
           }
         ],
         "responses" : {
           "200": {
-            "description": "Succefull response"
-          
+            "description": "Succefull response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_code": {
+                  "type": "string",
+                  "example": "200"
+                },
+                "body": {
+                  "type": "array",
+                  "example": {
+                    "Items": {
+                      "PK": "UserId#{user_id}",
+                      "SK": "CardInstanceId#{card_instance_id}#{item_type}",
+                      "PrintId": "{PrintId}",
+                      "CardInstanceId": "{card_instance_id}",
+                      "Condition": "MINT",
+                      "DataType": "DataType"
+                    },
+                    "pk-last-evaluated": "UserId#{user_id}",
+                    "sk-last-evaluated": "CardInstanceId#{card_instance_id}#{item_type}"
+                  }
+                }
+              }
+            }
           },
           "401": {
-            "description": "Query string parameter not provided"
+            "description": "JWT token not provided"
           },
           "404": {
             "description": "Not Found"
-          },
-          "406": {
-            "description": "JWT token not provided"
           }
         },
         "x-amazon-apigateway-integration" : {
@@ -41,34 +79,6 @@
           "uri" : {"Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SearchFunction.Arn}/invocations"},
           "passthroughBehavior" : "when_no_match",
           "type" : "aws_proxy"
-        }
-      }
-    },
-    "/api/collections": {
-      "get": {
-        "security": [
-          { "cognito": [] }
-        ],
-        "parameters": [
-          {
-            "name": "Authorization",
-            "in": "header",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "x-amazon-apigateway-integration": {
-          "httpMethod": "POST",
-          "uri": {
-            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetCollection.Arn}/invocations"
-          },
-          "passthroughBehavior": "when_no_match",
-          "type": "aws_proxy"
         }
       },
       "post": {
@@ -132,22 +142,6 @@
                     "Condition": "MINT",
                     "DataType": "DataType"
                   }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Bad request. Invalid input parameters.",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status_code": {
-                  "type": "string",
-                  "example": "404"
-                },
-                "body": {
-                  "type": "string",
-                  "example": "Card not found."
                 }
               }
             }
