@@ -31,7 +31,7 @@ def test_search_oraclename(setup_dynamodb_collection_with_items):
     # Act
     result = lambda_handler(event, None)
 
-    body = json.loads(result["Body"])
+    body = json.loads(result["body"])
 
     # Assert
     assert body["Items"][0]["PK"] == "USER#test-user"
@@ -58,7 +58,7 @@ def test_search_oracletext(setup_dynamodb_collection_with_items):
     # Act
     result = lambda_handler(event, None)
 
-    body = json.loads(result["Body"])
+    body = json.loads(result["body"])
 
     # Assert
     assert body["Items"][0]["PK"] == "USER#test-user"
@@ -108,11 +108,11 @@ def test_search_no_authorization(setup_dynamodb_collection):
 
     # Act
     result = lambda_handler(event, None)
-    body = json.loads(result["Body"])
+    body = json.loads(result["body"])
 
     # Assert
     assert result["statusCode"] == 401
-    assert body["message"] == "JWT token not provided"
+    assert body["Message"] == "JWT token not provided"
 
 
 def test_search_no_query(setup_dynamodb_collection):
@@ -125,8 +125,8 @@ def test_search_no_query(setup_dynamodb_collection):
 
     # Act
     result = lambda_handler(event, None)
-    body = json.loads(result["Body"])
+    body = json.loads(result["body"])
 
     # Assert
     assert result["statusCode"] == 406
-    assert body["message"] == "query string parameter not provided"
+    assert body["Message"] == "query string parameter not provided"
