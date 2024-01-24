@@ -22,8 +22,6 @@ function getToken(): string | null {
 }
 
 async function createDeck(): Promise<ReturnType<typeof router.push>> {
-  console.log("Creating deck");
-
   error.value = null;
   loading.value = true;
 

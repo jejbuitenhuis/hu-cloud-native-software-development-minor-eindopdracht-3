@@ -45,7 +45,6 @@ function unselectPrint() {
 
 function backToSearch(){
     selecting.value = false;
-    console.log("back")
 }
 
 function addCardToDeck(event : any){

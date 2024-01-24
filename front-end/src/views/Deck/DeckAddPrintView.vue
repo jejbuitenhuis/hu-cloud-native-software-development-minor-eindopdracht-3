@@ -36,8 +36,6 @@ async function getInstances() {
     return;
   }
   const unfilteredInstances = await response.json() as CardInstance[];
-  console.log(unfilteredInstances)
-  console.log(props.printId)
   instances.value = unfilteredInstances.filter((instance) => instance.PrintId === props.printId)
   loaded()
 }
