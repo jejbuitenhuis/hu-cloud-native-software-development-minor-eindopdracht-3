@@ -10,6 +10,7 @@ export type PrintCard = {
   Rarity: "common" | "uncommon" | "rare" | "mythic",
   CardFaces: PrintFace[],
 }
+
 export type PrintFace = {
   Colors: string[],
   FaceName: string,
@@ -19,6 +20,35 @@ export type PrintFace = {
   OracleText: string,
   TypeLine: string,
 }
+
+export type DeckCard = {
+  PK: string,
+  SK: string,
+  card_location: string,
+  CardFaces: CardFace[]
+  data_type: string,
+  deck_card_id: string,
+  deck_id: string,
+  OracleId: string,
+  OracleName: string,
+  Price: number,
+  PrintId: string,
+  Rarity: string,
+  ReleasedAt: string,
+  SetName: string,
+  user_id: string
+}
+
+export type CardFace = {
+  Colors: string[],
+  FlavorText: string,
+  ManaCost: string,
+  TypeLine: string,
+  ImageUrl?: string,
+  FaceName: string,
+  OracleText: string
+}
+
 export type CollectionPrintCard = {
   PK: string,
   SK: string,
@@ -36,6 +66,7 @@ export type CollectionPrintCard = {
   Rarity: "common" | "uncommon" | "rare" | "mythic",
   CardFaces: CollectionPrintFace[],
 }
+
 export type CollectionPrintFace = {
   Colors: string[],
   FaceName: string,
