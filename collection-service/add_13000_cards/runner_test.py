@@ -8,11 +8,11 @@ LOGGER.setLevel("INFO")
 
 
 # !--------------------UPDATE user_id DEPENDING ON THE USER--------------------!
-user_id = "test-user"
+user_id = "7ecaf27e-8f0d-403f-bdc3-b88912e0608e"
 # !--------------------UPDATE table_name DEPENDING ON THE STACK--------------------!
-table_name = "10000-cards-mtg-collection-db"
+table_name = "staging-mtg-collection-db"
 # !--------------------UPDATE default-cards_json_path DEPENDING ON THE PATH--------------------!
-default_cards_json_path = r""
+default_cards_json_path = r"D:\GitHub\hu-cloud-native-software-development-minor-eindopdracht-3\card-service\tests\integration\json_test_files\30_cards.json"
 
 @patch.dict(os.environ, {"DISABLE_XRAY": "True",
                          "DYNAMODB_TABLE_NAME": table_name,
