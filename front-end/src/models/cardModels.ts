@@ -45,6 +45,8 @@ export type CardFace = {
   ImageUrl?: string,
   FaceName: string,
   OracleText: string
+}
+
 export type CollectionPrintCard = {
   PK: string,
   SK: string,
