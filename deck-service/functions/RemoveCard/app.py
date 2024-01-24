@@ -18,13 +18,13 @@ DYNAMO_DB_COLLECTION_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
 table = DYNAMO_DB.Table(DYNAMO_DB_COLLECTION_TABLE_NAME)
 
 def lambda_handler(event, context):
-    LOGGER.info(f"Deleting card with id: {event['pathParameters']['deck_card_id']}")
+    LOGGER.info(f"Deleting card with id: {event['pathParameters']['card_id']}")
     user_id = jwt.get_unverified_claims(event['headers']['Authorization'].replace("Bearer ", ""))["sub"]
     deck_id = event["pathParameters"]["deck_id"]
-    deck_card_id = event["pathParameters"]["card_id"]
+    card_id = event["pathParameters"]["card_id"]
 
     PK = f'USER#{user_id}#DECK#{deck_id}'
-    SK = f'DECK_CARD#{deck_card_id}'
+    SK = f'DECK_CARD#{card_id}'
 
     get_response = table.query(
         KeyConditionExpression=Key('PK').eq(PK) &
@@ -32,7 +32,7 @@ def lambda_handler(event, context):
     )
 
     if len(get_response['Items']) == 0:
-        LOGGER.info(f"Deck card with id: {event['pathParameters']['deck_card_id']} not found")
+        LOGGER.info(f"Deck card with id: {event['pathParameters']['card_id']} not found")
         return {
             "statusCode": 404
         }
@@ -45,12 +45,12 @@ def lambda_handler(event, context):
     )
 
     if delete_response['ResponseMetadata']['HTTPStatusCode'] != 200:
-        LOGGER.info(f"Error while removing card with id: {event['pathParameters']['deck_card_id']}")
+        LOGGER.info(f"Error while removing card with id: {card_id}")
         return {
             "statusCode": 500
         }
     else:
-        LOGGER.info(f"Deck card with id: {event['pathParameters']['deck_card_id']} has been deleted")
+        LOGGER.info(f"Deck card with id: {card_id} has been deleted")
         return {
             "statusCode": 200,
             "body": "Card has been removed from deck",
