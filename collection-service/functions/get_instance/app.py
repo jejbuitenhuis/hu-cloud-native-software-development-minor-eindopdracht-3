@@ -20,9 +20,12 @@ def lambda_handler(event, context):
         event["headers"]["Authorization"].replace("Bearer ", "")
     )["sub"]
 
+    oracle_id = event["pathParameters"]["oracle_id"]
+
     response = table.query(
+        IndexName="GSI-Collection-OracleId",
         KeyConditionExpression=Key("PK").eq(f"UserId#{user_id}")
-        & Key("SK").eq(f"CardInstanceId#{event['pathParameters']['instance_id']}"),
+        & Key("GSI2SK").begins_with(f"OracleId#{oracle_id}"),
     )
     # OracleId
     #

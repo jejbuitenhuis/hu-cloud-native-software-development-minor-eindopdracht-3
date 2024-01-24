@@ -17,8 +17,9 @@ def test_get_card_instance_by_id(setup_dynamodb_collection):
             "CardInstanceId": "1",
             "DataType": "Card",
             "DeckId": "1",
+            "OracleId": "d6329dcc-b450-482a-8ee3-45449f7a4b3d",
             "GSI1SK": "DeckId#1",
-            "GSI2SK": "OracleId#1#CardInstanceId#1",
+            "GSI2SK": "OracleId#d6329dcc-b450-482a-8ee3-45449f7a4b3d#CardInstanceId#1",
         }
     )
     table.put_item(
@@ -26,13 +27,15 @@ def test_get_card_instance_by_id(setup_dynamodb_collection):
             "PK": "UserId#test-user",
             "SK": "CardInstanceId#2#Card",
             "CardInstanceId": "2",
+            "OracleId": "d6329dcc-b450-482a-8ee3-45449f7a4b3d",
             "DataType": "Card",
+            "GSI2SK": "OracleId#d6329dcc-b450-482a-8ee3-45449f7a4b3d#CardInstanceId#2",
         }
     )
 
     # Mock API Gateway event
     event = {
-        "pathParameters": {"instance_id": "1"},
+        "pathParameters": {"oracle_id": "d6329dcc-b450-482a-8ee3-45449f7a4b3d"},
         "headers": {"Authorization": f"Bearer {generate_test_jwt()}"},
     }
 
@@ -42,13 +45,21 @@ def test_get_card_instance_by_id(setup_dynamodb_collection):
     # Assert the response
     assert response["statusCode"] == 200
     body = json.loads(response["body"])
-    assert body["CardInstanceId"] == "1"
-    assert body["DataType"] == "Card"
-    assert body["DeckId"] == "1"
+    print(body)
+
+    instance_one = body[0]
+    instance_two = body[1]
+
+    assert instance_one["CardInstanceId"] == "1"
+    assert instance_one["DataType"] == "Card"
+    assert instance_one["DeckId"] == "1"
+
+    assert instance_two["CardInstanceId"] == "2"
+    assert instance_two["DataType"] == "Card"
 
 
 @patch.dict(os.environ, {"DYNAMODB_TABLE": "test-table", "DISABLE_XRAY": "True"})
-def test_get_card_instance_by_id(setup_dynamodb_collection):
+def test_get_card_instance_by_id_not_found(setup_dynamodb_collection):
     from functions.get_instance.app import lambda_handler
 
     # Insert mock data into the table
@@ -60,7 +71,9 @@ def test_get_card_instance_by_id(setup_dynamodb_collection):
             "CardInstanceId": "1",
             "DataType": "Card",
             "DeckId": "1",
+            "OracleId": "d6329dcc-b450-482a-8ee3-45449f7a4b3d",
             "GSI1SK": "DeckId#1",
+            "GSI2SK": "OracleId#d6329dcc-b450-482a-8ee3-45449f7a4b3d#CardInstanceId#1",
         }
     )
     table.put_item(
@@ -68,13 +81,15 @@ def test_get_card_instance_by_id(setup_dynamodb_collection):
             "PK": "UserId#test-user",
             "SK": "CardInstanceId#2#Card",
             "CardInstanceId": "2",
+            "OracleId": "d6329dcc-b450-482a-8ee3-45449f7a4b3d",
             "DataType": "Card",
+            "GSI2SK": "OracleId#d6329dcc-b450-482a-8ee3-45449f7a4b3d#CardInstanceId#2",
         }
     )
 
     # Mock API Gateway event
     event = {
-        "pathParameters": {"instance_id": "3"},
+        "pathParameters": {"oracle_id": "wrongdcc-b450-482a-8ee3-45449f7a4b3d"},
         "headers": {"Authorization": f"Bearer {generate_test_jwt()}"},
     }
 
