@@ -56,7 +56,7 @@ async function getInstances() {
   loaded()
 }
 
-function addCardToDeck(instance : string | undefined, printId : string | undefined) {
+function addCardToDeck(instance? : string, printId? : string) {
     emit('addCard', {oracleId : props.card['oracle_id'], location : props.location, cardInstance : instance, printId : printId})
 }
 
@@ -93,7 +93,7 @@ getOracle().then(() =>
           <DecoratedText :text="face.FlavorText"/>
         </div>
         <div>
-          <sl-button class="add-to-deck-button" @click="addCardToDeck">Add Card to Deck</sl-button>
+          <sl-button class="add-to-deck-button" @click="addCardToDeck()">Add Card to Deck</sl-button>
         </div>
       </div>
       <div class="instances">

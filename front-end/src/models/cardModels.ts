@@ -37,6 +37,7 @@ export type DeckCard = {
   ReleasedAt: string,
   SetName: string,
   user_id: string
+  card_instance_id?: string
 }
 
 export type CardFace = {

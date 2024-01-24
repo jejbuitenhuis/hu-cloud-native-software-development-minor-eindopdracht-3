@@ -53,7 +53,7 @@ function unselectPrint(){
   emit("unselectPrint");
 }
 
-function addCardToDeck(instance : string | undefined) {
+function addCardToDeck(instance? : string) {
     emit('addCard', {oracleId : props.card['oracle_id'], location : props.location, cardInstance : instance, printId : props.printId})
 }
 
@@ -82,7 +82,7 @@ getInstances();
           <DecoratedText :text="face.FlavorText"/>
         </div>
         <div>
-          <sl-button class="add-to-deck-button" @click="addCardToDeck">Add Card to Deck</sl-button>
+          <sl-button class="add-to-deck-button" @click="addCardToDeck()">Add Card to Deck</sl-button>
         </div>
         <div class="instances">
         <table>
