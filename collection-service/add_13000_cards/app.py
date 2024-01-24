@@ -54,8 +54,6 @@ def parse_card_item_from_own_lambda(item, user_id, condition):
         "Price": item["Price"],
         "LowerCaseOracleName": item["LowerCaseOracleName"],
         "CardFaces": face_items,
-        "DeckId": item["DeckId"],
-        "GSI1SK": f"DeckId#{item['DeckId']}#CardInstanceId#{card_instance_id}",
         "GSI2SK": f"OracleId#{item['OracleId']}#CardInstanceId#{card_instance_id}",
     }
 
@@ -78,17 +76,17 @@ def create_card_info(card, oracle_id):
 
 
 def turn_card_into_face_item(card):
-    image_uris = card.get("image_uris", {})
+    image_uris = card.get('image_uris')
     return {
-        "OracleText": card.get("oracle_text", ""),
-        "ManaCost": card.get("mana_cost", ""),
-        "TypeLine": card.get("type_line", ""),
-        "FaceName": card.get("name", ""),
-        "FlavorText": card.get("flavor_text", ""),
-        "ImageUrl": image_uris,
-        "Colors": card.get("colors", []),
-        "LowercaseFaceName": str.lower(card.get("name", "")),
-        "LowercaseOracleText": str.lower(card.get("oracle_text", "")),
+        "OracleText": card.get('oracle_text', ''),
+        "ManaCost": card.get('mana_cost', ''),
+        "TypeLine": card.get('type_line', ''),
+        "FaceName": card.get('name', ''),
+        "FlavorText": card.get('flavor_text', ''),
+        "ImageUrl": image_uris.get('png', ''),
+        "Colors": card.get('colors', []),
+        "LowercaseFaceName": str.lower(card.get('name', '')),
+        "LowercaseOracleText": str.lower(card.get('oracle_text', ''))
     }
 
 
@@ -125,7 +123,6 @@ def writeBatchToDb(items, table):
     with table.batch_writer() as batch:
         for item in items:
             batch.put_item(Item=item)
-
 
 def cutTheListAndPersist(item_list):
     if len(item_list) < 25:
@@ -214,9 +211,7 @@ def lambda_handler(event, context):
                     card_faces.append(turn_card_into_face_item(card))
 
                 card_info["CardFaces"] = card_faces
-                card_info[
-                    "CombinedLowercaseOracleText"
-                ] = getCombinedLowerCaseOracleText(card_faces)
+                card_info["CombinedLowercaseOracleText"] = getCombinedLowerCaseOracleText(card_faces)
 
                 collection_card_info = parse_card_item_from_own_lambda(
                     card_info, user_id, getRandomCondition()

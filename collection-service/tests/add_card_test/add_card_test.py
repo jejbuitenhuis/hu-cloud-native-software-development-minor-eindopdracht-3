@@ -132,7 +132,7 @@ def setup_saved_cards_response():
                 },
             ],
             "GSI1SK": "",
-        },
+        }
     ]
 
 
