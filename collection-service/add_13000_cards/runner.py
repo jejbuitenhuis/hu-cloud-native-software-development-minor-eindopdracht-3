@@ -19,6 +19,6 @@ default_cards_json_path = r""
                          "CARD_JSON_LOCATION": default_cards_json_path,
                          "USERID": user_id})
 def test_add_many_cards():
-    import add_10000_cards.app
-    importlib.reload(add_10000_cards.app)
-    add_10000_cards.app.lambda_handler({}, {})
+    import add_13000_cards.app
+    importlib.reload(add_13000_cards.app)
+    add_13000_cards.app.lambda_handler({}, {})
