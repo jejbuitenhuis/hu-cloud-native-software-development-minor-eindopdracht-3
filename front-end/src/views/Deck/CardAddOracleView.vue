@@ -78,7 +78,6 @@ getOracle();
     <div class="oracle-image">
       <img v-for="face in oracle.CardFaces" :src="face.ImageUrl" :alt="face.FaceName">
     </div>
-
     <div>
       <div class="oracle-info">
         <h2>{{ oracle.OracleName }}</h2>
@@ -95,29 +94,7 @@ getOracle();
           <sl-button class="add-to-deck-button" @click="addCardToDeck">Add Card to Deck</sl-button>
         </div>
       </div>
-      <div class="instances-info">
-        <table>
-          <thead>
-          <tr>
-            <th>Set name</th>
-            <th>Release date</th>
-            <th>Rarity</th>
-            <th>Price</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr v-for="instance in instances">
-            <!-- <td>{{ print.SetName }}</td> -->
-            <!-- <td>{{ new Date(print.ReleasedAt).toLocaleDateString("nl-nl") }}</td> -->
-            <!-- <td>{{ print.Rarity }}</td> -->
-            <!-- <td>{{ print.Price == null ? "-" : `€${print.Price}` }}</td> -->
-            <!-- <td>{{ print.deck }}</td> -->
-            <td>{{ instance['condition'] }}</td>
-            <td><button @click="switchToPrint(print.PrintId)">Select this print</button></td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
+
 
       <div class="prints-info">
         <table>
