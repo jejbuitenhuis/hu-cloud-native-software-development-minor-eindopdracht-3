@@ -171,6 +171,21 @@ Resources:
       Policies:
         - AmazonDynamoDBReadOnlyAccess
 
+  EditDeckCardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/EditDeckCard/
+      Events:
+        EditDeckCard:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGDeckApi"
+            Path: /api/decks/{deck_id}/cards/{card_id}
+            Method: PATCH
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - AmazonSSMReadOnlyAccess
+
 Outputs:
   MTGDeckApiUrl:
     Description: "API Gateway endpoint URL"
