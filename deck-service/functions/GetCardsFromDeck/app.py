@@ -31,7 +31,7 @@ def lambda_handler(event, context):
     LOGGER.info(f"Getting deckcards for deck with id '{deck_id}'")
 
     db_response = DECK_TABLE.query(
-        KeyConditionExpression=Key("PK").eq(f"USER#{user_id}#DECK#{deck_id}") & Key("SK").begins_with("DECKCARD#"),
+        KeyConditionExpression=Key("PK").eq(f"USER#{user_id}#DECK#{deck_id}") & Key("SK").begins_with("DECK_CARD#"),
     )
 
     LOGGER.info(f"{db_response = }")
