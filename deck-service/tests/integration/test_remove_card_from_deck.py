@@ -14,7 +14,7 @@ logger.setLevel("INFO")
 
 user_id = "1"
 deck_id = "1"
-deck_card_id = "1"
+card_id = "1"
 card_location = "1"
 card_instance_id = "6c538e3f-068d-44af-9117-ef3f653831d2"
 table_name = "test-deck-table"
@@ -59,12 +59,12 @@ def generate_jwt_token(user_id: str = "test-user", secret_key: str = "secret", a
 def get_deck_with_card():
     return {
         "PK": f"USER#{user_id}#DECK#{deck_id}",
-        "SK": f"DECK_CARD#{deck_card_id}",
+        "SK": f"DECK_CARD#{card_id}",
 
         "data_type": "DECK_CARD",
         "user_id": user_id,
         "deck_id": deck_id,
-        "deck_card_id": deck_card_id,
+        "card_id": card_id,
         "card_location": card_location,
         "card_instance_id": card_instance_id,
     }
@@ -80,7 +80,7 @@ def test_remove_card_successfull(aws_credentials):
         "pathParameters": {
             "user_id": "1",
             "deck_id": "1",
-            "deck_card_id": "1"
+            "card_id": "1"
         },
         "headers": {
             "Authorization": f"Bearer {generate_jwt_token(user_id=user_id)}"
@@ -91,7 +91,7 @@ def test_remove_card_successfull(aws_credentials):
 
     response = table.query(
         KeyConditionExpression=Key('PK').eq(f"USER#{user_id}#DECK#{deck_id}") &
-                               Key('SK').eq(f"DECK_CARD#{deck_card_id}")
+                               Key('SK').eq(f"DECK_CARD#{card_id}")
     )
 
     assert len(response['Items']) == 1
@@ -104,7 +104,7 @@ def test_remove_card_successfull(aws_credentials):
     # Assert
     response = table.query(
         KeyConditionExpression=Key('PK').eq(f"USER#{user_id}#DECK#{deck_id}") &
-                               Key('SK').eq(f"DECK_CARD#{deck_card_id}")
+                               Key('SK').eq(f"DECK_CARD#{card_id}")
     )
 
     assert put_response['ResponseMetadata']['HTTPStatusCode'] == 200
@@ -124,7 +124,7 @@ def test_remove_non_existent_card(aws_credentials):
         "pathParameters": {
             "user_id": "1",
             "deck_id": "1",
-            "deck_card_id": "1"
+            "card_id": "1"
         },
         "headers": {
             "Authorization": f"Bearer {generate_jwt_token(user_id=user_id)}"
