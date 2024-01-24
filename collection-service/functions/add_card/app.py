@@ -78,7 +78,7 @@ def parse_card_item(item, user_id, condition, deck_id):
 
 def save_card_to_db(item, user_id, condition, deck_id):
     try:
-        card_instance_item = parse_card_item(item, user_id, condition)
+        card_instance_item = parse_card_item(item, user_id, condition, deck_id)
         LOGGER.info(f"Saving card instance: {card_instance_item}")
         COLLECTION_TABLE.put_item(Item=card_instance_item)
         return card_instance_item
