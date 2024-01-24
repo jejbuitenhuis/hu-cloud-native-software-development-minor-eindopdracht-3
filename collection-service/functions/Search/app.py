@@ -24,9 +24,7 @@ def lambda_handler(event, context):
     query_string_parameters = event.get("queryStringParameters", {})
 
     search_value = (
-        query_string_parameters.get("q")
-        if query_string_parameters is not None
-        else None
+        query_string_parameters.get("q") if query_string_parameters is not None else ""
     )
 
     logger.info(f"Auth input: {authorization_value}")
@@ -42,13 +40,7 @@ def lambda_handler(event, context):
         }
 
     if not search_value:
-        return {
-            "headers": {
-                "Content-Type": "application/json",
-            },
-            "statusCode": 406,
-            "body": json.dumps({"Message": "query string parameter not provided"}),
-        }
+        search_value = ""
 
     # Cognito username
     tmp_authorization_value = authorization_value.replace("Bearer ", "")
@@ -94,6 +86,11 @@ def lambda_handler(event, context):
 
 def search_for_querystring(table, key_expression, search_query):
     try:
+        if not search_query:
+            return table.query(
+                KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
+            )
+
         return table.query(
             KeyConditionExpression=Key("PK").eq(f"USER#{key_expression}"),
             FilterExpression=Attr("LowerCaseOracleName").contains(search_query)

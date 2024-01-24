@@ -99,23 +99,6 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCollectionApi"
-            Path: /api/collections/search
-            Method: get
-      Environment:
-        Variables:
-          DYNAMODB_TABLE: !Ref MTGCollectionDynamoDBTable
-      Policies:
-        - AmazonDynamoDBReadOnlyAccess
-
-  GetCollection:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: functions/get_collection/
-      Events:
-        GetCollection:
-          Type: Api
-          Properties:
-            RestApiId: !Ref "MTGCollectionApi"
             Path: /api/collections
             Method: get
       Environment:

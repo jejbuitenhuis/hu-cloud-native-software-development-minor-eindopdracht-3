@@ -5,7 +5,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/collection/search": {
+    "/api/collections/search": {
       "get": {
         "parameters" : [
           {
@@ -27,13 +27,10 @@
           
           },
           "401": {
-            "description": "Query string parameter not provided"
+            "description": "JWT token not provided"
           },
           "404": {
             "description": "Not Found"
-          },
-          "406": {
-            "description": "JWT token not provided"
           }
         },
         "x-amazon-apigateway-integration" : {

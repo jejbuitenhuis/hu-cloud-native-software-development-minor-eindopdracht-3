@@ -115,7 +115,7 @@ def test_search_no_authorization(setup_dynamodb_collection):
     assert body["Message"] == "JWT token not provided"
 
 
-def test_search_no_query(setup_dynamodb_collection):
+def test_search_no_query(setup_dynamodb_collection_with_multiple_items):
     from functions.Search.app import lambda_handler
 
     # Arrange
@@ -127,6 +127,12 @@ def test_search_no_query(setup_dynamodb_collection):
     result = lambda_handler(event, None)
     body = json.loads(result["body"])
 
-    # Assert
-    assert result["statusCode"] == 406
-    assert body["Message"] == "query string parameter not provided"
+    assert body["Items"][0]["PK"] == "USER#test-user"
+    assert body["Items"][0]["SK"] == "CardInstance#1"
+    assert body["Items"][0]["OracleName"] == "Beloved Beggar // Generous Soul"
+
+    assert body["Items"][1]["PK"] == "USER#test-user"
+    assert (
+        body["Items"][1]["SK"] == "CardInstanceId#ed1387cd-0ff9-41fc-825c-1b1cdb6a52e1"
+    )
+    assert body["Items"][1]["OracleName"] == "Chicken Egg"
