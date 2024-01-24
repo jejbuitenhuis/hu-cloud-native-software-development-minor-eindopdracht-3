@@ -73,7 +73,7 @@ def create_card_info(card, oracle_id):
 
 
 def turn_card_into_face_item(card):
-    image_uris = card.get('image_uris', {})
+    image_uris = card.get('image_uris').get('png', '')
     return {
         "OracleText": card.get('oracle_text', ''),
         "ManaCost": card.get('mana_cost', ''),
@@ -120,7 +120,6 @@ def writeBatchToDb(items, table):
     with table.batch_writer() as batch:
         for item in items:
             batch.put_item(Item=item)
-
 
 def cutTheListAndPersist(item_list):
     if len(item_list) < 25:
@@ -185,9 +184,9 @@ def lambda_handler(event, context):
                             card_image_uri = ''
                         else:
                             if get_image_uri_from_face(card):
-                                card_image_uri = face['image_uris'].get('png', '')
+                                card_image_uri = face['image_uris']['png']
                             else:
-                                card_image_uri = card['image_uris'].get('png', '')
+                                card_image_uri = card['image_uris']['png']
 
                         if get_Colors_from_face(card):
                             card_colors = face['colors']
@@ -195,6 +194,7 @@ def lambda_handler(event, context):
                             card_colors = card['colors']
 
                         face_count += 1
+                        LOGGER.info(f'{card_image_uri}')
                         card_faces.append(turn_face_into_face_item(face, card_image_uri, card_colors))
                 else:
                     card_faces.append(turn_card_into_face_item(card))
