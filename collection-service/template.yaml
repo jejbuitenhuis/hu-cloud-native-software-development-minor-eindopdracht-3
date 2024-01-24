@@ -93,26 +93,10 @@ Resources:
   SearchFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "collection-service-${Stage}-SearchFunction"
       CodeUri: functions/Search
       Events:
         HelloWorld:
-          Type: Api
-          Properties:
-            RestApiId: !Ref "MTGCollectionApi"
-            Path: /api/collections/search
-            Method: get
-      Environment:
-        Variables:
-          DYNAMODB_TABLE: !Ref MTGCollectionDynamoDBTable
-      Policies:
-        - AmazonDynamoDBReadOnlyAccess
-
-  GetCollection:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: functions/get_collection/
-      Events:
-        GetCollection:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCollectionApi"
@@ -127,6 +111,7 @@ Resources:
   GetCollectionInstance:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "collection-service-${Stage}-GetCollectionInstanceFunction"
       CodeUri: functions/get_instance/
       Events:
         GetCollectionInstance:
@@ -141,10 +126,27 @@ Resources:
       Policies:
         - AmazonDynamoDBReadOnlyAccess
 
+  DeleteCardInstanceFromCollection:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/remove_card/
+      Events:
+        DeleteCardInstanceFromCollection:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCollectionApi"
+            Path: /api/collections/{instance_id}
+            Method: delete
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCollectionDynamoDBTable
+      Policies:
+        - AmazonDynamoDBFullAccess
+
   AddCardToCollectionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${Stage}-AddCardToCollectionFunction"
+      FunctionName: !Sub "collection-service-${Stage}-AddCardToCollectionFunction"
       CodeUri: functions/add_card/
       Events:
         AddCard:

@@ -14,19 +14,19 @@ def test_get_deck_card_by_id(setup_dynamodb_collection):
     table.put_item(Item={
         "PK": "USER#test-user",
         "SK": "DECK#1",
-        "DataType": "DECK",
-        "UserId": "test-user",
-        "DeckId": "1",
-        "DeckName": "Test deck",
+        "data_type": "DECK",
+        "user_id": "test-user",
+        "deck_id": "1",
+        "deck_name": "Test deck",
     })
     table.put_item(Item={
         "PK": "USER#test-user#DECK#1",
-        "SK": "DECKCARD#1",
-        "DataType": "DECKCARD",
-        "UserId": "test-user",
-        "DeckId": "1",
-        "DeckCardId": "1",
-        "CardName": "Swords of Plowshares",
+        "SK": "DECK_CARD#1",
+        "data_type": "DECK_CARD",
+        "user_id": "test-user",
+        "deck_id": "1",
+        "deck_card_id": "1",
+        "OracleName": "Swords of Plowshares",
     })
 
     # Mock API Gateway event
@@ -41,11 +41,11 @@ def test_get_deck_card_by_id(setup_dynamodb_collection):
     # Assert the response
     assert response['statusCode'] == 200
     body = json.loads(response['body'])
-    assert body['DataType'] == 'DECKCARD'
-    assert body['UserId'] == 'test-user'
-    assert body['DeckId'] == '1'
-    assert body['DeckCardId'] == '1'
-    assert body['CardName'] == 'Swords of Plowshares'
+    assert body['data_type'] == 'DECK_CARD'
+    assert body['user_id'] == 'test-user'
+    assert body['deck_id'] == '1'
+    assert body['deck_card_id'] == '1'
+    assert body['OracleName'] == 'Swords of Plowshares'
 
 
 @patch.dict(os.environ, {"DYNAMO_DB_DECK_TABLE_NAME": DYNAMODB_TABLE_NAME, "DISABLE_XRAY": "True"})
@@ -57,19 +57,19 @@ def test_get_deck_card_by_id_card_not_found(setup_dynamodb_collection):
     table.put_item(Item={
         "PK": "USER#test-user",
         "SK": "DECK#1",
-        "DataType": "DECK",
-        "UserId": "test-user",
-        "DeckId": "1",
-        "DeckName": "Test deck",
+        "data_type": "DECK",
+        "user_id": "test-user",
+        "deck_id": "1",
+        "deck_name": "Test deck",
     })
     table.put_item(Item={
         "PK": "USER#test-user#DECK#1",
-        "SK": "DECKCARD#1",
-        "DataType": "DECKCARD",
-        "UserId": "test-user",
-        "DeckId": "1",
-        "DeckCardId": "1",
-        "CardName": "Swords of Plowshares",
+        "SK": "DECK_CARD#1",
+        "data_type": "DECK_CARD",
+        "user_id": "test-user",
+        "deck_id": "1",
+        "deck_card_id": "1",
+        "OracleName": "Swords of Plowshares",
     })
 
     # Mock API Gateway event
@@ -94,19 +94,19 @@ def test_get_deck_card_by_id_deck_not_found(setup_dynamodb_collection):
     table.put_item(Item={
         "PK": "USER#test-user",
         "SK": "DECK#1",
-        "DataType": "DECK",
-        "UserId": "test-user",
-        "DeckId": "1",
-        "DeckName": "Test deck",
+        "data_type": "DECK",
+        "user_id": "test-user",
+        "deck_id": "1",
+        "deck_name": "Test deck",
     })
     table.put_item(Item={
         "PK": "USER#test-user#DECK#1",
-        "SK": "DECKCARD#1",
-        "DataType": "DECKCARD",
-        "UserId": "test-user",
-        "DeckId": "1",
-        "DeckCardId": "1",
-        "CardName": "Swords of Plowshares",
+        "SK": "DECK_CARD#1",
+        "data_type": "DECK_CARD",
+        "user_id": "test-user",
+        "deck_id": "1",
+        "deck_card_id": "1",
+        "OracleId": "Swords of Plowshares",
     })
 
     # Mock API Gateway event
