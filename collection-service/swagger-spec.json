@@ -21,13 +21,13 @@
             "type": "string"
           },
           {
-            "name": "PK-last-evaluated",
+            "name": "PKLastEvaluated",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "SK-last-evaluated",
+            "name": "SKLastEvaluated",
             "in": "query",
             "required": false,
             "type": "string"
@@ -41,8 +41,31 @@
         ],
         "responses" : {
           "200": {
-            "description": "Succefull response"
-          
+            "description": "Succefull response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status_code": {
+                  "type": "string",
+                  "example": "200"
+                },
+                "body": {
+                  "type": "array",
+                  "example": {
+                    "Items": {
+                      "PK": "UserId#{user_id}",
+                      "SK": "CardInstanceId#{card_instance_id}#{item_type}",
+                      "PrintId": "{PrintId}",
+                      "CardInstanceId": "{card_instance_id}",
+                      "Condition": "MINT",
+                      "DataType": "DataType"
+                    },
+                    "PKLastEvaluated": "UserId#{user_id}",
+                    "SKLastEvaluated": "CardInstanceId#{card_instance_id}#{item_type}"
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "JWT token not provided"
@@ -119,22 +142,6 @@
                     "Condition": "MINT",
                     "DataType": "DataType"
                   }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Bad request. Invalid input parameters.",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status_code": {
-                  "type": "string",
-                  "example": "404"
-                },
-                "body": {
-                  "type": "string",
-                  "example": "Card not found."
                 }
               }
             }

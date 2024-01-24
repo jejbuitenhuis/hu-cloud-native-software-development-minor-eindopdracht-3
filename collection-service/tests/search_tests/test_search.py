@@ -74,30 +74,6 @@ def test_search_oracletext(setup_dynamodb_collection_with_items):
         "EVENT_BUS_ARN": "",
     },
 )
-def test_search_not_found(setup_dynamodb_collection):
-    from functions.Search.app import lambda_handler
-
-    # Arrange
-    event = {
-        "headers": {"Authorization": f"Bearer {generate_test_jwt()}"},
-        "queryStringParameters": {"q": "Invalid"},
-    }
-
-    # Act
-    result = lambda_handler(event, None)
-
-    # Assert
-    assert result["statusCode"] == 404
-
-
-@patch.dict(
-    os.environ,
-    {
-        "DYNAMODB_TABLE": DYNAMODB_TABLE_NAME,
-        "DISABLE_XRAY": "True",
-        "EVENT_BUS_ARN": "",
-    },
-)
 def test_search_no_authorization(setup_dynamodb_collection):
     from functions.Search.app import lambda_handler
 
@@ -166,8 +142,8 @@ def test_search_limit_2_start_at_second(setup_dynamodb_collection_with_three_ite
         "headers": {"Authorization": generate_test_jwt()},
         "queryStringParameters": {
             "limit": 2,
-            "PK-last-evaluated": "USER#test-user",
-            "SK-last-evaluated": "CardInstanceId#1",
+            "PKLastEvaluated": "USER#test-user",
+            "SKLastEvaluated": "CardInstanceId#1",
         },
     }
 

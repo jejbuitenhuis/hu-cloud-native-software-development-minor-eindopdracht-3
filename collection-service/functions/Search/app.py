@@ -30,8 +30,8 @@ def lambda_handler(event, context):
     search_value = query_string_parameters.get("q", "")
 
     tmp_limit = query_string_parameters.get("limit")
-    tmp_pk_last_evaluated = query_string_parameters.get("PK-last-evaluated")
-    tmp_sk_last_evaluated = query_string_parameters.get("SK-last-evaluated")
+    tmp_pk_last_evaluated = query_string_parameters.get("PKLastEvaluated")
+    tmp_sk_last_evaluated = query_string_parameters.get("SKLastEvaluated")
 
     if tmp_pk_last_evaluated and tmp_sk_last_evaluated:
         last_evaluated_key = {"PK": tmp_pk_last_evaluated, "SK": tmp_sk_last_evaluated}
@@ -83,22 +83,27 @@ def lambda_handler(event, context):
 
     logger.info(f"Query success: {result}")
     items = result["Items"]
-    logger.info(f"All of the items returned: {items}")
 
-    if not items:
-        logger.info("No items found")
-        return {
-            "headers": {
-                "Content-Type": "application/json",
-            },
-            "statusCode": 404,
-            "body": json.dumps({"Message": "Not found"}),
-        }
+    pk_last_evaluated = None
+    sk_last_evaluated = None
+
+    if items:
+        last_item = items[-1]
+        pk_last_evaluated = last_item["PK"]
+        sk_last_evaluated = last_item["SK"]
+
+    logger.info(f"All of the items returned: {items}")
 
     return {
         "headers": {
             "Content-Type": "application/json",
         },
         "statusCode": 200,
-        "body": json.dumps({"Items": items}),
+        "body": json.dumps(
+            {
+                "Items": items,
+                "PKLastEvaluated": pk_last_evaluated,
+                "SKLastEvaluated": sk_last_evaluated,
+            }
+        ),
     }
