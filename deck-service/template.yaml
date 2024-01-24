@@ -84,6 +84,7 @@ Resources:
   CreateDeckFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-CreateDeckFunction"
       CodeUri: functions/CreateDeck/
       Events:
         HelloWorld:
@@ -98,6 +99,7 @@ Resources:
   GetDecksFromUserFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-GetDecksFromUserFunction"
       CodeUri: functions/GetDecksFromUser/
       Events:
         HelloWorld:
@@ -112,6 +114,7 @@ Resources:
   GetDeckByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-GetDeckByIdFunction"
       CodeUri: functions/GetDeckById/
       Events:
         HelloWorld:
@@ -126,6 +129,7 @@ Resources:
   GetCardsFromDeckFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-GetCardsFromDeckFunction"
       CodeUri: functions/GetCardsFromDeck/
       Events:
         GetAllCardsFromDeck:
@@ -155,6 +159,7 @@ Resources:
   GetCardByIdFromDeckFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "deck-service-${Stage}-GetCardByIdFromDeckFunction"
       CodeUri: functions/GetCardByIdFromDeck/
       Events:
         GetCardFromDeck:
