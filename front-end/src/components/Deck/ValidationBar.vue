@@ -30,6 +30,14 @@ const allCardsAreSameColorsAsCommander = computed(() => {
       .some(color => !commanderColors.includes(color))
   );
 });
+
+const allNonBasicLandCardsAreUnique = computed(() => {
+  const filteredMainDeck = props.mainDeck.filter(
+    card => card.CardFaces.every(face => !face.TypeLine.toLowerCase().includes("basic land")),
+  );
+
+  return (new Set( filteredMainDeck.map(card => card.OracleName) )).size === filteredMainDeck.length;
+});
 </script>
 
 <template>
@@ -49,6 +57,10 @@ const allCardsAreSameColorsAsCommander = computed(() => {
 
       <p class="validation" :class="{ error: !allCardsAreSameColorsAsCommander }">
         Deck cards are same color as commander
+      </p>
+
+      <p class="validation" :class="{ error: !allNonBasicLandCardsAreUnique }">
+        All cards are unique (except lands)
       </p>
     </div>
   </sl-card>
