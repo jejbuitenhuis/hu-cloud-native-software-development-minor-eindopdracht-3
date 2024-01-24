@@ -23,7 +23,7 @@ export type DeckCard = {
   PK: string,
   SK: string,
   card_location: string,
-  CardFaces: CardFaceWrapper[]
+  CardFaces: CardFace[]
   data_type: string,
   deck_card_id: string,
   deck_id: string,
@@ -37,34 +37,12 @@ export type DeckCard = {
   user_id: string
 }
 
-export type CardFaceWrapper = {
-  M: CardFace
-}
-
 export type CardFace = {
-  Colors: {
-    L: Color[]
-  },
-  FlavorText: {
-    "S": string
-  },
-  ManaCost: {
-    "S": string
-  },
-  TypeLine: {
-    "S": string
-  },
-  ImageUrl?: {
-    "S": string
-  },
-  FaceName: {
-    "S": string
-  },
-  OracleText: {
-    "S": string
-  }
-}
-
-export type Color = {
-  "S": string
+  Colors: string[],
+  FlavorText: string,
+  ManaCost: string,
+  TypeLine: string,
+  ImageUrl?: string,
+  FaceName: string,
+  OracleText: string
 }

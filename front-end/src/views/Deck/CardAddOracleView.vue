@@ -11,6 +11,16 @@ const route = useRoute();
 const allPrints = ref<PrintCard[] | null>()
 const oracle = ref<PrintCard | null>()
 const loading = ref(true)
+let loadingRemaining = 2;
+const instances = ref();
+
+
+function loaded(){
+  loadingRemaining -= 1;
+  if (loadingRemaining === 0) {
+    loading.value = false;
+  }
+}
 
 async function getOracle() {
 
@@ -30,7 +40,20 @@ async function getOracle() {
 
   allPrints.value = data;
   oracle.value = data[0];
+  loaded();
   loading.value = false;
+}
+
+async function getInstances() {
+  const token = localStorage.getItem("jwtToken");
+  if (!token) return;
+  const response = await fetch(`/api/collection/${oracle.value?.OracleId}`, {headers: {Authorization: token}});
+  if (!response.ok) {
+    console.error(`Failed card instances. Status: ${response.status}`)
+    return;
+  }
+  instances.value = await response.json() as any[];
+  loaded()
 }
 
 function addCardToDeck(instance : string | undefined) {
@@ -71,6 +94,29 @@ getOracle();
         <div>
           <sl-button class="add-to-deck-button" @click="addCardToDeck">Add Card to Deck</sl-button>
         </div>
+      </div>
+      <div class="instances-info">
+        <table>
+          <thead>
+          <tr>
+            <th>Set name</th>
+            <th>Release date</th>
+            <th>Rarity</th>
+            <th>Price</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="instance in instances">
+            <!-- <td>{{ print.SetName }}</td> -->
+            <!-- <td>{{ new Date(print.ReleasedAt).toLocaleDateString("nl-nl") }}</td> -->
+            <!-- <td>{{ print.Rarity }}</td> -->
+            <!-- <td>{{ print.Price == null ? "-" : `€${print.Price}` }}</td> -->
+            <!-- <td>{{ print.deck }}</td> -->
+            <td>{{ instance['condition'] }}</td>
+            <td><button @click="switchToPrint(print.PrintId)">Select this print</button></td>
+          </tr>
+          </tbody>
+        </table>
       </div>
 
       <div class="prints-info">
@@ -143,6 +189,7 @@ p {
 }
 
 table {
+  margin-top: 15px;
   border-spacing: 1rem 0;
 
   th {

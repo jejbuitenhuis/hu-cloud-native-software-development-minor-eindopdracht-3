@@ -5,7 +5,7 @@ import "@shoelace-style/shoelace/dist/components/icon/icon";
 import {useRoute} from "vue-router";
 import {ref} from "vue";
 import CardListPreview from "./CardListPreview.vue";
-import type { PrintCard, CardData } from "@/models/cardModels";
+import type { DeckCard } from "@/models/cardModels";
 import AddCardToDeckView from "./AddCardToDeckView.vue";
 import DeckSearchView from "./DeckSearchView.vue";
 
@@ -14,60 +14,18 @@ type Deck = {
   name: string,
 }
 
-const exampleCard : PrintCard = {
-  PK: "testpk",
-  SK: "testsk",
-  OracleName: "Goblin Commando",
-  Price: 0.05,
-  ReleasedAt: "2020",
-  SetName: "Jumpstart",
-  Rarity: "uncommon",
-  CardFaces: [{
-      Colors: ["R"],
-      FaceName: "Goblin Commando",
-      FlavorText: "With a commando around, somebody’s gonna get hurt.",
-      ImageUrl: "https://cards.scryfall.io/png/front/c/7/c742d940-1a8d-487a-a787-2ad96a96ef1f.png?1601077766",
-      ManaCost: "{4}{R}",
-      OracleText: "When Goblin Commando enters the battlefield, it deals 2 damage to target creature.",
-      TypeLine: "Creature — Goblin",
-    },
-    {
-      Colors: ["R"],
-      FaceName: "BLOKSFDJL",
-      FlavorText: "test face.",
-      ImageUrl: "https://mir-s3-cdn-cf.behance.net/project_modules/disp/8e427328807052.56053ef96e121.jpg",
-      ManaCost: "{1}{G}",
-      OracleText: "test face.",
-      TypeLine: "Creature — Dog",
-    }],
-  OracleId: "76c02534-35e3-4950-b4b3-90c679cdf6a7",
-  PrintId: "c742d940-1a8d-487a-a787-2ad96a96ef1f"
-}
-
-const exampleCardData : CardData = {
-cardLocation: "MAIN_DECK",
-card: exampleCard 
-}
-
 const errorMesssage = ref("");
 const route = useRoute();
 const deck = ref<Deck | null>(null);
 const loading = ref(true)
 
-const cardsList = ref();
-cardsList.value = [];
-const mainDeck = ref();
-mainDeck.value = [];
-const sideDeck = ref();
-sideDeck.value = [];
-const commanders = ref();
-commanders.value = [];
+const cardsList = ref<DeckCard[]>([]);
+const mainDeck = ref<DeckCard[]>([]);
+const sideDeck = ref<DeckCard[]>([]);
+const commanders = ref<DeckCard[]>([]);
 
 function sortCards() {
-  // temporary solution
-  // TODO: add actual sorting
-  mainDeck.value = cardsList.value;
-  for (let card in cardsList.value) {
+  for (let card of cardsList.value) {
       sortInCard(card);
   }
 }
@@ -105,7 +63,8 @@ async function getCards() {
     return;
   }
 
-  cardsList.value = await response.json() as CardData[];
+  cardsList.value = await response.json() as DeckCard[];
+  console.log(JSON.stringify(cardsList.value[0]))
   sortCards();
 }
 
@@ -120,18 +79,21 @@ async function getCard(cardId : string) {
     console.error(`Failed to fetch cards from deck. Status: ${response.status}`)
     return;
   }
-  console.log(await response.json() as CardData)
-  return await response.json() as CardData;
+  return await response.json() as DeckCard;
 }
 
 
 function addCardToList(event : any) {
-  console.log(event)
-  getCard(event['deckCardId']).then((response) => sortInCard(response))
+  getCard(event['deckCardId']).then((response) => {
+    if (response === undefined){
+      errorMesssage.value = "An error has occurred adding the selected card to your deck."
+      return
+    }
+    sortInCard(response)})
 }
 
-function sortInCard(card : CardData){
-  switch (card['cardLocation']){
+function sortInCard(card : DeckCard){
+  switch (card.card_location){
     case ('COMMANDER'):
       commanders.value.push(card);
       return;
@@ -142,10 +104,39 @@ function sortInCard(card : CardData){
       sideDeck.value.push(card);
       return;
   }
-  console.error("Couldn't sort card with location: " + card.cardLocation + ".");
+  console.error("Couldn't sort card with location: " + card.card_location + ".");
 }
 
-mainDeck.value = [exampleCardData];
+function deleteCard(card : DeckCard){
+  const token = localStorage.getItem("jwtToken");
+    if (!token) return;
+
+  fetch(`/api/decks/${route.params["deck_id"]}/cards/${card.deck_card_id}`, 
+    {
+      method: "DELETE",
+      headers: {Authorization: token}
+    }
+  ).then(
+    (response) =>
+    {
+      if (response.ok) {
+        switch (card.card_location){
+          case ('COMMANDER'):
+            commanders.value = commanders.value.filter((originalCard) => originalCard.deck_card_id !== card.deck_card_id)
+            return;
+          case ('MAIN_DECK'):
+            mainDeck.value = mainDeck.value.filter((originalCard) => originalCard.deck_card_id !== card.deck_card_id)
+            return;
+          case ('SIDE_DECK'):
+            sideDeck.value = sideDeck.value.filter((originalCard) => originalCard.deck_card_id !== card.deck_card_id)
+            return;
+        }
+      } else {
+          console.error(response)
+      }
+    }
+  )
+}
 
 getDeck();
 getCards();
@@ -153,28 +144,28 @@ getCards();
 
 <template>
   <p v-if="loading" class="centered-content">Loading</p>
-  <p v-if="errorMesssage.valueOf() !== ''" class="error">{{ errorMesssage.valueOf() }}</p>
+  <p v-if="errorMesssage !== ''" class="error">{{ errorMesssage }}</p>
   <div v-if="!loading && deck != null" class="page-content">
     <h2>Deck: {{deck.name}}</h2>
     <div class="cardList">
 
       <h3>Commander(s):</h3>
-      <div v-for="card in commanders.valueOf()">
-        <CardListPreview v-bind:card-data="card"></CardListPreview>
+      <div v-for="card in commanders">
+        <CardListPreview :card="card" @delete="deleteCard"></CardListPreview>
       </div>
-      <AddCardToDeckView location="COMMANDER" class="addbox" v-on:card-added="addCardToList"></AddCardToDeckView>
+      <AddCardToDeckView location="COMMANDER" class="addbox" @card-added="addCardToList"></AddCardToDeckView>
 
       <h3>Main deck:</h3>
-      <div v-for="card in mainDeck.valueOf()">
-        <CardListPreview v-bind:card-data="card"></CardListPreview>
+      <div v-for="card in mainDeck">
+        <CardListPreview :card="card" @delete="deleteCard"></CardListPreview>
       </div>
-      <AddCardToDeckView location="MAIN_DECK" class="addbox" v-on:card-added="addCardToList"></AddCardToDeckView>
+      <AddCardToDeckView location="MAIN_DECK" class="addbox" @card-added="addCardToList"></AddCardToDeckView>
 
       <h3>Side deck:</h3>
-      <div v-for="card in sideDeck.valueOf()">
-        <CardListPreview v-bind:card-data="card"></CardListPreview>
+      <div v-for="card in sideDeck">
+        <CardListPreview :card="card" @delete="deleteCard"></CardListPreview>
       </div>
-      <AddCardToDeckView location="SIDE_DECK" class="addbox" v-on:card-added="addCardToList"></AddCardToDeckView>
+      <AddCardToDeckView location="SIDE_DECK" class="addbox" @card-added="addCardToList"></AddCardToDeckView>
 
     </div>
   </div>
@@ -203,6 +194,10 @@ getCards();
 
 .addbox {
   width: 550px;
+}
+
+.card {
+  margin-bottom: 1px;
 }
 </style>
 

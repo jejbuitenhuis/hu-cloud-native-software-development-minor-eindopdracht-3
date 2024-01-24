@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type {CardData, PrintCard} from "@/models/cardModels";
+import type {DeckCard} from "@/models/cardModels";
 import { ref } from "vue";
-import CardDetailView from "./CardDetailView.vue";
+
+const emit = defineEmits(['delete'])
 
 const faceName = ref();
 const manaCost = ref();
@@ -10,12 +11,13 @@ const image = ref();
 const typeline = ref();
 const colors = ref();
 
-let faceNumber = 0
+let faceNumber = 0;
 
 const props = defineProps<{
-  cardData: CardData
+  card: DeckCard
 }>()
-const card = props.cardData.card;
+const card = props.card;
+
 
 setFace();
 
@@ -33,11 +35,19 @@ function flip(){
     setFace();
 }
 
+function deleteCard(){
+    if (confirm("Are you sure you want to delete: \"" + card.OracleName + "\"?")){
+        emit('delete', card);
+    }
+}
+
 function setFace(){
     faceName.value = card.CardFaces[faceNumber].FaceName;
     manaCost.value = card.CardFaces[faceNumber].ManaCost;
     oracleText.value = card.CardFaces[faceNumber].OracleText;
     image.value = card.CardFaces[faceNumber].ImageUrl;
+    typeline.value = card.CardFaces[faceNumber].TypeLine;
+    colors.value = card.CardFaces[faceNumber].Colors;
 }
 
 </script>
@@ -46,16 +56,17 @@ function setFace(){
         <div class="card" v-bind:style="{ 'background-image': 'url(' + image + ')', 
         'box-shadow': 'inset 0 0 0 1000px rgba(' + red + ',' + green + ',' + blue + ',' + alpha + ')'}">
             <span class="titlebox">
-                <p><span class="title">{{card.OracleName}}</span>{{ manaCost.valueOf() }}</p>
-                <p><span>{{ card.CardFaces[faceNumber].TypeLine }}</span></p>
-                <button v-if="card.CardFaces.length > 0" @click="flip">flip</button>
+                <p><span class="title">{{card.OracleName}}</span>{{ manaCost }}</p>
+                <p><span>{{ typeline }}</span></p>
+                <button v-if="card.CardFaces.length > 1" @click="flip">flip</button>
             </span>
             <div class="seperator"></div>
-            <span class="descriptionbox" :title="card.CardFaces[faceNumber].OracleText">
+            <span class="descriptionbox" :title="oracleText">
                 <p>
-                    {{ oracleText.valueOf() }}
+                    {{ oracleText }}
                 </p>
             </span>
+            <button @click="deleteCard()">x</button>
         </div>
 </template>
 

@@ -11,6 +11,13 @@ const oracleId = props.card['oracle_id'];
 const cardId = props.printId;
 const loading = ref(true)
 const card = ref<PrintCard | null>(null);
+const instances = ref([
+  {
+    'Condition' : "MINT"
+  }
+])
+
+let loadingRemaining = 2;
 
 async function getCard() {
   const token = localStorage.getItem("jwtToken");
@@ -21,7 +28,28 @@ async function getCard() {
     return;
   }
   card.value = await response.json() as PrintCard;
+  // TODO: remove loading.value = false here when getInstances has been implemented
   loading.value = false;
+  loaded()
+}
+
+async function getInstances() {
+  const token = localStorage.getItem("jwtToken");
+  if (!token) return;
+  const response = await fetch(`/api/collection/${cardId}`, {headers: {Authorization: token}});
+  if (!response.ok) {
+    console.error(`Failed card instances. Status: ${response.status}`)
+    return;
+  }
+  instances.value = await response.json() as any[];
+  loaded()
+}
+
+function loaded(){
+  loadingRemaining -= 1;
+  if (loadingRemaining === 0) {
+    loading.value = false;
+  }
 }
 
 function unselectPrint(){
@@ -33,6 +61,7 @@ function addCardToDeck(instance : string | undefined) {
 }
 
 getCard();
+getInstances();
 </script>
 
 <template>
@@ -59,11 +88,44 @@ getCard();
           <sl-button class="add-to-deck-button" @click="addCardToDeck">Add Card to Deck</sl-button>
         </div>
       </div>
+      <br>
+      Cards in your collection:
+
+      <div class="prints-info">
+        <table>
+          <thead>
+          <tr>
+            <th>Set name</th>
+            <th>Release date</th>
+            <th>Rarity</th>
+            <th>Price</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="instance in instances.valueOf()">
+            <td>{{ instance['condition'] }}</td>
+            <!-- <td>{{ new Date(print.ReleasedAt).toLocaleDateString("nl-nl") }}</td> -->
+            <!-- <td>{{ print.Rarity }}</td> -->
+            <!-- <td>{{ print.Price == null ? "-" : `€${print.Price}` }}</td> -->
+            <td><button @click="">Add from collection</button></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+
+table {
+  border-spacing: 1rem 0;
+
+  th {
+    text-align: left;
+  }
+}
+
 .add-to-deck-button {
   margin-top: 1rem;
 }
