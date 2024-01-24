@@ -57,7 +57,7 @@ def setup_dynamodb_collection_with_items(setup_dynamodb_collection):
 
     table.put_item(
         Item={
-            "PK": "USER#test-user",
+            "PK": "UserId#test-user",
             "SK": "CardInstanceId#1",
             "CardFaces": [
                 {
@@ -119,7 +119,7 @@ def setup_dynamodb_collection_with_multiple_items(setup_dynamodb_collection):
 
     table.put_item(
         Item={
-            "PK": "USER#test-user",
+            "PK": "UserId#test-user",
             "SK": "CardInstanceId#1",
             "CardFaces": [
                 {
@@ -174,7 +174,7 @@ def setup_dynamodb_collection_with_multiple_items(setup_dynamodb_collection):
 
     table.put_item(
         Item={
-            "PK": "USER#test-user",
+            "PK": "UserId#test-user",
             "SK": "CardInstanceId#ed1387cd-0ff9-41fc-825c-1b1cdb6a52e1",
             "CardFaces": [
                 {
@@ -215,7 +215,7 @@ def setup_dynamodb_collection_with_three_items(
     table = setup_dynamodb_collection_with_multiple_items
     table.put_item(
         Item={
-            "PK": "USER#test-user",
+            "PK": "UserId#test-user",
             "SK": "CardInstanceId#691387cd-0ff9-41fc-825c-1b1cdb6a52e1",
             "CardFaces": [
                 {

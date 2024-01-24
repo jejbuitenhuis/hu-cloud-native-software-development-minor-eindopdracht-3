@@ -74,6 +74,8 @@ Resources:
           AttributeType: S
         - AttributeName: GSI1SK
           AttributeType: S
+        - AttributeName: GSI2SK
+          AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
@@ -88,11 +90,20 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
+        - IndexName: GSI-Collection-OracleId
+          KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: GSI2SK
+            KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
       BillingMode: PAY_PER_REQUEST
 
   SearchFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "collection-service-${Stage}-SearchFunction"
       CodeUri: functions/Search
       Events:
         HelloWorld:
@@ -110,6 +121,7 @@ Resources:
   GetCollectionInstance:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "collection-service-${Stage}-GetCollectionInstanceFunction"
       CodeUri: functions/get_instance/
       Events:
         GetCollectionInstance:
@@ -124,10 +136,27 @@ Resources:
       Policies:
         - AmazonDynamoDBReadOnlyAccess
 
+  DeleteCardInstanceFromCollection:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/remove_card/
+      Events:
+        DeleteCardInstanceFromCollection:
+          Type: Api
+          Properties:
+            RestApiId: !Ref "MTGCollectionApi"
+            Path: /api/collections/{instance_id}
+            Method: delete
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref MTGCollectionDynamoDBTable
+      Policies:
+        - AmazonDynamoDBFullAccess
+
   AddCardToCollectionFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub "${Stage}-AddCardToCollectionFunction"
+      FunctionName: !Sub "collection-service-${Stage}-AddCardToCollectionFunction"
       CodeUri: functions/add_card/
       Events:
         AddCard:

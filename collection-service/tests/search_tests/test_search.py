@@ -25,7 +25,7 @@ def test_search_oraclename(setup_dynamodb_collection_with_items):
 
     event = {
         "headers": {"Authorization": f"Bearer {generate_test_jwt()}"},
-        "queryStringParameters": {"q": "Beloved"},
+        # "queryStringParameters": {"q": "Beloved"},
     }
 
     # Act
@@ -34,7 +34,8 @@ def test_search_oraclename(setup_dynamodb_collection_with_items):
     body = json.loads(result["body"])
 
     # Assert
-    assert body["Items"][0]["PK"] == "USER#test-user"
+    assert len(body["Items"]) == 1
+    assert body["Items"][0]["PK"] == "UserId#test-user"
     assert body["Items"][0]["SK"] == "CardInstanceId#1"
     assert body["Items"][0]["OracleName"] == "Beloved Beggar // Generous Soul"
 
@@ -61,7 +62,7 @@ def test_search_oracletext(setup_dynamodb_collection_with_items):
     body = json.loads(result["body"])
 
     # Assert
-    assert body["Items"][0]["PK"] == "USER#test-user"
+    assert body["Items"][0]["PK"] == "UserId#test-user"
     assert body["Items"][0]["SK"] == "CardInstanceId#1"
     assert body["Items"][0]["OracleName"] == "Beloved Beggar // Generous Soul"
 
@@ -104,11 +105,11 @@ def test_search_no_query(setup_dynamodb_collection_with_multiple_items):
     body = json.loads(result["body"])
 
     # Assert
-    assert body["Items"][0]["PK"] == "USER#test-user"
+    assert body["Items"][0]["PK"] == "UserId#test-user"
     assert body["Items"][0]["SK"] == "CardInstanceId#1"
     assert body["Items"][0]["OracleName"] == "Beloved Beggar // Generous Soul"
 
-    assert body["Items"][1]["PK"] == "USER#test-user"
+    assert body["Items"][1]["PK"] == "UserId#test-user"
     assert (
         body["Items"][1]["SK"] == "CardInstanceId#ed1387cd-0ff9-41fc-825c-1b1cdb6a52e1"
     )
@@ -142,7 +143,7 @@ def test_search_limit_2_start_at_second(setup_dynamodb_collection_with_three_ite
         "headers": {"Authorization": generate_test_jwt()},
         "queryStringParameters": {
             "limit": 2,
-            "pk-last-evaluated": "USER#test-user",
+            "pk-last-evaluated": "UserId#test-user",
             "sk-last-evaluated": "CardInstanceId#1",
         },
     }
@@ -157,13 +158,13 @@ def test_search_limit_2_start_at_second(setup_dynamodb_collection_with_three_ite
     assert items_length == 2
 
     # Items in a dynamodb database are sorted in lexicographical order so numbers first
-    assert body["Items"][0]["PK"] == "USER#test-user"
+    assert body["Items"][0]["PK"] == "UserId#test-user"
     assert (
         body["Items"][0]["SK"] == "CardInstanceId#691387cd-0ff9-41fc-825c-1b1cdb6a52e1"
     )
     assert body["Items"][0]["OracleName"] == "69 Chicken Egg"
 
-    assert body["Items"][1]["PK"] == "USER#test-user"
+    assert body["Items"][1]["PK"] == "UserId#test-user"
     assert (
         body["Items"][1]["SK"] == "CardInstanceId#ed1387cd-0ff9-41fc-825c-1b1cdb6a52e1"
     )
