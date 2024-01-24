@@ -73,14 +73,14 @@ def create_card_info(card, oracle_id):
 
 
 def turn_card_into_face_item(card):
-    image_uris = card.get('image_uris').get('png', '')
+    image_uris = card.get('image_uris')
     return {
         "OracleText": card.get('oracle_text', ''),
         "ManaCost": card.get('mana_cost', ''),
         "TypeLine": card.get('type_line', ''),
         "FaceName": card.get('name', ''),
         "FlavorText": card.get('flavor_text', ''),
-        "ImageUrl": image_uris,
+        "ImageUrl": image_uris.get('png', ''),
         "Colors": card.get('colors', []),
         "LowercaseFaceName": str.lower(card.get('name', '')),
         "LowercaseOracleText": str.lower(card.get('oracle_text', ''))

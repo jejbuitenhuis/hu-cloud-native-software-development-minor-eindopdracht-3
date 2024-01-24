@@ -25,7 +25,7 @@ local_filename = os.getenv("CARD_JSON_LOCATION", "/tmp/default-cards.json")
 
 
 def turnCardIntoFaceItem(card):
-    image_uris = card.get('image_uris').get('png', '')
+    image_uris = card.get('image_uris')
     return {
         "OracleText": card.get('oracle_text', ''),
         "ManaCost": card.get('mana_cost', ''),
