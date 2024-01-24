@@ -27,8 +27,8 @@ def lambda_handler(event, context):
         KeyConditionExpression=Key("PK").eq(f"UserId#{user_id}")
         & Key("GSI2SK").begins_with(f"OracleId#{oracle_id}"),
     )
-    # OracleId
-    #
+
+    
     if len(response["Items"]) == 0:
         return {"statusCode": 404}
 
