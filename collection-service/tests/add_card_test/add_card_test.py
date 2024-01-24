@@ -126,9 +126,8 @@ def setup_saved_cards_response():
                     "LowercaseFaceName": "agadeem, the undercrypt",
                     "LowercaseOracleText": "as agadeem, the undercrypt enters the battlefield, you may pay 3 life. if you don't, it enters the battlefield tapped.\n{t}: add {b}."
                 }
-            ],
-            "GSI1SK": ""
-        },
+            ]
+        }
     ]
 
 
