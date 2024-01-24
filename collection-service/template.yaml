@@ -128,7 +128,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref "MTGCollectionApi"
-            Path: /api/collections/{instance_id}
+            Path: /api/collections/{oracle_id}
             Method: get
       Environment:
         Variables:

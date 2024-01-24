@@ -218,7 +218,9 @@
           "passthroughBehavior": "when_no_match",
           "type": "aws_proxy"
         }
-      },
+      }
+    },
+    "/api/collections/{oracle_id}": {
       "get": {
         "security": [
           {
