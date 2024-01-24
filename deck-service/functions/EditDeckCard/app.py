@@ -198,7 +198,7 @@ def lambda_handler(event, context):
 
     user_id = get_user_id(event)
     deck_id = event["pathParameters"]["deck_id"]
-    deck_card_id = event["pathParameters"]["deck_card_id"]
+    deck_card_id = event["pathParameters"]["card_id"]
     card_location = body["cardLocation"]
     card_instance_id = body.get("cardInstanceId", None)
     card_print_id = body.get("cardPrintId", None)

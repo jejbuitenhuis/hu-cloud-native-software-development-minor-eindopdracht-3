@@ -292,15 +292,14 @@
             "schema": {
               "type": "object",
               "required": [
-                "cardOracle",
                 "cardLocation"
               ],
               "properties": {
-                "cardOracle": {
+                "cardInstanceId": {
                   "type": "string",
                   "format": "uuid"
                 },
-                "cardInstanceId": {
+                "cardPrintId": {
                   "type": "string",
                   "format": "uuid"
                 },
