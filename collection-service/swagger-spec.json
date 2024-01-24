@@ -17,8 +17,26 @@
           {
             "name": "q",
             "in": "query",
-            "required": true,
+            "required": false,
             "type": "string"
+          },
+          {
+            "name": "PK-last-evaluated",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "SK-last-evaluated",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "number"
           }
         ],
         "responses" : {

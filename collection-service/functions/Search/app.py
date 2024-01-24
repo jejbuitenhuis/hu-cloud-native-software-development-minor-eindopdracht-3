@@ -29,11 +29,12 @@ def lambda_handler(event, context):
 
     search_value = query_string_parameters.get("q", "")
 
-    tmp_last_evaluated_key = query_string_parameters.get("offset")
     tmp_limit = query_string_parameters.get("limit")
+    tmp_pk_last_evaluated = query_string_parameters.get("PK-last-evaluated")
+    tmp_sk_last_evaluated = query_string_parameters.get("SK-last-evaluated")
 
-    if tmp_last_evaluated_key is not None:
-        last_evaluated_key = tmp_last_evaluated_key
+    if tmp_pk_last_evaluated and tmp_sk_last_evaluated:
+        last_evaluated_key = {"PK": tmp_pk_last_evaluated, "SK": tmp_sk_last_evaluated}
 
     if tmp_limit is not None:
         limit_value = tmp_limit
