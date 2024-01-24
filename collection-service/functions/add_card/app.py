@@ -69,8 +69,8 @@ def parse_card_item(item, user_id, condition, deck_id):
     }
 
     if deck_id:
-        tmp["DeckId"] = (deck_id,)
-        tmp["GSI1SK"] = (f"DeckId#{item['DeckId']}#CardInstanceId#{card_instance_id}",)
+        tmp["DeckId"] = deck_id
+        tmp["GSI1SK"] = f"DeckId#{item['DeckId']}#CardInstanceId#{card_instance_id}"
 
     return tmp
 
