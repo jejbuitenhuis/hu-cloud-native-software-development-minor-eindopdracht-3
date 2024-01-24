@@ -112,6 +112,9 @@
                 },
                 "condition": {
                   "type": "string"
+                },
+                "deck_id": {
+                  "type": "string"
                 }
               },
               "required": [
@@ -173,14 +176,14 @@
         }
       }
     },
-    "/api/collections/{instance_id}": {
+    "/api/collections/{oracle_id}": {
       "get": {
         "security": [
           { "cognito": [] }
         ],
         "parameters": [
           {
-            "name": "instance_id",
+            "name": "oracle_id",
             "in": "path",
             "required": true,
             "type": "string"

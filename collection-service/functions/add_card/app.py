@@ -32,7 +32,7 @@ def fetch_api_url():
         raise e
 
 
-def parse_card_item(item, user_id, condition):
+def parse_card_item(item, user_id, condition, deck_id):
     card_instance_id = str(uuid.uuid4())
     face_items = []
 
@@ -51,7 +51,7 @@ def parse_card_item(item, user_id, condition):
             }
         )
 
-    return {
+    tmp = {
         "PK": f"UserId#{user_id}",
         "SK": f"CardInstanceId#{card_instance_id}",
         "PrintId": item["PrintId"],
@@ -65,15 +65,19 @@ def parse_card_item(item, user_id, condition):
         "Price": item["Price"],
         "LowerCaseOracleName": item["LowerCaseOracleName"],
         "CardFaces": face_items,
-        "DeckId": item["DeckId"],
-        "GSI1SK": f"DeckId#{item['DeckId']}#CardInstanceId#{card_instance_id}",
         "GSI2SK": f"OracleId#{item['OracleId']}#CardInstanceId#{card_instance_id}",
     }
 
+    if deck_id:
+        tmp["DeckId"] = (deck_id,)
+        tmp["GSI1SK"] = (f"DeckId#{item['DeckId']}#CardInstanceId#{card_instance_id}",)
 
-def save_card_to_db(item, user_id, condition):
+    return tmp
+
+
+def save_card_to_db(item, user_id, condition, deck_id):
     try:
-        card_instance_item = parse_card_item(item, user_id, condition)
+        card_instance_item = parse_card_item(item, user_id, condition, deck_id)
         COLLECTION_TABLE.put_item(Item=card_instance_item)
         return card_instance_item
     except ClientError as e:
@@ -93,6 +97,7 @@ def lambda_handler(event, context):
     oracle_id = body["oracle_id"]
     print_id = body["print_id"]
     condition = body["condition"]
+    deck_id = body.get("deck_id", "")
     user_id = get_user_id(event)
 
     try:
@@ -116,7 +121,7 @@ def lambda_handler(event, context):
                 "body": json.dumps({"Message": api_error_message}),
             }
 
-        saved_card = save_card_to_db(api_response_body, user_id, condition)
+        saved_card = save_card_to_db(api_response_body, user_id, condition, deck_id)
 
         LOGGER.info(
             f"Successfully added the following card to the collection: {saved_card}"
