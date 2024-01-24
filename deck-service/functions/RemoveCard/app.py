@@ -18,7 +18,7 @@ DYNAMO_DB_COLLECTION_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME")
 table = DYNAMO_DB.Table(DYNAMO_DB_COLLECTION_TABLE_NAME)
 
 def lambda_handler(event, context):
-    LOGGER.info(f"Deleting card with id: {event['pathParameters']['instance_id']}")
+    LOGGER.info(f"Deleting card with id: {event['pathParameters']['deck_card_id']}")
     user_id = jwt.get_unverified_claims(event['headers']['Authorization'].replace("Bearer ", ""))["sub"]
     deck_id = event["pathParameters"]["deck_id"]
     deck_card_id = event["pathParameters"]["deck_card_id"]
