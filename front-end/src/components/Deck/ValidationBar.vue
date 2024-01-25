@@ -18,7 +18,8 @@ const commanderIsLegendaryCreature = computed(
     && props.commanders[0]?.CardFaces[0]?.TypeLine.toLowerCase().includes("creature"),
 );
 
-const mainDeckValid = computed( () => props.mainDeck.length === MAX_MAIN_DECK );
+const allCardsCount = computed( () => props.commanders.length + props.mainDeck.length );
+const mainDeckValid = computed( () => allCardsCount.value === MAX_MAIN_DECK );
 
 const allCardsAreSameColorsAsCommander = computed(() => {
   if (!props.commanders[0]) return false;
@@ -52,7 +53,7 @@ const allNonBasicLandCardsAreUnique = computed(() => {
       </p>
 
       <p class="validation" :class="{ error: !mainDeckValid }">
-        <strong>Main deck:</strong> {{ mainDeck.length }}/{{ MAX_MAIN_DECK }} card(s)
+        <strong>Main deck:</strong> {{ allCardsCount }}/{{ MAX_MAIN_DECK }} card(s)
       </p>
 
       <p class="validation" :class="{ error: !allCardsAreSameColorsAsCommander }">
